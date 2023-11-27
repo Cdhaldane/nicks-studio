@@ -2,7 +2,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 94vh;
+  justify-items: flex-start;
+  height: calc(100vh - 6rem) !important;
+  width: 96%;
+  margin: 0 auto;
+  background-size: cover;
+  transition: background-image 1s ease-in-out;
+  overflow-y: hidden !important;
 }
 
 .home-container > div {
@@ -18,9 +24,22 @@
 
 .home-title-back {
   position: absolute;
-  transform: translateY(-2%) translateX(0.5%);
+  transform: translateY(2%) translateX(0.5%);
   color: #d83b65 !important;
-  z-index: -1;
+  font-weight: bold;
+  font-family: "Inter", sans-serif;
+  grid-row-start: 1;
+  grid-column-start: 1;
+  color: rgb(12, 12, 12);
+  font-size: 10rem;
+  --stack-height: calc(100% / var(--stacks) - 1px);
+  --inverse-index: calc(calc(var(--stacks) - 1) - var(--index));
+  --clip-top: calc(var(--stack-height) * var(--index));
+  --clip-bottom: calc(var(--stack-height) * var(--inverse-index));
+  clip-path: inset(var(--clip-top) 0 var(--clip-bottom) 0);
+  animation: stack 340ms cubic-bezier(0.46, 0.29, 0, 1.24) 1 backwards
+      calc(var(--index) * 120ms),
+    glitch 2s ease infinite 2s alternate-reverse;
 }
 
 .home-links-container {
@@ -115,6 +134,22 @@
   border-left: 2px solid #d83b65;
 }
 
+.home-line-horizontal {
+  position: absolute;
+  z-index: 1;
+  height: 2px;
+  width: 100%;
+  background-color: #d83b65;
+}
+
+.top {
+  top: 3rem;
+}
+
+.bottom {
+  bottom: 3rem;
+}
+
 .left {
   left: 2vw;
 }
@@ -125,7 +160,6 @@
 
 nav {
   position: relative;
-  top: 3rem;
   margin-top: -3rem;
   display: flex;
   flex-direction: row;
@@ -134,7 +168,6 @@ nav {
   width: 100% !important;
   color: #d83b65;
   background-color: black;
-  border-bottom: 2px solid #d83b65;
   height: 3rem;
 }
 
@@ -158,7 +191,6 @@ footer {
   width: 100%;
   color: #d83b65;
   background-color: black;
-  border-top: 2px solid #d83b65;
   height: 3rem;
 }
 
@@ -186,6 +218,7 @@ footer {
   width: 40%;
   object-fit: cover;
   z-index: -2;
+  overflow: hidden !important;
 }
 
 .bio-container p {
@@ -196,6 +229,8 @@ footer {
   width: 40%;
   margin-top: 2rem;
   margin-bottom: 5rem;
+  opacity: 1;
+  overflow: hidden;
 }
 
 .stack {
@@ -203,6 +238,7 @@ footer {
   grid-template-columns: 1fr;
   margin-bottom: -100px;
   margin-top: -60px;
+  overflow: hidden;
 }
 
 .stack span {
@@ -211,7 +247,7 @@ footer {
   grid-row-start: 1;
   grid-column-start: 1;
   color: rgb(12, 12, 12);
-  font-size: 8rem;
+  font-size: 10rem;
   --stack-height: calc(100% / var(--stacks) - 1px);
   --inverse-index: calc(calc(var(--stacks) - 1) - var(--index));
   --clip-top: calc(var(--stack-height) * var(--index));
@@ -261,5 +297,54 @@ footer {
   100% {
     text-shadow: none;
     transform: none;
+  }
+}
+
+.drop-in {
+  animation: drop-in 1s ease 200ms backwards;
+}
+
+.drop-in-2 {
+  animation: drop-in 1200ms ease 500ms backwards;
+}
+
+.fade-up {
+  animation: fade-up 1s ease 200ms backwards;
+}
+
+.fade-down {
+  animation: fade-down 1s ease 200ms backwards;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0px);
+  }
+}
+
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0px);
+  }
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0px);
   }
 }

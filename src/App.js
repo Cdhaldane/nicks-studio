@@ -20,7 +20,7 @@ function App() {
       <div className="main">
         {window.location !== "/home" && <Navbar />}
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/nicks-studio" element={<Home />} />
           <Route path="/bio" element={<Bio />} />
           {/* // <Route path="/about" element={<About />} />
           // <Route path="/contact" element={<Contact />} />

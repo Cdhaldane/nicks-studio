@@ -16,14 +16,18 @@ const Bio = () => {
 
   return (
     <div className="bio-container">
-      <div className="stack" style={{ "--stacks": 3 }}>
+      <div className="stack drop-in" style={{ "--stacks": 3 }}>
         <span style={{ "--index": 0 }}>PERSONAL INFO</span>
         <span className="bio-back">PERSONAL INFO</span>
         <span style={{ "--index": 1 }}>PERSONAL INFO</span>
         <span style={{ "--index": 2 }}>PERSONAL INFO</span>
       </div>
-      <img src="/assets/nick-bio.jpg" alt="Profile" className="bio-image" />
-      <p>
+      <img
+        src={process.env.PUBLIC_URL + "/nick-bio.jpg"}
+        alt="Profile"
+        className="bio-image drop-in"
+      />
+      <p className="drop-in-2">
         Intertwining classic Country melodies with the intimate familiarity and
         euphonic vocals of Rock and Americana, Nickola Magnolia sings songs of
         change, death, heartbreak, hope and belonging from the shores of the

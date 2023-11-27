@@ -5,7 +5,7 @@ import "./Styles.css";
 const Navbar = () => {
   return (
     <nav>
-      <ul>
+      {/* <ul>
         <li>
           <a href="/">HOME</a>
         </li>
@@ -18,7 +18,7 @@ const Navbar = () => {
         <li>
           <a href="#">Contact</a>
         </li>
-      </ul>
+      </ul> */}
     </nav>
   );
 };
