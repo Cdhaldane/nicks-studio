@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/nicks-studio/static/css/main.0da97ded.css",
-    "main.js": "/nicks-studio/static/js/main.7e6c9cfd.js",
+    "main.css": "/nicks-studio/static/css/main.f250736f.css",
+    "main.js": "/nicks-studio/static/js/main.42764d54.js",
     "index.html": "/nicks-studio/index.html",
-    "main.0da97ded.css.map": "/nicks-studio/static/css/main.0da97ded.css.map",
-    "main.7e6c9cfd.js.map": "/nicks-studio/static/js/main.7e6c9cfd.js.map"
+    "main.f250736f.css.map": "/nicks-studio/static/css/main.f250736f.css.map",
+    "main.42764d54.js.map": "/nicks-studio/static/js/main.42764d54.js.map"
   },
   "entrypoints": [
-    "static/css/main.0da97ded.css",
-    "static/js/main.7e6c9cfd.js"
+    "static/css/main.f250736f.css",
+    "static/js/main.42764d54.js"
   ]
 }
