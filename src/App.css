@@ -1,0 +1,83 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%; /* Ensure full width */
+}
+
+body {
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  font-family: 'Inter', sans-serif;
+  background-color: black;
+  /* Other styles */
+}
+
+.main {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    min-width: 100vw; /* Corrected from 100vh to 100vw */
+    overflow-y: auto !important; /* Allow scrolling on smaller devices */
+  }
+
+  nav, footer {
+    font-size: 0.8rem; /* Adjust font size for smaller screens */
+    position: absolute; /* Position elements */
+  }
+
+  .home-container {
+    margin-top: 0px; /* Adjust margin */
+    min-height: 100vh; /* Adjust height */
+  }
+
+  .home-container h1 {
+    font-size: 3.5rem; /* Smaller font size for headers */
+    margin-bottom: 0%; /* Adjust margin */
+    margin-top: 20%; /* Adjust margin */
+  }
+
+  .home-links-container, .bio-container, .home-button {
+    padding: 10px; /* Adjust padding */
+    flex-direction: column; /* Stack elements vertically */
+  }
+
+  .home-button {
+    font-size: 1.2rem; /* Smaller button font size */
+  }
+
+  .bio-image {
+    width: 90%; /* Smaller profile image */
+  }
+  .bio-container {
+    margin-top: 0px; /* Adjust margin */
+    min-height: 100vh; /* Adjust height */
+  }
+  .bio-container p {
+    font-size: 0.5rem; /* Smaller font size for text */
+    width: 90%; /* Adjust width */
+    overflow-y: hidden; /* Hide overflow */
+  }
+
+  .home-image {
+    top: 0; /* Adjust position */
+    width: 95%;
+}
+}
