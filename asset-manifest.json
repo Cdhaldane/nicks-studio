@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/nicks-studio/static/css/main.859256f2.css",
-    "main.js": "/nicks-studio/static/js/main.2202946e.js",
+    "main.js": "/nicks-studio/static/js/main.180372b3.js",
     "static/media/revicons.eot": "/nicks-studio/static/media/revicons.a77de540a38981833f9e.eot",
     "static/media/revicons.ttf": "/nicks-studio/static/media/revicons.57fd05d4ae650374c8de.ttf",
     "static/media/revicons.woff": "/nicks-studio/static/media/revicons.e8746a624ed098489406.woff",
     "index.html": "/nicks-studio/index.html",
     "main.859256f2.css.map": "/nicks-studio/static/css/main.859256f2.css.map",
-    "main.2202946e.js.map": "/nicks-studio/static/js/main.2202946e.js.map"
+    "main.180372b3.js.map": "/nicks-studio/static/js/main.180372b3.js.map"
   },
   "entrypoints": [
     "static/css/main.859256f2.css",
-    "static/js/main.2202946e.js"
+    "static/js/main.180372b3.js"
   ]
 }
