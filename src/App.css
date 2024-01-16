@@ -1,3 +1,19 @@
+:root {
+  --text: #f3f3f3;
+  --blue: #527af9;
+  --black: #141414;
+  --white: white;
+  --offwhite: #f5f5f5;
+  --side-bg: #242424;
+  --bg: #121118;
+  --lightgrey: #585858;
+  --darkgrey: #252525;
+  --pink: #d83b65;
+  --dpink: #962344;
+  --green: #15af5c;
+  --yellow: #ddc036;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -78,3 +94,181 @@ body {
     width: 95%;
   }
 }
+
+.home.stack {
+  color: var(--dpink);
+}
+
+.stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-bottom: -100px;
+  margin-top: -60px;
+  overflow: hidden;
+}
+
+img,
+svg text,
+.protected-content {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.stack span {
+  font-weight: bold;
+  font-family: "Rye", serif;
+  grid-row-start: 1;
+  grid-column-start: 1;
+  font-size: 10rem;
+  --stack-height: calc(100% / var(--stacks) - 1px);
+  --inverse-index: calc(calc(var(--stacks) - 1) - var(--index));
+  --clip-top: calc(var(--stack-height) * var(--index));
+  --clip-bottom: calc(var(--stack-height) * var(--inverse-index));
+  clip-path: inset(var(--clip-top) 0 var(--clip-bottom) 0);
+  animation: stack 340ms cubic-bezier(0.46, 0.29, 0, 1.24) 1 backwards
+      calc(var(--index) * 120ms),
+    glitch 2s ease infinite 2s alternate-reverse;
+}
+
+.stack span:nth-child(odd) {
+  --glitch-translate: 8px;
+}
+.stack span:nth-child(even) {
+  --glitch-translate: -8px;
+}
+
+@keyframes stack {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%);
+    text-shadow: -2px 3px 0 red, 2px -3px 0 blue;
+  }
+  60% {
+    opacity: 0.5;
+    transform: translateX(50%);
+  }
+  80% {
+    transform: none;
+    opacity: 1;
+    text-shadow: 2px -3px 0 red, -2px 3px 0 blue;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+
+@keyframes glitch {
+  0% {
+    text-shadow: -2px 3px 0 red, 2px -3px 0 blue;
+    transform: translate(var(--glitch-translate));
+  }
+  2% {
+    text-shadow: 2px -3px 0 red, -2px 3px 0 blue;
+  }
+  4%,
+  100% {
+    text-shadow: none;
+    transform: none;
+  }
+}
+
+.drop-in {
+  animation: drop-in 1s ease 200ms backwards;
+}
+
+.drop-in-2 {
+  animation: drop-in 1200ms ease 500ms backwards;
+}
+
+.fade-up {
+  animation: fade-up 1s ease 200ms backwards;
+}
+
+.fade-down {
+  animation: fade-down 1s ease 200ms backwards;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0px);
+  }
+}
+
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0px);
+  }
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0px);
+  }
+}
+
+nav {
+  position: relative;
+  margin-top: -3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100% !important;
+  color: #d83b65;
+  background-color: black;
+  height: 3rem;
+}
+
+ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 50%;
+  list-style: none;
+  text-decoration: none;
+}
+
+/* Create custom scroll bar */
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+
+::-webkit-scrollbar-track {
+  background: black;
+}
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+  background: var(--pink);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/*# sourceMappingURL=App.css.map */
