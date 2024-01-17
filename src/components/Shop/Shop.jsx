@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Client from "shopify-buy";
+import Modal from "../Modal/Modal";
+import { useDispatch } from "react-redux";
+import { connect } from "react-redux";
+import { useAlert } from "../Alert/AlertProvider";
 import "./Shop.css";
 
 // Initialize Shopify client
@@ -8,8 +12,12 @@ const client = Client.buildClient({
   storefrontAccessToken: "8e7e244e6bb1154a85685231573b7d3f",
 });
 
-function Shop() {
+function Shop({ items }) {
   const [products, setProducts] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const dispatch = useDispatch();
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     fetchProducts();
@@ -18,13 +26,34 @@ function Shop() {
   const fetchProducts = async () => {
     try {
       const response = await client.product.fetchAll();
-      console.log("Products:", response);
       setProducts(response);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
   };
 
+  const onClose = () => {
+    setIsOpen(false);
+  };
+
+  const addToCart = (item) => {
+    console.log(items);
+    if (items.length > 0) {
+      const cartItems = [JSON.parse(items)];
+      console.log(cartItems);
+      if (cartItems.find((cartItem) => cartItem.id === item.id)) {
+        showAlert("error", "Item already in cart!");
+        onClose();
+        return;
+      }
+    }
+
+    dispatch({
+      type: "ADD_TO_CART",
+      payload: JSON.stringify(item),
+    });
+    onClose();
+  };
   return (
     <div className="shop-container">
       <div className="stack drop-in shop-stack" style={{ "--stacks": 3 }}>
@@ -35,7 +64,14 @@ function Shop() {
       </div>
       <div className="shop-main">
         {products.map((product) => (
-          <div key={product.id} className="shop-item">
+          <div
+            key={product.id}
+            className="shop-item"
+            onClick={() => {
+              setIsOpen(true);
+              setSelectedProduct(product);
+            }}
+          >
             <img
               src={product.images[0].src}
               alt={product.title}
@@ -46,9 +82,19 @@ function Shop() {
             <p className="item-price">${product.variants[0].price.amount}</p>
           </div>
         ))}
+        <Modal
+          isOpen={isOpen}
+          onClose={onClose}
+          product={selectedProduct}
+          onExecute={(item) => addToCart(item)}
+        />
       </div>
     </div>
   );
 }
 
-export default Shop;
+const mapStateToProps = (state) => ({
+  items: state.cart.items,
+});
+
+export default connect(mapStateToProps)(Shop);

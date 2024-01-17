@@ -10,8 +10,11 @@
   --darkgrey: #252525;
   --pink: #d83b65;
   --dpink: #962344;
-  --green: #15af5c;
+  --green: #2cd37a;
+  --dgreen: #1b7c4f;
   --yellow: #ddc036;
+  --red: #e26262;
+  --dred: #a23b3b;
 }
 
 * {
@@ -40,6 +43,37 @@ body {
   height: 100%;
   width: 100%;
   min-height: 100vh; /* Adjust height */
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--pink);
+  border: none;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s ease all;
+}
+
+.red {
+  background-color: var(--red);
+}
+
+.red:hover {
+  background-color: var(--dred);
+}
+
+.green {
+  background-color: var(--green);
+}
+
+.green:hover {
+  background-color: var(--dgreen);
 }
 
 @media screen and (max-width: 768px) {
@@ -272,3 +306,12 @@ ul {
 }
 
 /*# sourceMappingURL=App.css.map */
+.noselect {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -webkit-user-drag: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}

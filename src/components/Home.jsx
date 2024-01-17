@@ -34,7 +34,7 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <>
       <div
         className="home-container"
         style={{
@@ -86,17 +86,18 @@ const Home = () => {
       <div id="bio" className="bio-section">
         <Bio />
       </div>
-      <Parallax speed={-5}>
-        <div id="music" className="music-section">
+      <div id="music" className="music-section">
+        <Parallax speed={-5}>
           <Music />
-        </div>
-      </Parallax>
+        </Parallax>
+      </div>
+
       <Parallax speed={10}>
         <div id="shop" className="shop-section">
           <Shop />
         </div>
       </Parallax>
-    </div>
+    </>
   );
 };
 

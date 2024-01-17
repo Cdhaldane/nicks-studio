@@ -5,7 +5,8 @@
   justify-items: flex-start;
   height: calc(100vh - 6rem) !important;
   width: 96%;
-  margin: 0 auto;
+  margin: 0vw auto;
+  margin-top: 70px;
   background-size: cover;
   transition: background-image 1s ease-in-out;
 }
@@ -269,6 +270,20 @@
 .footer-copy {
   font-size: 0.8em;
   font-family: "Rye", serif;
+}
+
+.music-section {
+  min-height: 20vw !important;
+  margin: 5vw auto;
+  background-size: cover;
+  transition: background-image 1s ease-in-out;
+}
+
+.shop-section {
+  min-height: 20vw !important;
+  margin: 5vw auto;
+  background-size: cover;
+  transition: background-image 1s ease-in-out;
 }
 
 @media (max-width: 600px) {

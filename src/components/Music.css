@@ -25,11 +25,6 @@
   max-height: 100%;
 }
 
-.album:hover {
-  cursor: pointer;
-  transform: scale(1.05);
-}
-
 .album h3 {
   margin-top: 10px;
   font-size: 1rem;

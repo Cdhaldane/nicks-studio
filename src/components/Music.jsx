@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import Carousel from "react-multi-carousel";
+import Record from "./Record/Record";
 import "react-multi-carousel/lib/styles.css";
 import axios from "axios";
 
@@ -81,46 +82,12 @@ const Music = () => {
         rewind
         slidesToSlide={2}
         responsive={responsive}
-        draggable={false}
+        draggable={true}
       >
         {albums.map((album, index) => (
-          <div key={index} className="album">
-            <img
-              src={album.images[0].url}
-              alt={album.name}
-              className="album-cover"
-            />
-            <h3>{album.name}</h3>
-            <a
-              href={album.external_urls.spotify}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Listen on Spotify
-            </a>
-          </div>
+          <Record album={album} key={index} />
         ))}
       </Carousel>
-
-      {/* <div className="music-timeline" ref={timelineRef}>
-        {albums.map((album, index) => (
-          <div key={index} className="album">
-            <img
-              src={album.images[0].url}
-              alt={album.name}
-              className="album-cover"
-            />
-            <h3>{album.name}</h3>
-            <a
-              href={album.external_urls.spotify}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Listen on Spotify
-            </a>
-          </div>
-        ))}
-      </div> */}
     </div>
   );
 };
