@@ -46,3 +46,8 @@
 .react-multi-carousel-list > ul > li {
   width: auto !important;
 }
+
+.player-container {
+  position: relative;
+  bottom: 100px;
+}

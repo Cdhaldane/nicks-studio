@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Carousel from "react-multi-carousel";
-import Record from "./Record/Record";
+import Record from "../Record/Record";
+import Player from "./Player";
 import "react-multi-carousel/lib/styles.css";
 import axios from "axios";
 
@@ -9,6 +10,8 @@ import "./Music.css";
 const Music = () => {
   const [albums, setAlbums] = useState([]);
   const [currentAlbum, setCurrentAlbum] = useState(0);
+  const [currentSong, setCurrentSong] = useState();
+  const [token, setToken] = useState();
 
   const timelineRef = useRef(null);
 
@@ -48,7 +51,7 @@ const Music = () => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-
+      setToken(response.data.access_token);
       getArtistData(response.data.access_token);
     } catch (error) {
       console.error("Error fetching Spotify token:", error);
@@ -78,6 +81,7 @@ const Music = () => {
 
   return (
     <div className="music-container">
+      <Player currentSong={currentSong} token={token} />
       <Carousel
         rewind
         slidesToSlide={2}
@@ -85,7 +89,11 @@ const Music = () => {
         draggable={true}
       >
         {albums.map((album, index) => (
-          <Record album={album} key={index} />
+          <Record
+            album={album}
+            key={index}
+            setCurrentSong={(e) => setCurrentSong(e)}
+          />
         ))}
       </Carousel>
     </div>

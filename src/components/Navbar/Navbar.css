@@ -7,6 +7,7 @@
   top: 50%;
   left: 5%;
   transition: top 0.5s ease;
+  z-index: 100;
 }
 
 .nav-links.scrolled {
@@ -14,7 +15,6 @@
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000;
   flex-wrap: nowrap;
   background-color: black;
   border-bottom: 2px solid #d83b65;
@@ -27,6 +27,16 @@
   margin-bottom: 0;
   display: flex;
   justify-content: center;
+  animation: toSmallButton 1s ease forwards;
+}
+
+@keyframes toSmallButton {
+  from {
+    padding: 3%;
+  }
+  to {
+    padding: 20px 20px;
+  }
 }
 
 .nav-cart {
@@ -42,5 +52,6 @@
 }
 
 .nav-cart:hover {
-  transform: scale(1.1);
+  color: var(--dpink);
+  border-left: 2px solid var(--dpink);
 }

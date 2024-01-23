@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import "./Record.css";
 
-const Record = ({ album, index }) => {
+const Record = ({ album, index, setCurrentSong }) => {
   const vinylRef = useRef(null);
 
   return (
@@ -12,6 +12,9 @@ const Record = ({ album, index }) => {
       }}
       onMouseLeave={() => {
         vinylRef.current.className = "exit";
+      }}
+      onClick={() => {
+        setCurrentSong(album);
       }}
     >
       <div className="album noselect">

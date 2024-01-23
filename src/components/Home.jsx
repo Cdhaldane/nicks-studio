@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Bio from "./Bio";
-import Music from "./Music";
+import Music from "./Music/Music";
 import Shop from "./Shop/Shop";
 import Navbar from "./Navbar/Navbar";
 import "./Styles.css";
@@ -54,11 +54,9 @@ const Home = () => {
         </Parallax>
       </div>
 
-      <Parallax speed={10}>
-        <div id="shop" className="shop-section">
-          <Shop />
-        </div>
-      </Parallax>
+      <div id="shop" className="shop-section">
+        <Shop />
+      </div>
     </>
   );
 };
