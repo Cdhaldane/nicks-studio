@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Bio from "./Bio";
 import Music from "./Music";
 import Shop from "./Shop/Shop";
+import Navbar from "./Navbar/Navbar";
 import "./Styles.css";
 import { useNavigate } from "react-router-dom";
 import { Parallax } from "react-scroll-parallax";
@@ -29,10 +30,6 @@ const Home = () => {
     return () => clearInterval(interval); // Clean up the interval
   }, [imageIndex]);
 
-  const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId).scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <>
       <div
@@ -41,47 +38,12 @@ const Home = () => {
           backgroundImage: `url(${process.env.PUBLIC_URL}/${backgroundImage})`,
         }}
       >
-        <div className="home stack drop-in" style={{ "--stacks": 3 }}>
-          <h1 className="home-title-back">NICKOLA MAGNOLIA</h1>
+        <div className="stack drop-in home-stack" style={{ "--stacks": 3 }}>
           <span style={{ "--index": 0 }}>NICKOLA MAGNOLIA</span>
+          <span className="bio-back">NICKOLA MAGNOLIA</span>
           <span style={{ "--index": 1 }}>NICKOLA MAGNOLIA</span>
           <span style={{ "--index": 2 }}>NICKOLA MAGNOLIA</span>
         </div>
-        {/* <span className="home-line left fade-up"></span>
-      <span className="home-line right fade-down"></span>
-      <span className="home-line-horizontal top fade-up"></span>
-      <span className="home-line-horizontal bottom fade-down"></span> */}
-
-        <div className="home-links-container ">
-          <button className="home-button drop-in">INSTAGRAM</button>
-          <button
-            className="home-button drop-in-2"
-            onClick={() => scrollToSection("music")}
-          >
-            MUSIC
-          </button>
-          <button className="home-button drop-in">LINKTREE</button>
-          <button
-            className="home-button drop-in-2"
-            onClick={() => scrollToSection("bio")}
-          >
-            BIO
-          </button>
-          <button className="home-button drop-in">YOUTUBE</button>
-          <button
-            className="home-button drop-in-2"
-            onClick={() => navigate("./shop")}
-          >
-            SHOP
-          </button>
-          <button className="home-button drop-in">CONTACT</button>
-        </div>
-
-        {/* <img
-        className="home-image"
-        src={process.env.PUBLIC_URL + "/nick-couch.jpg"}
-        alt="Nickola Magnolia"
-      /> */}
       </div>
       <div id="bio" className="bio-section">
         <Bio />

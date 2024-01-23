@@ -48,7 +48,8 @@
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 10px;
-  border-bottom: 0.5px solid var(--text);
+  border-bottom: 1px solid var(--text);
+  padding-bottom: 5px;
 }
 
 .modal-main img {

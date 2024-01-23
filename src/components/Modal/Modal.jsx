@@ -3,8 +3,6 @@ import "./Modal.css"; // Import your CSS here
 
 function Modal({ isOpen, onClose, product, onExecute }) {
   useEffect(() => {
-    //if click outside of modal, close modal
-
     const handleClickOutside = (e) => {
       if (e.target.className === "modal") {
         onClose();

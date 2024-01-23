@@ -11,23 +11,25 @@ function Footer() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Facebook
+          <i class="fa-brands fa-facebook"></i>
         </a>
         <a
           href="https://twitter.com/nicksmusic"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Twitter
+          <i class="fa-brands fa-twitter"></i>
         </a>
         <a
           href="https://instagram.com/nicksmusic"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Instagram
+          <i class="fa-brands fa-instagram"></i>
         </a>
-        <a href="mailto:nick@example.com">Contact</a>
+        <a href="mailto:nick@example.com">
+          <i class="fa-solid fa-envelope"></i>
+        </a>
       </div>
 
       <p className="footer-copy">© Nick's Music 2023. All rights reserved.</p>

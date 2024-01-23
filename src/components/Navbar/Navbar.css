@@ -1,16 +1,46 @@
-.nav-container {
+.nav-links {
+  display: flex;
+  width: 90%;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  transition: top 0.5s ease;
+}
+
+.nav-links.scrolled {
   position: fixed;
-  right: 0px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  flex-wrap: nowrap;
+  background-color: black;
+  border-bottom: 2px solid #d83b65;
+}
+
+.nav-links.scrolled a {
+  width: 100%;
+  border: none;
+  padding: 20px 20px;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-cart {
   display: flex;
   align-items: center;
-  width: auto;
-  height: 3rem;
+  justify-content: center;
   color: #d83b65;
-  z-index: 1000;
-  top: 1%;
-  right: 1%;
   font-size: 1.5em;
-  padding: 5px 20px 5px 15px;
-  border-radius: 10%;
-  background-color: var(--bg);
+  cursor: pointer;
+  width: 40%;
+  transition: transform 0.2s ease;
+  border-left: 2px solid #d83b65;
+}
+
+.nav-cart:hover {
+  transform: scale(1.1);
 }

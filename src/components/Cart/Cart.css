@@ -1,9 +1,51 @@
 .cart-count {
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 10px;
   font-size: 0.8em;
   border-radius: 50%;
   width: 0.8em;
   height: 0.8em;
+}
+
+.cart-main {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.cart-main h2 {
+  width: 70%;
+  font: 1.8em sans-serif;
+  margin-left: 10px;
+}
+
+.cart-main img {
+  width: 20%;
+}
+
+.cart-main h3 {
+  width: 10%;
+  font: 1.3em sans-serif;
+  text-align: right;
+  color: rgb(155, 155, 155);
+}
+
+.cart-footer {
+  display: flex;
+  text-align: right;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.cart-footer h3 {
+  width: 100%;
+  font: 1.3em sans-serif;
+  text-align: right;
+}
+
+.cart-button {
+  width: 48% !important;
+  border-radius: 4px !important;
 }

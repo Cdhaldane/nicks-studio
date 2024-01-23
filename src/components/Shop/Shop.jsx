@@ -39,7 +39,7 @@ function Shop({ items }) {
   const addToCart = (item) => {
     console.log(items);
     if (items.length > 0) {
-      const cartItems = [JSON.parse(items)];
+      const cartItems = items.map((item) => JSON.parse(item));
       console.log(cartItems);
       if (cartItems.find((cartItem) => cartItem.id === item.id)) {
         showAlert("error", "Item already in cart!");

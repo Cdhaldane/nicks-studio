@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: absolute;
+  position: fixed;
   left: 2%;
   top: 10px;
   padding: 10px 20px;
