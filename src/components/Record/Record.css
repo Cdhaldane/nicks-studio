@@ -8,6 +8,8 @@
 }
 .wrap {
   user-select: none !important;
+  width: 30vw;
+  height: 30vw;
 }
 .album::after {
   position: absolute;

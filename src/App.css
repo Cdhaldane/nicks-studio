@@ -22,6 +22,9 @@
   padding: 0;
 }
 
+#root {
+}
+
 html,
 body {
   margin: 0;
@@ -32,6 +35,7 @@ body {
 
 body {
   overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-y: scroll;
   font-family: "Inter", sans-serif;
   background-color: black;
   /* Other styles */
@@ -43,6 +47,7 @@ body {
   height: 90%;
   width: 100%;
   min-height: 100vh; /* Adjust height */
+  overflow-x: hidden;
 }
 
 .btn {
@@ -74,59 +79,6 @@ body {
 
 .green:hover {
   background-color: var(--dgreen) !important;
-}
-
-@media screen and (max-width: 768px) {
-  body {
-    min-width: 100vw; /* Corrected from 100vh to 100vw */
-    overflow-y: auto !important; /* Allow scrolling on smaller devices */
-  }
-
-  nav,
-  footer {
-    font-size: 0.8rem; /* Adjust font size for smaller screens */
-    position: absolute; /* Position elements */
-  }
-
-  .home-container {
-    margin-top: 0px; /* Adjust margin */
-    min-height: 100vh; /* Adjust height */
-  }
-
-  .home-container h1 {
-    font-size: 3.5rem; /* Smaller font size for headers */
-    margin-bottom: 0%; /* Adjust margin */
-    margin-top: 20%; /* Adjust margin */
-  }
-
-  .home-links-container,
-  .bio-container,
-  .home-button {
-    padding: 10px; /* Adjust padding */
-    flex-direction: column; /* Stack elements vertically */
-  }
-
-  .home-button {
-    font-size: 1.2rem; /* Smaller button font size */
-  }
-
-  .bio-image {
-    width: 90%; /* Smaller profile image */
-  }
-  .bio-container {
-    margin-top: 0px; /* Adjust margin */
-    min-height: 100vh; /* Adjust height */
-  }
-  .bio-container p {
-    font-size: 0.5rem; /* Smaller font size for text */
-    width: 90%; /* Adjust width */
-    overflow-y: hidden; /* Hide overflow */
-  }
-
-  .home-image {
-    top: 0; /* Adjust position */
-    width: 95%;
-  }
 }
 
 .home.stack {
@@ -223,11 +175,11 @@ svg text,
 }
 
 .drop-in {
-  animation: drop-in 1s ease 200ms backwards;
+  animation: drop-in 600ms ease 200ms backwards;
 }
 
 .drop-in-2 {
-  animation: drop-in 1200ms ease 500ms backwards;
+  animation: drop-in 200ms ease 200ms backwards;
 }
 
 .fade-up {
@@ -269,29 +221,6 @@ svg text,
     opacity: 1;
     transform: translate(0px);
   }
-}
-
-nav {
-  position: relative;
-  margin-top: -3rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 100% !important;
-  color: #d83b65;
-  background-color: black;
-  height: 3rem;
-}
-
-ul {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 50%;
-  list-style: none;
-  text-decoration: none;
 }
 
 /* Create custom scroll bar */

@@ -54,11 +54,9 @@ const Home = () => {
         </Parallax>
       </div>
 
-      <Parallax speed={10}>
-        <div id="shop" className="shop-section">
-          <Shop />
-        </div>
-      </Parallax>
+      <div id="shop" className="shop-section">
+        <Shop />
+      </div>
     </>
   );
 };

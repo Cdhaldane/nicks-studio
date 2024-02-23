@@ -1,12 +1,10 @@
 .music-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 5rem;
   color: white;
-  width: 98%;
+  width: 95%;
   margin: 0 auto;
-  margin-bottom: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .music-timeline {
@@ -22,7 +20,6 @@
   text-align: center;
   user-select: text !important;
   max-width: 90%;
-  max-height: 100%;
 }
 
 .album h3 {
@@ -38,11 +35,17 @@
 }
 
 .react-multi-carousel-list {
-  margin: 0 auto;
   width: 100%;
+  height: fit-content;
   overflow: visible !important;
 }
 
 .react-multi-carousel-list > ul > li {
   width: auto !important;
+}
+
+.carousel-right {
+  width: 20px;
+  height: 20px;
+  background-color: red;
 }

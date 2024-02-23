@@ -263,10 +263,10 @@
 }
 
 .music-section {
-  min-height: 40vw !important;
-  margin: 5vw auto;
   background-size: cover;
   transition: background-image 1s ease-in-out;
+  margin-top: 10vw;
+  margin-bottom: -5vw;
 }
 
 .shop-section {
@@ -278,11 +278,4 @@
 
 .bio-section {
   margin-top: 3%;
-}
-
-@media (max-width: 600px) {
-  .footer-links a {
-    display: block;
-    margin: 5px 0;
-  }
 }

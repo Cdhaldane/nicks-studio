@@ -80,7 +80,7 @@ const Music = () => {
     <div className="music-container">
       <Carousel
         rewind
-        slidesToSlide={2}
+        slidesToSlide={1}
         responsive={responsive}
         draggable={true}
       >
