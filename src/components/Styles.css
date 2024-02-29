@@ -3,10 +3,14 @@
   flex-direction: column;
   align-items: center;
   justify-items: flex-start;
+  height: 100% !important;
   height: calc(100vh - 6rem) !important;
   width: 96%;
+  /* min-height: 100vh; */
+  /* background-position: 0% 30%; */
   margin: 0vw auto;
   background-size: cover;
+  animation: backgroundFadeIn 1.5s ease-out forwards;
   transition: background-image 1s ease-in-out;
 }
 
@@ -263,10 +267,10 @@
 }
 
 .music-section {
-  min-height: 40vw !important;
-  margin: 5vw auto;
   background-size: cover;
   transition: background-image 1s ease-in-out;
+  margin-top: 10vw;
+  margin-bottom: -5vw;
 }
 
 .shop-section {
@@ -280,9 +284,11 @@
   margin-top: 3%;
 }
 
-@media (max-width: 600px) {
-  .footer-links a {
-    display: block;
-    margin: 5px 0;
+@keyframes backgroundFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

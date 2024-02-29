@@ -9,23 +9,33 @@ import { Parallax } from "react-scroll-parallax";
 
 const imageList = [
   "n1.jpg",
-  // "n2.jpg",
-  // "n3.jpg",
+  "n2.jpg",
+  "n3.jpg",
+  "n5.jpg",
+  "n6.jpg",
   // Add more images as needed
 ];
 
 const Home = () => {
   const [backgroundImage, setBackgroundImage] = useState(imageList[0]);
+  const [backgroundImagePosition, setBackgroundImagePosition] = useState("top");
   const [imageIndex, setImageIndex] = useState(0);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    // if mobile return
+    if (window.innerWidth < 768) setBackgroundImage("n5.jpg");
+
     const interval = setInterval(() => {
       let nextIndex = (imageIndex + 1) % imageList.length;
       setImageIndex(nextIndex);
       setBackgroundImage(imageList[nextIndex]);
-    }, 5000); // Change image every 5000 milliseconds (5 seconds)
+
+      if (nextIndex === 3) {
+        setBackgroundImagePosition("0% 30%");
+      }
+    }, 15000); // (15 seconds)
 
     return () => clearInterval(interval); // Clean up the interval
   }, [imageIndex]);
@@ -36,6 +46,7 @@ const Home = () => {
         className="home-container"
         style={{
           backgroundImage: `url(${process.env.PUBLIC_URL}/${backgroundImage})`,
+          backgroundPosition: backgroundImagePosition,
         }}
       >
         <div className="stack drop-in home-stack" style={{ "--stacks": 3 }}>

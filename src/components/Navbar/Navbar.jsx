@@ -5,7 +5,20 @@ import { Link, redirect, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  let navigate = useNavigate();
+  const [width, setWidth] = useState(window.innerWidth);
+  const [isOpen, setIsOpen] = useState(true);
+
+  useEffect(() => {
+    const handleWindowSizeChange = () => {
+      setWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleWindowSizeChange);
+    return () => {
+      window.removeEventListener("resize", handleWindowSizeChange);
+    };
+  }, []);
+
+  const isMobile = width <= 768;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,58 +32,75 @@ const Navbar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isMobile && isScrolled) {
+      setIsOpen(false);
+    } else {
+      setIsOpen(true);
+    }
+  }, [isScrolled]);
+
   const scrollToSection = (sectionId) => {
     document.getElementById(sectionId).scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <div className={`nav-links ${isScrolled ? "scrolled" : ""}`}>
-      <Link
-        className="home-button drop-in"
-        to={"https://www.instagram.com/nickolamagnolia"}
-      >
-        INSTAGRAM
-      </Link>
-      <Link
-        className="home-button drop-in-2"
-        onClick={() => scrollToSection("music")}
-      >
-        MUSIC
-      </Link>
-      <Link
-        to={"https://linktr.ee/nickolamagnolia"}
-        className="home-button drop-in"
-      >
-        LINKTREE
-      </Link>
-      <Link
-        className="home-button drop-in-2"
-        onClick={() => scrollToSection("bio")}
-      >
-        BIO
-      </Link>
-      <Link
-        to={"https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q"}
-        className="home-button drop-in"
-      >
-        YOUTUBE
-      </Link>
-      <Link
-        className="home-button drop-in-2"
-        onClick={() => scrollToSection("shop")}
-      >
-        SHOP
-      </Link>
-      <Link
-        to={"https://www.instagram.com/direct/t/100599608092241"}
-        className="home-button drop-in"
-      >
-        CONTACT
-      </Link>
-      {isScrolled && (
-        <div className="nav-cart drop-in">
-          <Cart />
+      {isMobile && isScrolled && (
+        <div className="nav-links-bars" onClick={() => setIsOpen(!isOpen)}>
+          <i class="fa-solid fa-bars"></i>
         </div>
+      )}
+      {isOpen && (
+        <>
+          <Link
+            className="home-button drop-in"
+            to={"https://www.instagram.com/nickolamagnolia"}
+          >
+            INSTAGRAM
+          </Link>
+          <Link
+            className="home-button drop-in-2"
+            onClick={() => scrollToSection("music")}
+          >
+            MUSIC
+          </Link>
+          <Link
+            to={"https://linktr.ee/nickolamagnolia"}
+            className="home-button drop-in"
+          >
+            LINKTREE
+          </Link>
+          <Link
+            className="home-button drop-in-2"
+            onClick={() => scrollToSection("bio")}
+          >
+            BIO
+          </Link>
+          <Link
+            to={"https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q"}
+            className="home-button drop-in"
+          >
+            YOUTUBE
+          </Link>
+          <Link
+            className="home-button drop-in-2"
+            onClick={() => scrollToSection("shop")}
+          >
+            SHOP
+          </Link>
+          <Link
+            to={"https://www.instagram.com/direct/t/100599608092241"}
+            className="home-button drop-in"
+          >
+            CONTACT
+          </Link>
+          {isScrolled && (
+            <div className="nav-cart drop-in">
+              <Cart />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

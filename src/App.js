@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar/Navbar.jsx";
 import { ShopifyProvider, useShop } from "@shopify/hydrogen-react";
 
 import "./App.css";
+import "./components/Styles-Mobile.css";
 
 const Providers = () => {
   return (

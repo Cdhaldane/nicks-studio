@@ -1,7 +1,7 @@
 .shop-container {
   margin: 0 auto;
   padding: 20px;
-  margin-top: 5vw;
+  margin-top: 10vw;
 }
 
 .shop-main {
@@ -40,6 +40,7 @@
 }
 
 .shop-item:hover {
+  transition: all 0.2s ease-in-out;
   transform: scale(1.05);
   cursor: pointer;
 }
@@ -54,6 +55,6 @@
   font-size: 9rem;
   color: var(--dpink);
   text-align: center;
-  z-index: 3 !important;
+  z-index: 0 !important;
   margin-bottom: 0 !important;
 }
