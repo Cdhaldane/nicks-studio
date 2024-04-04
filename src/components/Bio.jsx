@@ -4,14 +4,12 @@ import "./Styles.css";
 
 const Bio = () => {
   return (
-    <Parallax speed={10}>
+    <Parallax speed={2}>
       <div className="bio-container">
-        <Parallax speed={5}>
-          <div className="stack drop-in bio-stack" style={{ "--stacks": 3 }}>
-            <span style={{ "--index": 0 }}>PERSONAL INFO</span>
-            <span className="bio-back">PERSONAL INFO</span>
-            <span style={{ "--index": 1 }}>PERSONAL INFO</span>
-            <span style={{ "--index": 2 }}>PERSONAL INFO</span>
+        <Parallax speed={1}>
+          <div className="nav-title bio">
+            <span>Personal</span>
+            <span className="back">Personal</span>
           </div>
         </Parallax>
         <div className="bio-main">

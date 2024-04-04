@@ -58,12 +58,12 @@ function Shop({ items }) {
   return (
     <>
       <div className="shop-container">
-        <div className="stack drop-in shop-stack" style={{ "--stacks": 3 }}>
-          <span style={{ "--index": 0 }}>MERCHANDISE</span>
-          <span className="bio-back">MERCHANDISE</span>
-          <span style={{ "--index": 1 }}>MERCHANDISE</span>
-          <span style={{ "--index": 2 }}>MERCHANDISE</span>
-        </div>
+        <Parallax speed={5}>
+          <div className="nav-title bio merch">
+            <span>Merchandise</span>
+            <span className="back">Merchandise</span>
+          </div>
+        </Parallax>
         <div className="shop-main">
           {products.map((product) => (
             <div

@@ -1,9 +1,11 @@
 :root {
+  --primary: #d83b65;
+  --secondary: #000000;
   --text: #f3f3f3;
   --blue: #527af9;
   --black: #141414;
-  --white: white;
-  --offwhite: #f5f5f5;
+  --white: rgb(255, 255, 255);
+  --off-white: #f5f5f5;
   --side-bg: #242424;
   --bg: #121118;
   --lightgrey: #585858;
@@ -42,7 +44,6 @@ body {
 }
 
 .main {
-  margin-top: 3rem;
   padding: 0;
   height: 90%;
   width: 100%;
@@ -104,19 +105,15 @@ svg text,
 }
 
 .stack span {
-  font-weight: bold;
-  font-family: "Rye", serif;
+  font-family: "Dancing Script", cursive;
   grid-row-start: 1;
   grid-column-start: 1;
-  font-size: 10rem;
+  font-size: 9rem;
   --stack-height: calc(100% / var(--stacks) - 1px);
   --inverse-index: calc(calc(var(--stacks) - 1) - var(--index));
   --clip-top: calc(var(--stack-height) * var(--index));
   --clip-bottom: calc(var(--stack-height) * var(--inverse-index));
   clip-path: inset(var(--clip-top) 0 var(--clip-bottom) 0);
-  animation: stack 340ms cubic-bezier(0.46, 0.29, 0, 1.24) 1 backwards
-      calc(var(--index) * 120ms),
-    glitch 2s ease infinite 2s alternate-reverse;
 }
 
 .stack span:nth-child(odd) {
@@ -124,19 +121,6 @@ svg text,
 }
 .stack span:nth-child(even) {
   --glitch-translate: -8px;
-}
-
-.home-stack {
-  position: relative;
-  flex-direction: column;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 9rem;
-  color: var(--dpink) !important;
-  text-align: center;
-  z-index: 3 !important;
-  margin-bottom: 0 !important;
-  overflow: visible !important;
 }
 
 @keyframes stack {

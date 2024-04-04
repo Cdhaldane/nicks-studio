@@ -26,6 +26,7 @@
   color: var(--text);
   font-size: 0.8rem;
   z-index: 10000;
+  animation: appear 0.3s ease-in-out;
 }
 
 .modal-content input {
@@ -77,4 +78,13 @@
 
 .br-right {
   border-radius: 0px 4px 4px 0px !important;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

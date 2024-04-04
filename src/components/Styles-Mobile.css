@@ -11,6 +11,12 @@
     width: 100%;
     margin: 0 auto;
   }
+  .home-container > img {
+    height: 100% !important;
+    object-fit: cover;
+    object-position: 15% 0%;
+    z-index: -2;
+  }
   .home-stack {
     top: 0%;
   }
@@ -22,24 +28,26 @@
   }
 
   .nav-links {
-    justify-content: center;
-    top: 50%;
-    overflow: hidden;
-    animation: slideDown 0.5s ease-in-out;
-  }
-  .nav-links.scrolled {
-    top: 0;
-    left: 0;
     width: 100%;
-    z-index: 10;
-    flex-wrap: wrap;
+    left: 0%;
+    top: 0%;
+    height: auto;
+    position: relative;
+    align-items: flex-start;
+    justify-content: flex-start;
     background-color: black;
     border-bottom: 2px solid #d83b65;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 10px;
   }
+  .nav-title {
+    font-size: 2.5em !important;
+    width: 50%;
+    height: 100px;
+    margin: 0 auto;
+  }
+  .nav-title > span {
+    line-height: 80%;
+  }
+
   .nav-links-bars {
     color: #d83b65;
     border: 2px solid #d83b65;
@@ -56,19 +64,18 @@
 
   .nav-cart {
     border: none;
+    right: 20px;
   }
-  .home-button {
-    font-size: 1rem;
-    padding: 0.4rem !important;
+  .nav-button {
+    font-size: 0.8rem;
+    padding: 0rem !important;
   }
 
   .bio-section {
     margin-top: 0px;
-    margin-bottom: 10%;
   }
   .bio-main {
     flex-direction: column;
-    margin-top: 30%;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -83,13 +90,18 @@
   .bio-stack span {
     font-size: 3rem !important;
   }
+
+  .bio-container {
+    padding-top: 1em;
+  }
   .bio-container p {
     font-size: 1rem;
   }
 
   .music-section {
     margin-top: 0px;
-    margin-bottom: 50%;
+    min-height: 50vh;
+    justify-content: center;
   }
 
   .music-container .wrap {
