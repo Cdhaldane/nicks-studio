@@ -3,17 +3,20 @@
   flex-direction: row;
   align-items: center;
   justify-items: flex-start;
-  height: 100% !important;
-  min-height: 100vh;
+  height: 100vh !important;
+  width: 100% !important;
   /* background-position: 0% 30%; */
   margin: 0vw auto;
   background-size: cover;
   animation: backgroundFadeIn 1.5s ease-out forwards;
   transition: background-image 1s ease-in-out;
+  margin-top: -100px !important;
+  overflow: hidden !important;
 }
 
 .home-container > img {
   width: 100% !important;
+  height: 100% !important;
   z-index: -2;
 }
 
@@ -72,96 +75,6 @@
 
 /* Path: src/components/Bio.js */
 
-.bio-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 5rem;
-  color: white;
-  width: 96%;
-  margin: 0 auto;
-  padding-top: 10rem;
-}
-
-.bio-main {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 90%;
-  margin-top: 5rem;
-  z-index: -1;
-}
-
-.bio-main span {
-  width: 70%;
-  display: flex;
-  flex-direction: row;
-  margin-left: 5rem;
-}
-
-.bio-image {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover;
-}
-
-.bio {
-  position: relative;
-  font-size: 9rem !important;
-}
-.bio .back {
-  color: var(--white) !important;
-}
-
-.bio-container p {
-  font-family: "Inter", sans-serif;
-  font-weight: 200;
-  font-size: 1.2rem;
-  text-align: left;
-  margin-top: 2rem;
-  opacity: 1;
-  overflow: hidden;
-}
-
-.bio-container p:last-child {
-  margin-bottom: 2rem;
-}
-
-.footer {
-  justify-content: space-evenly;
-  color: var(--white);
-  background-color: var(--dpink);
-  text-align: center;
-  margin: 0 auto;
-  padding: 10px;
-}
-.footer-title {
-  font-size: 1.5em;
-  font-weight: 800;
-  margin-bottom: 10px;
-  font-family: "Rye", serif;
-}
-
-.footer-links {
-  margin-bottom: 10px;
-}
-
-.footer-links a {
-  color: var(--white);
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-.footer-links a:hover {
-  text-decoration: underline;
-}
-
-.footer-copy {
-  font-size: 0.8em;
-  font-family: "Rye", serif;
-}
-
 .music-section {
   background-size: cover;
   transition: background-image 1s ease-in-out;
@@ -208,8 +121,9 @@
 }
 
 .social-button {
-  font-size: 1.5em;
+  font-size: 2em;
   color: var(--white);
+  background-color: #1414147e;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid var(--white);
@@ -218,6 +132,7 @@
   height: 25px;
   display: flex;
   justify-content: center;
+  box-sizing: content-box;
   align-items: center;
   border-radius: 50%;
   text-decoration: none;

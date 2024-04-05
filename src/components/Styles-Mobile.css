@@ -1,13 +1,12 @@
 @media (max-width: 768px) {
-  #root {
-    width: 101vw;
-  }
   .main {
     margin-top: 0px;
+    width: 100%;
   }
   .home-container {
     margin-top: 0px;
     height: 100vh !important;
+    min-height: 89vh;
     width: 100%;
     margin: 0 auto;
   }
@@ -30,13 +29,13 @@
   .nav-links {
     width: 100%;
     left: 0%;
-    top: 0%;
+    top: 0% !important;
     height: auto;
     position: relative;
     align-items: flex-start;
     justify-content: flex-start;
     background-color: black;
-    border-bottom: 2px solid #d83b65;
+    border-bottom: 2px solid var(--white);
   }
   .nav-title {
     font-size: 2.5em !important;
@@ -49,14 +48,13 @@
   }
 
   .nav-links-bars {
-    color: #d83b65;
-    border: 2px solid #d83b65;
+    color: var(--white);
     background-color: black;
     padding: 3%;
     font-family: "Inter", sans-serif;
     font-size: 1rem;
     cursor: pointer;
-    position: fixed;
+    position: absolute;
     left: 2%;
     top: 2%;
     z-index: 100;
@@ -80,6 +78,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 10px;
+  }
+  .bio-main img {
+    width: 100% !important;
   }
   .bio-main span {
     width: 100%;
@@ -92,16 +94,13 @@
   }
 
   .bio-container {
-    padding-top: 1em;
+    margin-top: 10%;
+    height: fit-content;
+    padding-top: 5%;
+    padding-bottom: 5%;
   }
   .bio-container p {
     font-size: 1rem;
-  }
-
-  .music-section {
-    margin-top: 0px;
-    min-height: 50vh;
-    justify-content: center;
   }
 
   .music-container .wrap {
@@ -111,6 +110,10 @@
 
   .stack {
     overflow: visible;
+  }
+
+  .shop-container {
+    margin-top: 10px;
   }
 
   .shop-stack span {
@@ -142,6 +145,24 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  .mobile-links a {
+    color: var(--white);
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: 800;
+    font-family: "Inter", sans-serif;
+  }
+
+  .socials {
+    gap: 15px;
+    bottom: 1em;
+  }
+  .social-button {
+    font-size: 1.5em;
+    width: 10px;
+    height: 10px;
   }
 }
 

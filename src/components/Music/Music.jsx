@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import Carousel from "react-multi-carousel";
-import Record from "../Record/Record";
+import Record from "./Record/Record";
 import Player from "./Player";
 import "react-multi-carousel/lib/styles.css";
 import axios from "axios";
@@ -12,26 +12,25 @@ const Music = () => {
   const [currentAlbum, setCurrentAlbum] = useState(0);
   const [currentSong, setCurrentSong] = useState();
   const [token, setToken] = useState();
+  const [loading, setLoading] = useState(true);
 
   const timelineRef = useRef(null);
 
   const responsive = {
-    superLargeDesktop: {
-      // the naming can be any, depends on you.
-      breakpoint: { max: 4000, min: 3000 },
-      items: 5,
-    },
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
       items: 3,
+      slidesToSlide: 3,
     },
     tablet: {
       breakpoint: { max: 1024, min: 464 },
       items: 2,
+      slidesToSlide: 2,
     },
     mobile: {
       breakpoint: { max: 464, min: 0 },
       items: 1,
+      slidesToSlide: 1,
     },
   };
 
@@ -76,17 +75,24 @@ const Music = () => {
   };
 
   useEffect(() => {
-    getSpotifyToken();
+    getSpotifyToken().then(() => setLoading(false));
   }, []);
+
+  if (loading)
+    return (
+      <div className="shop-container">
+        <div className="loading"></div>
+      </div>
+    );
 
   return (
     <div className="music-container">
       <Player currentSong={currentSong} token={token} />
       <Carousel
-        rewind
-        slidesToSlide={1}
         responsive={responsive}
-        draggable={true}
+        ssr
+        containerClass="container-with-dots"
+        itemClass="image-item"
       >
         {albums.map((album, index) => (
           <Record

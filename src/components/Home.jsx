@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Bio from "./Bio";
+import Bio from "../Views/About/Bio";
 import Music from "./Music/Music";
 import Shop from "./Shop/Shop";
 import Navbar from "./Navbar/Navbar";
@@ -58,12 +58,6 @@ const Home = () => {
       </div>
       <div className="socials">
         <Link
-          to={"https://linktr.ee/nickolamagnolia"}
-          className="social-button"
-        >
-          <i className="fa-brands fa-twitter "></i>
-        </Link>
-        <Link
           className="social-button"
           to={"https://www.instagram.com/nickolamagnolia"}
         >
@@ -75,22 +69,30 @@ const Home = () => {
         >
           <i className="fa-brands fa-youtube"></i>
         </Link>
-      </div>
-      <div id="bio" className="bio-section">
-        <Bio />
-      </div>
-      <div id="music" className="music-section">
-        <div className="nav-title bio music">
-          <span>Music</span>
-          <span className="back">Music</span>
-        </div>
-        <Parallax speed={-3}>
-          <Music />
-        </Parallax>
-      </div>
-
-      <div id="shop" className="shop-section">
-        <Shop />
+        <Link
+          to={"https://www.facebook.com/musicmagnolia/"}
+          className="social-button"
+        >
+          <i className="fa-brands fa-facebook"></i>
+        </Link>
+        <Link
+          to={"https://www.tiktok.com/@nickolamagnolia"}
+          className="social-button"
+        >
+          <i className="fa-brands fa-tiktok"></i>
+        </Link>
+        <Link
+          to={"https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4"}
+          className="social-button"
+        >
+          <i className="fa-brands fa-spotify"></i>
+        </Link>
+        <Link
+          to={"https://music.apple.com/ca/artist/nickola-magnolia/1588557558"}
+          className="social-button"
+        >
+          <i className="fa-brands fa-apple"></i>
+        </Link>
       </div>
     </>
   );

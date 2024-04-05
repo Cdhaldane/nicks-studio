@@ -85,7 +85,9 @@ const Cart = ({ items }) => {
       )}
       <div className="cart" onClick={() => setShowModal(!showModal)}>
         <i className="fas fa-shopping-cart"></i>
-        <span className="cart-count">{items.length}</span>
+        {cartItems.length > 0 && (
+          <span className="cart-count">{items.length}</span>
+        )}
       </div>
     </CartProvider>
   );

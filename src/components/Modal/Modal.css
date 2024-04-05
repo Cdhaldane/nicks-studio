@@ -22,7 +22,8 @@
   display: flex;
   flex-direction: column;
   padding: 10px 20px;
-  width: 20%;
+  width: max-content;
+  max-width: 30%;
   color: var(--text);
   font-size: 0.8rem;
   z-index: 10000;

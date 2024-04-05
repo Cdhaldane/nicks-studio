@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import { ParallaxProvider } from "react-scroll-parallax";
 import { AlertProvider } from "./components/Alert/AlertProvider";
 import Alert from "./components/Alert/Alert";
@@ -7,7 +12,10 @@ import Client from "shopify-buy";
 
 // Import your components here
 import Home from "./components/Home";
-import Footer from "./components/Footer";
+import About from "./Views/About/Bio.jsx";
+import Shop from "./components/Shop/Shop.jsx";
+import Music from "./components/Music/Music.jsx";
+import Footer from "./components/Footer/Footer.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
 import { ShopifyProvider, useShop } from "@shopify/hydrogen-react";
 
@@ -23,6 +31,8 @@ const Providers = () => {
 };
 
 function App() {
+  const location = useLocation();
+  console.log(location);
   return (
     <ShopifyProvider
       storeDomain="nickolamagnolia.myshopify.com"
@@ -34,15 +44,23 @@ function App() {
       <AlertProvider>
         <Alert />
         <ParallaxProvider>
-          <Router>
-            <div className="main">
-              {window.location !== "/home" && <Navbar />}
-              <Routes>
-                <Route path="/nicks-studio" element={<Home />} />
-              </Routes>
-              <Footer />
-            </div>
-          </Router>
+          <div
+            className="main"
+            style={{
+              backgroundImage:
+                location.pathname !== "/" &&
+                `url(${process.env.PUBLIC_URL}/n1.jpg)`,
+            }}
+          >
+            {window.location !== "/home" && <Navbar />}
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/music" element={<Music />} />
+            </Routes>
+            {location.pathname !== "/" && <Footer />}
+          </div>
         </ParallaxProvider>
       </AlertProvider>
     </ShopifyProvider>

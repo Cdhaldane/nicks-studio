@@ -1,12 +1,15 @@
 .music-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 5rem;
   color: white;
-  width: 98%;
+  width: 100%;
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
   margin: 0 auto;
+  margin-top: var(--nav-height);
+  min-height: 60vh;
   margin-bottom: 5rem;
+  animation: appearGrow 1s ease-in-out;
 }
 
 .music-timeline {
@@ -21,13 +24,21 @@
   flex-direction: column;
   text-align: center;
   user-select: text !important;
-  max-width: 90%;
-  max-height: 100%;
 }
 
+.image-item {
+  margin: 20px 25px;
+  margin-top: 50px;
+  width: calc(90vw / 3 - 50px) !important;
+}
 .album h3 {
   margin-top: 10px;
-  font-size: 1rem;
+}
+.container-with-dots {
+  width: 90%;
+  margin: 0 auto;
+
+  background-color: rgba(0, 0, 0, 0.487);
 }
 
 .album a {
@@ -37,17 +48,44 @@
   text-decoration: none;
 }
 
-.react-multi-carousel-list {
-  margin: 0 auto;
-  width: 100%;
-  overflow: visible !important;
-}
-
-.react-multi-carousel-list > ul > li {
-  width: auto !important;
-}
-
 .player-container {
   position: relative;
   bottom: 100px;
+}
+
+@media (max-width: 768px) {
+  .music-container {
+    margin-top: 20px;
+    min-height: 65vh;
+    justify-content: center;
+  }
+
+  .music-container .wrap {
+    width: 50vw;
+    height: 50vw;
+  }
+
+  .stack {
+    overflow: visible;
+  }
+
+  .container-with-dots {
+    height: 300px;
+    padding-bottom: 50px;
+  }
+  .image-item {
+    width: 200% !important;
+    margin: 8%;
+  }
+}
+
+@keyframes appearGrow {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

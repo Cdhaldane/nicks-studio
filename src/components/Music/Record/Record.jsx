@@ -8,10 +8,13 @@ const Record = ({ album, index, setCurrentSong }) => {
     <div
       className="wrap noselect"
       onMouseEnter={() => {
-        vinylRef.current.className = "enter";
+        if (vinylRef.current) vinylRef.current.className = "enter";
       }}
       onMouseLeave={() => {
-        vinylRef.current.className = "exit";
+        if (vinylRef.current) vinylRef.current.className = "exit";
+        setTimeout(() => {
+          if (vinylRef.current) vinylRef.current.className = "stop";
+        }, 1000);
       }}
       onClick={() => {
         setCurrentSong(album);

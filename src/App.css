@@ -17,14 +17,13 @@
   --yellow: #ddc036;
   --red: #e26262;
   --dred: #a23b3b;
+
+  --nav-height: 200px;
 }
 
 * {
   margin: 0;
   padding: 0;
-}
-
-#root {
 }
 
 html,
@@ -48,7 +47,9 @@ body {
   height: 90%;
   width: 100%;
   min-height: 100vh; /* Adjust height */
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  overflow-y: scroll;
+  background-size: cover;
 }
 
 .btn {
@@ -207,10 +208,31 @@ svg text,
   }
 }
 
+.loading {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #fff;
+  border-bottom-color: var(--dpink);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* Create custom scroll bar */
 
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 3px;
+  position: absolute;
 }
 
 /* Track */

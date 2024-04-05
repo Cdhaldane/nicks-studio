@@ -17,11 +17,12 @@ function Shop({ items }) {
   const [products, setProducts] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const { showAlert } = useAlert();
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts().then(() => setLoading(false));
   }, []);
 
   const fetchProducts = async () => {
@@ -55,14 +56,20 @@ function Shop({ items }) {
     });
     onClose();
   };
+  if (loading)
+    return (
+      <div className="shop-container">
+        <div className="loading"></div>
+      </div>
+    );
   return (
     <>
       <div className="shop-container">
         <Parallax speed={5}>
-          <div className="nav-title bio merch">
+          {/* <div className="nav-title bio merch">
             <span>Merchandise</span>
             <span className="back">Merchandise</span>
-          </div>
+          </div> */}
         </Parallax>
         <div className="shop-main">
           {products.map((product) => (
