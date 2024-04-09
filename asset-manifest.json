@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/nicks-studio/static/css/main.c23463b6.css",
-    "main.js": "/nicks-studio/static/js/main.95984da8.js",
+    "main.css": "/nicks-studio/static/css/main.af4c586f.css",
+    "main.js": "/nicks-studio/static/js/main.9cbc7323.js",
     "static/media/revicons.eot": "/nicks-studio/static/media/revicons.a77de540a38981833f9e.eot",
     "static/media/revicons.ttf": "/nicks-studio/static/media/revicons.57fd05d4ae650374c8de.ttf",
     "static/media/revicons.woff": "/nicks-studio/static/media/revicons.e8746a624ed098489406.woff",
     "index.html": "/nicks-studio/index.html",
-    "main.c23463b6.css.map": "/nicks-studio/static/css/main.c23463b6.css.map",
-    "main.95984da8.js.map": "/nicks-studio/static/js/main.95984da8.js.map"
+    "main.af4c586f.css.map": "/nicks-studio/static/css/main.af4c586f.css.map",
+    "main.9cbc7323.js.map": "/nicks-studio/static/js/main.9cbc7323.js.map"
   },
   "entrypoints": [
-    "static/css/main.c23463b6.css",
-    "static/js/main.95984da8.js"
+    "static/css/main.af4c586f.css",
+    "static/js/main.9cbc7323.js"
   ]
 }
