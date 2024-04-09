@@ -32,7 +32,7 @@ const Providers = () => {
 
 function App() {
   const location = useLocation();
-  console.log(location);
+
   return (
     <ShopifyProvider
       storeDomain="nickolamagnolia.myshopify.com"

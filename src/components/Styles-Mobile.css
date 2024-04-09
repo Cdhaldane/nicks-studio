@@ -1,4 +1,4 @@
-@media (max-width: 768px) {
+@media (max-width: 1250px) {
   .main {
     margin-top: 0px;
     width: 100%;
@@ -13,7 +13,7 @@
   .home-container > img {
     height: 100% !important;
     object-fit: cover;
-    object-position: 15% 0%;
+
     z-index: -2;
   }
   .home-stack {
@@ -36,6 +36,7 @@
     justify-content: flex-start;
     background-color: black;
     border-bottom: 2px solid var(--white);
+    flex-direction: column;
   }
   .nav-title {
     font-size: 2.5em !important;
@@ -163,6 +164,12 @@
     font-size: 1.5em;
     width: 10px;
     height: 10px;
+  }
+}
+
+@media (max-width: 750px) {
+  .home-container img {
+    object-position: 15% 0%;
   }
 }
 

@@ -21,7 +21,7 @@ const Navbar = () => {
     }
   }, []);
 
-  const isMobile = width <= 768;
+  const isMobile = width <= 1250;
 
   useEffect(() => {
     const handleClickOutside = (event) => {

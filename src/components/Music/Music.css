@@ -53,7 +53,7 @@
   bottom: 100px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1250px) {
   .music-container {
     margin-top: 20px;
     min-height: 65vh;
@@ -70,7 +70,6 @@
   }
 
   .container-with-dots {
-    height: 300px;
     padding-bottom: 50px;
   }
   .image-item {
