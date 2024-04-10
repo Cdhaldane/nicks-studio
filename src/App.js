@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   useLocation,
@@ -17,6 +17,7 @@ import Shop from "./components/Shop/Shop.jsx";
 import Music from "./components/Music/Music.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
+import Banner from "./components/Banner/Banner.jsx";
 import { ShopifyProvider, useShop } from "@shopify/hydrogen-react";
 
 import "./App.css";
@@ -52,6 +53,7 @@ function App() {
                 `url(${process.env.PUBLIC_URL}/n1.jpg)`,
             }}
           >
+            {/* <Banner message="Free shipping on orders over $100" /> */}
             {window.location !== "/home" && <Navbar />}
             <Routes>
               <Route path="/" element={<Home />} />
