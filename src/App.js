@@ -18,6 +18,7 @@ import Music from "./components/Music/Music.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Banner from "./components/Banner/Banner.jsx";
+import MailchimpFormContainer from "./components/MailChimpForm/MailChimpForm.jsx";
 import { ShopifyProvider, useShop } from "@shopify/hydrogen-react";
 
 import "./App.css";

@@ -144,11 +144,47 @@
   color: var(--dpink);
 }
 
+.email-join {
+  position: absolute;
+  bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--black);
+  color: var(--white);
+  border: 2px solid var(--white);
+  border-radius: 4px;
+  animation: slideInBottom 0.5s ease-out forwards;
+}
+
+.email-join::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -10px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: var(--white) transparent transparent transparent;
+}
+
 @keyframes backgroundFadeIn {
   from {
     opacity: 0;
   }
   to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInBottom {
+  from {
+    transform: translateY(50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
     opacity: 1;
   }
 }

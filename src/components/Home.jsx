@@ -6,6 +6,7 @@ import Navbar from "./Navbar/Navbar";
 import "./Styles.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Parallax } from "react-scroll-parallax";
+import MailchimpFormContainer from "./MailChimpForm/MailChimpForm";
 
 const imageList = [
   "n1.jpg",
@@ -20,6 +21,7 @@ const Home = () => {
   const [backgroundImage, setBackgroundImage] = useState(imageList[0]);
   const [backgroundImagePosition, setBackgroundImagePosition] = useState("top");
   const [imageIndex, setImageIndex] = useState(0);
+  const [isMail, setIsMail] = useState(false);
   const isMobile = window.innerWidth < 768;
 
   const navigate = useNavigate();
@@ -75,6 +77,14 @@ const Home = () => {
         >
           <i className="fa-brands fa-facebook"></i>
         </Link>
+        <a className="social-button" onClick={() => setIsMail(!isMail)}>
+          <i className="fa-solid fa-envelope"></i>
+        </a>
+        {isMail && (
+          <div className="email-join">
+            <MailchimpFormContainer onClose={() => setIsMail(false)} />
+          </div>
+        )}
         <Link
           to={"https://www.tiktok.com/@nickolamagnolia"}
           className="social-button"

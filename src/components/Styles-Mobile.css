@@ -157,11 +157,12 @@
   }
 
   .socials {
-    gap: 15px;
+    gap: 10px;
     bottom: 1em;
   }
   .social-button {
     font-size: 1.5em;
+    padding: 0.9rem;
     width: 10px;
     height: 10px;
   }
