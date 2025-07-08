@@ -1,0 +1,93 @@
+.mc__form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  padding: 1rem;
+}
+
+.email-join h3 {
+  font-size: 1.5em;
+}
+
+.email-join input,
+.email-join button {
+  width: 100%;
+  margin: 10px auto;
+  height: 40px;
+  padding: 0.5rem;
+  font-size: 1em;
+  border: 3px solid var(--white);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.email-join input[type="submit"],
+.email-join button {
+  padding: 0.5rem 1rem;
+  height: 40px;
+  background-color: var(--white);
+  border: 1px solid var(--white);
+  color: #141414;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s ease all;
+}
+
+.email-join input[type="submit"]:hover,
+.email-join button:hover {
+  background-color: var(--black);
+  color: var(--white);
+}
+
+.mc__alert {
+  color: var(--white);
+  background-color: var(--black);
+  border-radius: 4px;
+  margin: 10px auto;
+  text-align: center;
+}
+
+.mc__alert--error {
+  color: var(--red);
+}
+
+.mc__alert--success {
+  color: var(--green);
+}
+
+.mc__alert--sending {
+  color: var(--yellow);
+}
+
+@media screen and (max-width: 768px) {
+  .email-join {
+    border-radius: 0;
+    font-size: 0.8rem;
+  }
+
+  .email-join input,
+  .email-join button,
+  .email-join input[type="submit"] {
+    width: 100%;
+    margin: 10px auto;
+    height: 30px;
+    padding: 0.5rem;
+    font-size: 0.9em;
+    border: 3px solid var(--white);
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin: 5px auto;
+  }
+
+  .email-join h3 {
+    font-size: 1.5em;
+  }
+}

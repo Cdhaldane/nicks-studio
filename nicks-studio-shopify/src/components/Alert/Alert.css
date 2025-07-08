@@ -1,0 +1,30 @@
+.alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  left: 2%;
+  top: 10px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1em !important;
+  z-index: 1001;
+}
+
+.alert i {
+  font-size: 1em;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.alert-error {
+  color: var(--white);
+  background-color: var(--red);
+  margin-top: 10px;
+}
+
+.alert-success {
+  color: var(--white);
+  background-color: var(--green);
+  margin-top: 10px;
+}

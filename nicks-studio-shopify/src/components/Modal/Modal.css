@@ -1,0 +1,96 @@
+/* FILEPATH: /c:/Users/CharllieDhaldane/Desktop/Work/portfolio/VOSYN-WEBAPP/vosyn-webapp/src/Components/Modal/Modal.css */
+
+.modal {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--secondary-light);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  padding: 10px 20px;
+  width: max-content;
+  max-width: 30%;
+  min-width: 300px;
+  position: relative;
+  color: var(--text);
+  font-size: 0.8rem;
+  z-index: 10000;
+  animation: appear 0.3s ease-in-out;
+}
+
+.modal-content input {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--lightgrey);
+  color: var(--text);
+  outline: none;
+  font: 1em sans-serif;
+}
+
+.modal-content h1 {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: var(--text);
+}
+
+.modal-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--text);
+  padding-bottom: 5px;
+}
+
+.modal-main img {
+  width: auto;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.modal-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 50px;
+  gap: 10px;
+}
+
+.modal-footer button {
+  border-radius: 0;
+  width: 100% !important;
+  height: 42px !important;
+}
+
+.br-left {
+  border-radius: 4px 0px 0px 4px !important;
+}
+
+.br-right {
+  border-radius: 0px 4px 4px 0px !important;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

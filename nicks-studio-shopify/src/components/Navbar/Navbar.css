@@ -1,0 +1,141 @@
+.nav-links {
+  display: flex;
+  width: 90%;
+  height: fit-content;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  top: 80px !important;
+  left: 5%;
+  transition: all 0.5s ease-out;
+  z-index: 100;
+}
+.nav-links > a {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+.nav-links.expanded {
+  animation: grow 0.5s ease forwards;
+}
+.nav-links.not-expanded {
+  animation: shrink 0.5s ease forwards;
+}
+
+@keyframes grow {
+  from {
+    height: 100px;
+  }
+  to {
+    height: fit-content
+  }
+}
+
+@keyframes shrink {
+  from {
+    height: 370px;
+  }
+  to {
+    height: 100px;
+  }
+}
+
+.nav-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 6em;
+  width: 4em;
+  color: var(--white);
+  font-weight: 700;
+  font-family: "Pacifico", cursive;
+  rotate: -5deg;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.nav-title > span {
+  text-align: center;
+  line-height: 5rem;
+  position: absolute;
+  text-shadow: 2px 2px 2px var(--dpink);
+}
+
+.nav-title .back {
+  color: var(--primary);
+  z-index: -1;
+  transform: translateY(2%) translateX(5px);
+}
+
+.nav-button {
+  height: fit-content;
+  color: var(--white);
+  text-shadow: 2px 2px 2px var(--black);
+  padding: 0% 1%;
+  font-family: "Rye", sans-serif;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 1.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  color: var(--dpink) !important;
+  transition: all 0.3s ease;
+}
+
+.mobile-links {
+  display: flex;
+  flex-direction: column;
+  width: 99%;
+  gap: 20px;
+  padding: 20px;
+  animation: slideIn 1s ease forwards;
+}
+
+.mobile-links a {
+  color: var(--white);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: 800;
+  font-family: "Rye", sans-serif;
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-10%);
+  }
+}
+/* .nav-links.scrolled {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  flex-wrap: nowrap;
+  background-color: black;
+  border-bottom: 2px solid #d83b65;
+}
+
+.nav-links.scrolled a {
+  width: 100%;
+  border: none;
+  padding: 20px 20px;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  animation: toSmallButton 1s ease forwards;
+} */
+
+@keyframes toSmallButton {
+  from {
+    padding: 3%;
+  }
+  to {
+    padding: 20px 20px;
+  }
+}

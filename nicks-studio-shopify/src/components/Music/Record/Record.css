@@ -1,0 +1,77 @@
+#wrap {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.album {
+  position: relative;
+  cursor: pointer;
+  user-select: none !important;
+   z-index: 100000;
+}
+.wrap {
+  user-select: none !important;
+}
+.album::after {
+  position: absolute;
+  top: -2%;
+  left: 0;
+  width: 100%;
+  height: 5%;
+  z-index: 100000;
+  background-color: rgba(0, 0, 0, 0.607);
+  border-radius: 40%;
+  content: "";
+  z-index: -3 !important;
+}
+
+#vinyl {
+  position: absolute;
+  top: 0%;
+  left: 5%;
+  margin: 0 auto;
+  z-index: -1;
+  width: 90%;
+  aspect-ratio: 1/1;
+  display: block;
+  background-image: url("https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Music-PNG/Gramophone_Vinyl_LP_Record_PNG_Transparent_Clip_Art_Image.png?m=1462983196");
+  background-size: 106% 106%;
+  background-position: center;
+  box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  content: "";
+}
+
+.enter {
+  animation: 5s linear spinThat infinite, ease-out getOut 1s forwards;
+}
+
+.exit {
+  animation: ease-in getIn 0.5s forwards, 5s linear spinThat infinite;
+}
+.stop {
+  top: -5% !important;
+}
+
+@keyframes getOut {
+  0% {
+    top: -5%;
+  }
+  100% {
+    top: -8%;
+  }
+}
+@keyframes getIn {
+  0% {
+    top: -8%;
+  }
+  100% {
+    top: -5%;
+  }
+}
+@keyframes spinThat {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
