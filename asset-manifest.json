@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "https://nickolamagnolia.com/static/css/main.0ec9d745.css",
-    "main.js": "https://nickolamagnolia.com/static/js/main.dea88c8b.js",
+    "main.css": "https://nickolamagnolia.com/static/css/main.87576057.css",
+    "main.js": "https://nickolamagnolia.com/static/js/main.da9f3d5f.js",
     "static/js/537.d9b8c019.chunk.js": "https://nickolamagnolia.com/static/js/537.d9b8c019.chunk.js",
     "static/media/revicons.eot": "https://nickolamagnolia.com/static/media/revicons.a77de540a38981833f9e.eot",
     "static/media/revicons.ttf": "https://nickolamagnolia.com/static/media/revicons.57fd05d4ae650374c8de.ttf",
     "static/media/revicons.woff": "https://nickolamagnolia.com/static/media/revicons.e8746a624ed098489406.woff",
     "index.html": "https://nickolamagnolia.com/index.html",
-    "main.0ec9d745.css.map": "https://nickolamagnolia.com/static/css/main.0ec9d745.css.map",
-    "main.dea88c8b.js.map": "https://nickolamagnolia.com/static/js/main.dea88c8b.js.map",
+    "main.87576057.css.map": "https://nickolamagnolia.com/static/css/main.87576057.css.map",
+    "main.da9f3d5f.js.map": "https://nickolamagnolia.com/static/js/main.da9f3d5f.js.map",
     "537.d9b8c019.chunk.js.map": "https://nickolamagnolia.com/static/js/537.d9b8c019.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0ec9d745.css",
-    "static/js/main.dea88c8b.js"
+    "static/css/main.87576057.css",
+    "static/js/main.da9f3d5f.js"
   ]
 }
