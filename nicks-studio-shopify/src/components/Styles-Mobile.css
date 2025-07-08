@@ -8,7 +8,7 @@
 }
 
 /* Medium devices (tablets, 768px and up) */
-@media (max-width: 768px) {
+@media (max-width: 1300px) {
   /* Global mobile adjustments */
   :root {
     --nav-height: 80px;
@@ -53,7 +53,7 @@
 
   /* Navigation mobile styles */
   .nav-links {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -68,10 +68,10 @@
   }
 
   .nav-links.expanded {
-    transform: translateY(-17%);
+    transform: translateY(-12%);
   }
   .nav-links.expanded .nav-links-bars {
-    transform: translateY(-1rem);
+    top: calc(var(--nav-height) / 2);
   }
 
   .nav-title {
@@ -90,7 +90,6 @@
 
   .nav-links-bars {
     position: fixed;
-    top: 2rem;
     left: var(--space-md);
     color: var(--white);
     background-color: var(--bg-primary);

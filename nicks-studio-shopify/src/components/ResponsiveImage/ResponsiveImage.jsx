@@ -21,7 +21,7 @@ const ResponsiveImage = ({
   const imageName = getImageName(src);
   
   const generateSrcSet = (name, format = 'jpg') => {
-    const basePath = format === 'webp' ? '/optimized/webp/' : '/optimized/';
+    const basePath = format === 'webp' ? `${process.env.PUBLIC_URL}/optimized/webp/` : `${process.env.PUBLIC_URL}/optimized/`;
     const extension = format === 'webp' ? '.webp' : '.jpg';
     
     return [
@@ -35,7 +35,7 @@ const ResponsiveImage = ({
 
   const webpSrcSet = generateSrcSet(imageName, 'webp');
   const jpegSrcSet = generateSrcSet(imageName, 'jpg');
-  const fallbackSrc = `/optimized/${imageName}-medium.jpg`;
+  const fallbackSrc = `${process.env.PUBLIC_URL}/optimized/${imageName}-medium.jpg`;
 
   return (
     <picture className={`responsive-image ${className}`} {...props}>

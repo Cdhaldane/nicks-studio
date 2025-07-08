@@ -2,6 +2,7 @@ import React from "react";
 import { Parallax } from "react-scroll-parallax";
 import SEOHelmet from "../../components/SEO/SEOHelmet";
 import { PersonSchema, BreadcrumbSchema } from "../../components/SEO/StructuredData";
+import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 import "./Bio.css";
 
 const Bio = () => {
@@ -35,10 +36,12 @@ const Bio = () => {
       <div className="bio-container">
       <div className="bio-main">
         <Parallax speed={5}>
-          <img
-            src={process.env.PUBLIC_URL + "/nick-bio.jpg"}
-            alt="Profile"
+          <ResponsiveImage
+            src="nick-bio"
+            alt="Nickola Magnolia - Country & Americana Artist"
             className="bio-image drop-in"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
           />
         </Parallax>
         <span>

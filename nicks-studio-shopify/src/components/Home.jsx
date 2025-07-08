@@ -118,18 +118,14 @@ const Home = () => {
         ref={heroRef}
         className={`home-container ${hasAnimated ? 'animate-in' : ''}`}
       >
-        <picture>
-          <source 
-            srcSet={`${process.env.PUBLIC_URL}${getCurrentHeroImage()}`}
-            media="(min-width: 768px)"
-          />
-          <img
-            src={`${process.env.PUBLIC_URL}${getCurrentHeroImage()}`}
-            alt="Nickola Magnolia - Country & Americana Artist"
-            loading="eager"
-            className="hero-image"
-          />
-        </picture>
+        <ResponsiveImage
+          src={getCurrentHeroImage().replace('.jpg', '')} // Remove extension as ResponsiveImage expects base name
+          alt="Nickola Magnolia - Country & Americana Artist"
+          className="hero-image"
+          loading="eager"
+          sizes="100vw"
+          priority={true}
+        />
         
         {/* Hero overlay content */}
         <div className="hero-overlay">

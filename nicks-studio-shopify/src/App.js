@@ -63,7 +63,7 @@ function App() {
                   backgroundImage:
                     location.pathname !== "/" &&
                     location.pathname !== "/admin" &&
-                    `url(${process.env.PUBLIC_URL}/n1.jpg)`,
+                    `url(${process.env.PUBLIC_URL}/optimized/n1-large.jpg)`,
                 }}
               >
                 {/* <Banner message="Free shipping on orders over $100" /> */}
