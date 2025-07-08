@@ -68,10 +68,12 @@
   }
 
   .nav-links.expanded {
-    transform: translateY(-12%);
+    transform: translateY(0%);
+    top: 0 !important;
   }
   .nav-links.expanded .nav-links-bars {
-    top: calc(var(--nav-height) / 2);
+    position: absolute;
+    top: 15px;
   }
 
   .nav-title {
