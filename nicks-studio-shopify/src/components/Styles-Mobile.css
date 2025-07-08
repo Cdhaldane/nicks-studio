@@ -111,7 +111,6 @@
     right: var(--space-md);
     z-index: var(--z-tooltip);
     border: none;
-    backdrop-filter: blur(10px);
     border-radius: var(--radius-md);
   }
 
@@ -257,16 +256,7 @@
   }
 
   /* Modal mobile styles */
-  .modal-content {
-    width: 95vw;
-    max-width: 400px;
-    height: auto;
-    max-height: 90vh;
-    margin: var(--space-md);
-    padding: var(--space-lg);
-    border-radius: var(--radius-xl);
-    overflow-y: auto;
-  }
+
 
   .modal-header {
     flex-direction: column;

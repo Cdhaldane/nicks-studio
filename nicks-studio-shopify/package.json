@@ -49,6 +49,8 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "optimize-images": "node scripts/optimize-images.js",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,md}",
     "type-check": "tsc --noEmit",
     "analyze": "npm run build && npx bundle-analyzer build/static/js/*.js"

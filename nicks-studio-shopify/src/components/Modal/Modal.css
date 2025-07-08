@@ -14,6 +14,20 @@
   z-index: 1000;
 }
 
+@media (max-width: 768px) {
+  .modal {
+    padding: 0;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 0;
+    align-items: center;
+  }
+}
+
 .modal-content {
   background-color: var(--secondary-light);
   padding: 20px;
@@ -32,6 +46,31 @@
   animation: appear 0.3s ease-in-out;
 }
 
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 90vw;
+    min-width: 280px;
+    margin: 20px;
+    padding: 15px;
+    font-size: 0.9rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: 95vw;
+    min-width: 250px;
+    margin: 10px;
+    padding: 12px;
+    font-size: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
 .modal-content input {
   margin-bottom: 10px;
   padding: 10px;
@@ -43,10 +82,25 @@
   font: 1em sans-serif;
 }
 
+@media (max-width: 768px) {
+  .modal-content input {
+    padding: 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    margin-bottom: 12px;
+  }
+}
+
 .modal-content h1 {
   font-size: 0.9rem;
   margin-bottom: 5px;
   color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .modal-content h1 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
 }
 
 .modal-header {
@@ -72,10 +126,24 @@
   gap: 10px;
 }
 
+@media (max-width: 768px) {
+  .modal-footer {
+    height: 60px;
+    gap: 12px;
+  }
+}
+
 .modal-footer button {
   border-radius: 0;
   width: 100% !important;
   height: 42px !important;
+}
+
+@media (max-width: 768px) {
+  .modal-footer button {
+    height: 48px !important;
+    min-height: 44px; /* Better touch target size */
+  }
 }
 
 .br-left {
