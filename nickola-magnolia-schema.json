@@ -1,0 +1,116 @@
+{
+  "@context": "https://schema.org",
+  "@type": "MusicGroup",
+  "name": "Nickola Magnolia",
+  "description": "Country & Americana musician from the Great Lakes region, intertwining classic Country melodies with intimate Rock and Americana influences",
+  "url": "https://nickolamagnolia.com",
+  "image": "https://nickolamagnolia.com/nick-bio.jpg",
+  "logo": "https://nickolamagnolia.com/nick-bio.jpg",
+  "genre": ["Country", "Americana", "Rock"],
+  "foundingDate": "2020",
+  "foundingLocation": {
+    "@type": "Place",
+    "name": "Great Lakes Region",
+    "addressRegion": "Michigan",
+    "addressCountry": "US",
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "42.3314",
+      "longitude": "-84.5467"
+    }
+  },
+  "member": {
+    "@type": "Person",
+    "name": "Nickola Magnolia",
+    "jobTitle": "Musician",
+    "description": "Singer, songwriter, and guitarist specializing in Country and Americana music",
+    "birthPlace": {
+      "@type": "Place",
+      "addressRegion": "Michigan",
+      "addressCountry": "US"
+    },
+    "knowsAbout": [
+      "Country Music",
+      "Americana",
+      "Songwriting",
+      "Guitar",
+      "Vocals",
+      "Live Performance"
+    ]
+  },
+  "album": [
+    {
+      "@type": "MusicAlbum",
+      "name": "Broken Lonesome",
+      "datePublished": "2022",
+      "albumProductionType": "https://schema.org/StudioAlbum",
+      "albumReleaseType": "https://schema.org/AlbumRelease",
+      "genre": ["Country", "Americana"],
+      "description": "Debut record featuring stunning vocal performances and thoughtful intimate songwriting",
+      "byArtist": {
+        "@type": "MusicGroup",
+        "name": "Nickola Magnolia"
+      }
+    }
+  ],
+  "sameAs": [
+    "https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4",
+    "https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q",
+    "https://www.instagram.com/nickolamagnolia",
+    "https://music.apple.com/artist/nickola-magnolia",
+    "https://www.facebook.com/nickolamagnolia",
+    "https://soundcloud.com/nickolamagnolia"
+  ],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://nickolamagnolia.com"
+  },
+  "potentialAction": [
+    {
+      "@type": "ListenAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4",
+        "actionPlatform": [
+          "https://schema.org/DesktopWebPlatform",
+          "https://schema.org/MobileWebPlatform"
+        ]
+      },
+      "expectsAcceptanceOf": {
+        "@type": "Offer",
+        "category": "free"
+      }
+    }
+  ],
+  "performerIn": [
+    {
+      "@type": "MusicEvent",
+      "name": "Opening for Chris Janson",
+      "description": "Notable performance opening for country artist Chris Janson",
+      "performer": {
+        "@type": "MusicGroup",
+        "name": "Nickola Magnolia"
+      }
+    },
+    {
+      "@type": "MusicEvent", 
+      "name": "Opening for Keith Whitley",
+      "description": "Notable performance opening for country legend Keith Whitley",
+      "performer": {
+        "@type": "MusicGroup",
+        "name": "Nickola Magnolia"
+      }
+    }
+  ],
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/ListenAction",
+      "userInteractionCount": 10000
+    }
+  ],
+  "award": [
+    "Notable for stunning vocal performance",
+    "Recognized for thoughtful intimate songwriting"
+  ]
+}
