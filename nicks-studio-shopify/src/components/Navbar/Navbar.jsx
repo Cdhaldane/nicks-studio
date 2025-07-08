@@ -141,7 +141,10 @@ const Navbar = () => {
           <div className="mobile-links">
             <Link
               to={"/about"}
-              onClick={() => setActive("about")}
+              onClick={() => {
+                setActive("about");
+                setIsOpen(false);
+              }}
               className="nav-button"
               style={{
                 color: active === "about" ? "var(--dpink)" : "var(--white)",
@@ -151,7 +154,10 @@ const Navbar = () => {
             </Link>
             <Link
               to={"/music"}
-              onClick={() => setActive("listen")}
+              onClick={() => {
+                setActive("listen");
+                setIsOpen(false);
+              }}
               className="nav-button"
               style={{
                 color: active === "listen" ? "var(--dpink)" : "var(--white)",
@@ -161,13 +167,17 @@ const Navbar = () => {
             </Link>
             <Link
               to={"https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q"}
+              onClick={() => setIsOpen(false)}
               className="nav-button"
             >
               Watch
             </Link>
             <Link
               to={"/shop"}
-              onClick={() => setActive("shop")}
+              onClick={() => {
+                setActive("shop");
+                setIsOpen(false);
+              }}
               className="nav-button"
               style={{
                 color: active === "shop" ? "var(--dpink)" : "var(--white)",
@@ -177,6 +187,7 @@ const Navbar = () => {
             </Link>
             <Link
               to={"https://www.instagram.com/direct/t/100599608092241"}
+              onClick={() => setIsOpen(false)}
               className="nav-button"
             >
               Contact

@@ -40,7 +40,7 @@ export const CONSTANTS = {
   // Image rotation settings
   IMAGE_ROTATION: {
     INTERVAL: 15000, // 15 seconds
-    IMAGES: ['n1.jpg', 'n2.jpg'],
+    IMAGES: ['n1.jpg'],
   },
 
   // Spotify artist ID

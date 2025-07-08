@@ -75,6 +75,8 @@
   }
 
   .nav-title {
+    position: relative;
+    top: 10px;
     font-size: clamp(1.5rem, 6vw, 2rem) !important;
     width: auto;
     height: auto;

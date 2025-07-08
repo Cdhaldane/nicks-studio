@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Parallax } from 'react-scroll-parallax';
 import MailchimpFormContainer from './MailChimpForm/MailChimpForm';
+import ResponsiveImage from './ResponsiveImage/ResponsiveImage';
 import { useWindowSize } from '../hooks/useWindowSize';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { CONSTANTS, SOCIAL_MEDIA } from '../utils/constants';
@@ -41,13 +42,12 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [isMobile]);
 
-  // Get current hero image
+  // Get current hero image for ResponsiveImage component
   const getCurrentHeroImage = useCallback(() => {
-    if (isMobile) return '/n6.jpg';
-    
     const images = CONSTANTS.IMAGE_ROTATION.IMAGES;
-    return `/${images[imageIndex] || images[0]}`;
-  }, [isMobile, imageIndex]);
+    const currentImage = images[imageIndex] || images[0];
+    return currentImage; // Just return the base filename (e.g., "n1.jpg")
+  }, [imageIndex]);
 
   // Close email modal on escape key
   useEffect(() => {
