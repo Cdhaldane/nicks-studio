@@ -10,9 +10,12 @@ const NewsPopup = ({ forceShow = false, onForceClose = null }) => {
     // Show popup if forced to show or if user hasn't visited before
     if (forceShow || !hasVisited) {
       // Small delay to ensure page has loaded
-      const timer = setTimeout(() => {
-        setShowPopup(true);
-      }, forceShow ? 100 : 1000);
+      const timer = setTimeout(
+        () => {
+          setShowPopup(true);
+        },
+        forceShow ? 100 : 1000
+      );
 
       return () => clearTimeout(timer);
     }

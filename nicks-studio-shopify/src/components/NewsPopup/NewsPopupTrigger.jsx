@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import NewsPopup from '../NewsPopup/NewsPopup';
 import './NewsPopupTrigger.css';
 
-const NewsPopupTrigger = ({ 
-  triggerText = "🎵 View Tour Dates", 
-  position = "bottom-right",
-  style = "floating" // "floating" or "inline"
+const NewsPopupTrigger = ({
+  triggerText = '🎵 View Tour Dates',
+  position = 'bottom-right',
+  style = 'floating', // "floating" or "inline"
 }) => {
   const [showPopup, setShowPopup] = useState(false);
 
@@ -21,19 +21,16 @@ const NewsPopupTrigger = ({
 
   return (
     <>
-      <button 
+      <button
         className={triggerClassName}
         onClick={handleTriggerClick}
         title="Click to view tour dates and news"
       >
         {triggerText}
       </button>
-      
+
       {showPopup && (
-        <NewsPopup 
-          forceShow={true} 
-          onForceClose={handlePopupClose}
-        />
+        <NewsPopup forceShow={true} onForceClose={handlePopupClose} />
       )}
     </>
   );

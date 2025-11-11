@@ -97,12 +97,12 @@
     bottom: 15px;
     right: 15px;
   }
-  
+
   .news-trigger.bottom-left {
     bottom: 15px;
     left: 15px;
   }
-  
+
   .news-trigger.top-right,
   .news-trigger.top-left {
     top: 70px;
@@ -115,7 +115,7 @@
     font-size: 0.8em;
     border-radius: 20px;
   }
-  
+
   .news-trigger.bottom-center {
     bottom: 15px;
     padding: 10px 15px;
@@ -143,6 +143,12 @@
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
