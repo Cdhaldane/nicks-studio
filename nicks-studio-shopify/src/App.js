@@ -28,6 +28,8 @@ import Footer from "./components/Footer/Footer.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Banner from "./components/Banner/Banner.jsx";
 import MailchimpFormContainer from "./components/MailChimpForm/MailChimpForm.jsx";
+import NewsPopup from "./components/NewsPopup/NewsPopup.jsx";
+import NewsPopupTrigger from "./components/NewsPopup/NewsPopupTrigger.jsx";
 import { ShopifyProvider, useShop } from "@shopify/hydrogen-react";
 
 import "./App.css";
@@ -56,6 +58,7 @@ function App() {
         >
           <AlertProvider>
             <Alert />
+            <NewsPopup />
             <ParallaxProvider>
               <div
                 className="main"
@@ -80,6 +83,14 @@ function App() {
                 </Routes>
                 {location.pathname !== "/" && location.pathname !== "/admin" && <Footer />}
               </div>
+              {/* Floating trigger for news popup - appears on all pages except admin */}
+              {location.pathname !== "/admin" && (
+                <NewsPopupTrigger 
+                  triggerText="🎵 Tour Dates"
+                  position="bottom-right"
+                  style="floating"
+                />
+              )}
             </ParallaxProvider>
           </AlertProvider>
         </ShopifyProvider>
