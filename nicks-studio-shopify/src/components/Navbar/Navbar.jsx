@@ -114,13 +114,8 @@ const Navbar = () => {
         {isOpen && !isMobile && (
           <>
             <Link
-              to={"/shop"}
-              onClick={() => setActive("shop")}
+              to={"https://nickolamagnolia.myshopify.com"}
               className="nav-button"
-              style={{
-                color: active === "shop" ? "var(--dpink)" : "var(--white)",
-                scale: active === "shop" ? "1.2" : "1",
-              }}
             >
               Merchandise
             </Link>
@@ -173,15 +168,9 @@ const Navbar = () => {
               Watch
             </Link>
             <Link
-              to={"/shop"}
-              onClick={() => {
-                setActive("shop");
-                setIsOpen(false);
-              }}
+              to={"https://nickolamagnolia.myshopify.com"}
+              onClick={() => setIsOpen(false)}
               className="nav-button"
-              style={{
-                color: active === "shop" ? "var(--dpink)" : "var(--white)",
-              }}
             >
               Merchandise
             </Link>
