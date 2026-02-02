@@ -79,29 +79,31 @@ export const fetchProductsByCollection = async collectionId => {
 export const createCheckout = async lineItems => {
   try {
     console.log('Creating checkout with items:', lineItems);
-    
+
     // Extract the numeric variant ID from the Shopify GID
     // Format: gid://shopify/ProductVariant/12345678 -> 12345678
-    const cartItems = lineItems.map(item => {
-      const variantId = item.variantId.split('/').pop();
-      return `${variantId}:${item.quantity}`;
-    }).join(',');
-    
+    const cartItems = lineItems
+      .map(item => {
+        const variantId = item.variantId.split('/').pop();
+        return `${variantId}:${item.quantity}`;
+      })
+      .join(',');
+
     // Construct the checkout URL
     // Format: https://store.myshopify.com/cart/VARIANT_ID:QUANTITY,VARIANT_ID:QUANTITY
     const checkoutUrl = `https://${shopifyDomain}/cart/${cartItems}`;
-    
+
     console.log('Checkout URL created:', checkoutUrl);
-    
+
     return {
       webUrl: checkoutUrl,
-      id: 'direct-cart'
+      id: 'direct-cart',
     };
   } catch (error) {
     console.error('Error creating checkout:', {
       error,
       message: error.message,
-      lineItems
+      lineItems,
     });
     throw error;
   }
