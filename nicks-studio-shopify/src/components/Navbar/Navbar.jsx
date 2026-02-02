@@ -1,38 +1,38 @@
-import React, { useState, useEffect } from "react";
-import Cart from "../Cart/Cart";
-import "./Navbar.css";
-import { Link, redirect, useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import Cart from '../Cart/Cart';
+import './Navbar.css';
+import { Link, redirect, useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
   const [isOpen, setIsOpen] = useState(true);
-  const [active, setActive] = useState("home");
+  const [active, setActive] = useState('home');
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/about") {
-      setActive("about");
-    } else if (location.pathname === "/music") {
-      setActive("listen");
-    } else if (location.pathname === "/shop") {
-      setActive("shop");
+    if (location.pathname === '/about') {
+      setActive('about');
+    } else if (location.pathname === '/music') {
+      setActive('listen');
+    } else if (location.pathname === '/shop') {
+      setActive('shop');
     }
   }, []);
 
   const [isMobile, setIsMobile] = useState(width <= 1250);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      const el = document.querySelector(".nav-links");
+    const handleClickOutside = event => {
+      const el = document.querySelector('.nav-links');
       if (!el.contains(event.target) && isMobile) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
     return () => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, []);
 
@@ -55,49 +55,49 @@ const Navbar = () => {
         setIsMobile(true);
       }
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId).scrollIntoView({ behavior: "smooth" });
+  const scrollToSection = sectionId => {
+    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <>
       <div
         className={`nav-links drop-in ${
-          isOpen && isMobile ? "expanded" : "not-expanded  "
+          isOpen && isMobile ? 'expanded' : 'not-expanded  '
         }`}
       >
         {isOpen && !isMobile && (
           <>
             <Link
-              to={"/about"}
-              onClick={() => setActive("about")}
+              to={'/about'}
+              onClick={() => setActive('about')}
               className="nav-button"
               style={{
-                color: active === "about" ? "var(--dpink)" : "var(--white)",
-                scale: active === "about" ? "1.2" : "1",
+                color: active === 'about' ? 'var(--dpink)' : 'var(--white)',
+                scale: active === 'about' ? '1.2' : '1',
               }}
             >
               About
             </Link>
             <Link
-              to={"/music"}
-              onClick={() => setActive("listen")}
+              to={'/music'}
+              onClick={() => setActive('listen')}
               className="nav-button"
               style={{
-                color: active === "listen" ? "var(--dpink)" : "var(--white)",
-                scale: active === "listen" ? "1.2" : "1",
+                color: active === 'listen' ? 'var(--dpink)' : 'var(--white)',
+                scale: active === 'listen' ? '1.2' : '1',
               }}
             >
               Listen
             </Link>
             <Link
-              to={"https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q"}
+              to={'https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q'}
               className="nav-button"
             >
               Watch
@@ -105,8 +105,8 @@ const Navbar = () => {
           </>
         )}
         <div
-          className={`nav-title ${isMobile ? "mobile-title" : ""}`}
-          onClick={() => navigate("/")}
+          className={`nav-title ${isMobile ? 'mobile-title' : ''}`}
+          onClick={() => navigate('/')}
         >
           <span>Nickola Magnolia</span>
           <span className="back">Nickola Magnolia</span>
@@ -114,13 +114,18 @@ const Navbar = () => {
         {isOpen && !isMobile && (
           <>
             <Link
-              to={"https://nickolamagnolia.myshopify.com"}
+              to={'/shop'}
+              onClick={() => setActive('shop')}
               className="nav-button"
+              style={{
+                color: active === 'shop' ? 'var(--dpink)' : 'var(--white)',
+                scale: active === 'shop' ? '1.2' : '1',
+              }}
             >
               Merchandise
             </Link>
             <Link
-              to={"https://www.instagram.com/direct/t/100599608092241"}
+              to={'https://www.instagram.com/direct/t/100599608092241'}
               className="nav-button"
             >
               Contact
@@ -135,47 +140,53 @@ const Navbar = () => {
         {isMobile && isOpen && (
           <div className="mobile-links">
             <Link
-              to={"/about"}
+              to={'/about'}
               onClick={() => {
-                setActive("about");
+                setActive('about');
                 setIsOpen(false);
               }}
               className="nav-button"
               style={{
-                color: active === "about" ? "var(--dpink)" : "var(--white)",
+                color: active === 'about' ? 'var(--dpink)' : 'var(--white)',
               }}
             >
               About
             </Link>
             <Link
-              to={"/music"}
+              to={'/music'}
               onClick={() => {
-                setActive("listen");
+                setActive('listen');
                 setIsOpen(false);
               }}
               className="nav-button"
               style={{
-                color: active === "listen" ? "var(--dpink)" : "var(--white)",
+                color: active === 'listen' ? 'var(--dpink)' : 'var(--white)',
               }}
             >
               Listen
             </Link>
             <Link
-              to={"https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q"}
+              to={'https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q'}
               onClick={() => setIsOpen(false)}
               className="nav-button"
             >
               Watch
             </Link>
             <Link
-              to={"https://nickolamagnolia.myshopify.com"}
-              onClick={() => setIsOpen(false)}
+              to={'/shop'}
+              onClick={() => {
+                setActive('shop');
+                setIsOpen(false);
+              }}
               className="nav-button"
+              style={{
+                color: active === 'shop' ? 'var(--dpink)' : 'var(--white)',
+              }}
             >
               Merchandise
             </Link>
             <Link
-              to={"https://www.instagram.com/direct/t/100599608092241"}
+              to={'https://www.instagram.com/direct/t/100599608092241'}
               onClick={() => setIsOpen(false)}
               className="nav-button"
             >

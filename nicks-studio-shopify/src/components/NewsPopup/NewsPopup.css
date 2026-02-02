@@ -76,7 +76,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8f8f8;
+  background: var(--secondary, #f8f8f8);
 }
 
 .news-popup-image img {
@@ -127,7 +127,7 @@
 }
 
 .news-btn.primary {
-  background: linear-gradient(45deg, #e74c3c, #f39c12);
+  background: linear-gradient(45deg, var(--primary, #e74c3c), #f39c12);
   color: white;
   text-decoration: none;
   display: inline-flex;
@@ -136,7 +136,7 @@
 }
 
 .news-btn.primary:hover {
-  background: linear-gradient(45deg, #c0392b, #e67e22);
+  background: linear-gradient(45deg, var(--primary-dark, #c0392b), #e67e22);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
   text-decoration: none;

@@ -19,7 +19,7 @@
 /* Floating Button Styles */
 .news-trigger.floating {
   position: fixed;
-  background: linear-gradient(45deg, #e74c3c, #f39c12);
+  background: linear-gradient(45deg, var(--primary, #e74c3c), #f39c12);
   color: white;
   padding: 12px 20px;
   font-size: 0.9em;
@@ -27,7 +27,7 @@
 }
 
 .news-trigger.floating:hover {
-  background: linear-gradient(45deg, #c0392b, #e67e22);
+  background: linear-gradient(45deg, var(--primary-dark, #c0392b), #e67e22);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
   animation: none;
@@ -114,6 +114,7 @@
     padding: 8px 12px;
     font-size: 0.8em;
     border-radius: 20px;
+    bottom: 90px;
   }
 
   .news-trigger.bottom-center {
