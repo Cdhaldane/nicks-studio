@@ -217,7 +217,7 @@
 
 .loading {
   text-align: center;
-  padding: 80px 20px;
+  padding: 20px 20px;
   color: var(--text);
   font-size: 1.2rem;
   grid-column: 1 / -1;

@@ -86,13 +86,13 @@ function App() {
                   location.pathname !== '/admin' && <Footer />}
               </div>
               {/* Floating trigger for news popup - appears on all pages except admin */}
-              {location.pathname !== '/admin' && (
+              {/* {location.pathname !== '/admin' && (
                 <NewsPopupTrigger
                   triggerText="🎵 Tour Dates"
                   position="bottom-right"
                   style="floating"
                 />
-              )}
+              )} */}
             </ParallaxProvider>
           </AlertProvider>
         </ShopifyProvider>

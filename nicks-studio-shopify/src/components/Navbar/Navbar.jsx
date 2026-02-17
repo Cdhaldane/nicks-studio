@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Cart from '../Cart/Cart';
+import Cart from '../Cart/CartSquare';
 import './Navbar.css';
 import { Link, redirect, useNavigate, useLocation } from 'react-router-dom';
 

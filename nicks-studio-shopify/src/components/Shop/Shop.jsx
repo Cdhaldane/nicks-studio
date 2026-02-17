@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { useAlert } from '../Alert/AlertProvider';
 import SEOHelmet from '../SEO/SEOHelmet';
 import { BreadcrumbSchema } from '../SEO/StructuredData';
-import { fetchAllProducts } from '../../services/shopifyService';
+import { fetchAllProducts } from '../../services/squareService';
 import './Shop.css';
 import { Parallax } from 'react-scroll-parallax';
 
@@ -26,6 +26,7 @@ function Shop({ items }) {
     try {
       setLoading(true);
       const fetchedProducts = await fetchAllProducts();
+      console.log('Fetched products:', fetchedProducts);
       setProducts(fetchedProducts);
       setError(null);
     } catch (error) {
@@ -62,7 +63,7 @@ function Shop({ items }) {
   if (loading) {
     return (
       <div className="shop-container">
-        <div className="loading">Loading products...</div>
+        <div className="loading"></div>
       </div>
     );
   }
