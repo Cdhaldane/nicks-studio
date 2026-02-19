@@ -34,13 +34,15 @@ export const CONSTANTS = {
     FACEBOOK: 'https://www.facebook.com/musicmagnolia/',
     TIKTOK: 'https://www.tiktok.com/@nickolamagnolia',
     SPOTIFY: 'https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4',
-    APPLE_MUSIC: 'https://music.apple.com/ca/artist/nickola-magnolia/1588557558',
+    APPLE_MUSIC:
+      'https://music.apple.com/ca/artist/nickola-magnolia/1588557558',
   },
 
   // Image rotation settings
   IMAGE_ROTATION: {
     INTERVAL: 15000, // 15 seconds
-    IMAGES: ['n1.jpg', 'n2.jpg', 'n6.jpg'],
+    IMAGES: ['n1.jpg'],
+    // IMAGES: ['n1.jpg', 'n2.jpg', 'n6.jpg'],
   },
 
   // Spotify artist ID
@@ -99,10 +101,10 @@ export const NAVIGATION_ITEMS = [
   { path: '/about', label: 'About' },
   { path: '/music', label: 'Listen' },
   { path: '/shop', label: 'Merchandise' },
-  { 
-    path: 'https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q', 
-    label: 'Watch', 
-    external: true 
+  {
+    path: 'https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q',
+    label: 'Watch',
+    external: true,
   },
 ];
 
@@ -149,8 +151,10 @@ export const SOCIAL_MEDIA = [
 // SEO and meta data
 export const SEO = {
   DEFAULT_TITLE: 'Nickola Magnolia - Country & Americana Artist',
-  DEFAULT_DESCRIPTION: 'Intertwining classic Country melodies with intimate Rock and Americana influences from the shores of the Great Lakes.',
-  KEYWORDS: 'Nickola Magnolia, Country Music, Americana, Canadian Artist, Music, Albums, Merchandise',
+  DEFAULT_DESCRIPTION:
+    'Intertwining classic Country melodies with intimate Rock and Americana influences from the shores of the Great Lakes.',
+  KEYWORDS:
+    'Nickola Magnolia, Country Music, Americana, Canadian Artist, Music, Albums, Merchandise',
   SITE_URL: 'https://nickolamagnolia.com',
   TWITTER_HANDLE: '@nickolamagnolia',
   FACEBOOK_APP_ID: '',

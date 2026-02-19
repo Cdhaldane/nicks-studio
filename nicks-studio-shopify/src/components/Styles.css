@@ -85,6 +85,7 @@
 .socials {
   position: fixed;
   bottom: 2rem;
+  margin: 0 auto;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -97,7 +98,7 @@
   backdrop-filter: blur(10px);
   border-radius: 50px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  animation: slideUp 0.8s ease-out 0.5s both;
+  /* animation: slideUp 0.8s ease-out 0.5s both; */
 }
 
 .social-button {
@@ -247,12 +248,12 @@
 
 @keyframes glow {
   from {
-    text-shadow: 
+    text-shadow:
       3px 3px 6px rgba(0, 0, 0, 0.8),
       0 0 20px rgba(216, 59, 101, 0.3);
   }
   to {
-    text-shadow: 
+    text-shadow:
       3px 3px 6px rgba(0, 0, 0, 0.8),
       0 0 30px rgba(216, 59, 101, 0.6);
   }
@@ -263,31 +264,31 @@
   .home-container {
     margin-top: 0;
   }
-  
+
   .hero-image {
     object-position: 20% center;
   }
-  
+
   .hero-name {
     font-size: clamp(1.5rem, 6vw, 2.5rem);
   }
-  
+
   .hero-subtitle {
     font-size: clamp(0.8rem, 3vw, 1rem);
   }
-  
+
   .socials {
     bottom: 1rem;
     gap: 0.5rem;
     padding: 0.8rem;
   }
-  
+
   .social-button {
     width: 40px;
     height: 40px;
     font-size: 1rem;
   }
-  
+
   .email-join {
     bottom: 60px;
     left: 1rem;
@@ -295,12 +296,12 @@
     transform: none;
     padding: 1.5rem;
   }
-  
+
   .email-join::before {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   .welcome-message {
     top: 1rem;
     right: 1rem;
@@ -314,13 +315,13 @@
     gap: 0.3rem;
     padding: 0.5rem;
   }
-  
+
   .social-button {
     width: 35px;
     height: 35px;
     font-size: 0.9rem;
   }
-  
+
   .email-join {
     padding: 1rem;
   }
@@ -336,7 +337,7 @@
     animation: none;
     transition: none;
   }
-  
+
   .hero-name {
     animation: none;
   }
@@ -347,13 +348,13 @@
   .hero-overlay {
     background: rgba(0, 0, 0, 0.8);
   }
-  
+
   .social-button {
     background: var(--black);
     border-color: var(--white);
     color: var(--white);
   }
-  
+
   .email-join {
     background: var(--black);
     border-color: var(--white);

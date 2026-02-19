@@ -1,17 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { HashRouter as Router } from "react-router-dom";
-import App from "./App";
-import { Provider } from "react-redux";
-import store from "./store";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { HashRouter as Router } from 'react-router-dom';
+import App from './App';
+import { Provider } from 'react-redux';
+import store from './store';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Router>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </Router>
+  <ErrorBoundary>
+    <Router>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </Router>
+  </ErrorBoundary>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,0 +1,9 @@
+{
+  "name": "square-api-serverless",
+  "version": "1.0.0",
+  "description": "Serverless functions for Square API",
+  "main": "index.js",
+  "dependencies": {
+    "square": "^44.0.0"
+  }
+}

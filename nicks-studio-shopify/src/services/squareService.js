@@ -1,6 +1,6 @@
 /**
  * Square E-Commerce Integration Service
- * 
+ *
  * This service handles all Square API interactions including:
  * - Fetching catalog items (products)
  * - Creating checkout sessions
@@ -13,13 +13,15 @@ const SQUARE_CONFIG = {
   locationId: process.env.REACT_APP_SQUARE_LOCATION_ID || '',
   environment: process.env.REACT_APP_SQUARE_ENVIRONMENT || 'sandbox', // 'sandbox' or 'production'
   // API base URLs
-  apiBaseUrl: process.env.REACT_APP_SQUARE_ENVIRONMENT === 'production'
-    ? 'https://connect.squareup.com'
-    : 'https://connect.squareupsandbox.com',
+  apiBaseUrl:
+    process.env.REACT_APP_SQUARE_ENVIRONMENT === 'production'
+      ? 'https://connect.squareup.com'
+      : 'https://connect.squareupsandbox.com',
 };
 
 // For client-side, we need a backend proxy to call Square API
 // This assumes you have a backend endpoint that proxies Square API calls
+// On Vercel, this will use the serverless functions in the /api folder
 const API_PROXY_URL = process.env.REACT_APP_API_URL || '/api';
 
 /**
@@ -29,8 +31,8 @@ const API_PROXY_URL = process.env.REACT_APP_API_URL || '/api';
 export const fetchAllProducts = async () => {
   try {
     console.log('Fetching products from Square...');
-    
-    const response = await fetch(`${API_PROXY_URL}/square/catalog/items`, {
+
+    const response = await fetch(`${API_PROXY_URL}/square-catalog-items`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -42,11 +44,11 @@ export const fetchAllProducts = async () => {
     }
 
     const data = await response.json();
-    
+
     // Transform Square catalog items to match our app's product format
     const products = transformSquareProducts(data.objects || []);
     console.log(`Successfully fetched ${products.length} products from Square`);
-    
+
     return products;
   } catch (error) {
     console.error('Error fetching Square products:', error);
@@ -58,13 +60,18 @@ export const fetchAllProducts = async () => {
  * Transform Square catalog items to match the existing product format
  * This maintains compatibility with the existing Cart and Shop components
  */
-const transformSquareProducts = (catalogItems) => {
+const transformSquareProducts = catalogItems => {
   return catalogItems
-    .filter(item => item.type === 'ITEM' && !item.isDeleted && item.itemData?.productType !== 'APPOINTMENTS_SERVICE')
+    .filter(
+      item =>
+        item.type === 'ITEM' &&
+        !item.isDeleted &&
+        item.itemData?.productType !== 'APPOINTMENTS_SERVICE'
+    )
     .map(item => {
       const itemData = item.itemData;
       const variations = itemData.variations || [];
-      
+
       // Get images from the itemData.images array (populated by server)
       const images = (itemData.images || [])
         .filter(img => img.url)
@@ -73,7 +80,7 @@ const transformSquareProducts = (catalogItems) => {
           src: img.url,
           altText: `${itemData.name} image ${index + 1}`,
         }));
-      
+
       return {
         id: item.id,
         title: itemData.name,
@@ -85,8 +92,10 @@ const transformSquareProducts = (catalogItems) => {
           const varData = variation.itemVariationData;
           const priceMoney = varData?.priceMoney;
           // Square returns price in cents as a string, convert to dollars
-          const priceAmount = priceMoney?.amount ? parseInt(priceMoney.amount) / 100 : 0;
-          
+          const priceAmount = priceMoney?.amount
+            ? parseInt(priceMoney.amount) / 100
+            : 0;
+
           return {
             id: variation.id,
             title: varData?.name || 'Regular',
@@ -109,14 +118,17 @@ const transformSquareProducts = (catalogItems) => {
 /**
  * Fetch a single product by ID
  */
-export const fetchProduct = async (productId) => {
+export const fetchProduct = async productId => {
   try {
-    const response = await fetch(`${API_PROXY_URL}/square/catalog/item/${productId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${API_PROXY_URL}/square-catalog-item?id=${productId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to fetch product: ${response.statusText}`);
@@ -124,7 +136,7 @@ export const fetchProduct = async (productId) => {
 
     const data = await response.json();
     const products = transformSquareProducts([data.object]);
-    
+
     return products[0] || null;
   } catch (error) {
     console.error('Error fetching Square product:', error);
@@ -135,17 +147,22 @@ export const fetchProduct = async (productId) => {
 /**
  * Fetch products by category
  */
-export const fetchProductsByCategory = async (categoryId) => {
+export const fetchProductsByCategory = async categoryId => {
   try {
-    const response = await fetch(`${API_PROXY_URL}/square/catalog/category/${categoryId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${API_PROXY_URL}/square-catalog-category?id=${categoryId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch category products: ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch category products: ${response.statusText}`
+      );
     }
 
     const data = await response.json();
@@ -160,11 +177,11 @@ export const fetchProductsByCategory = async (categoryId) => {
  * Create a Square Checkout session
  * Returns a checkout URL that redirects to Square's hosted checkout page
  */
-export const createCheckout = async (lineItems) => {
+export const createCheckout = async lineItems => {
   try {
     console.log('Creating Square checkout with items:', lineItems);
 
-    const response = await fetch(`${API_PROXY_URL}/square/checkout`, {
+    const response = await fetch(`${API_PROXY_URL}/square-checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -185,7 +202,7 @@ export const createCheckout = async (lineItems) => {
     }
 
     const data = await response.json();
-    
+
     console.log('Square checkout created:', data);
 
     return {
@@ -207,7 +224,7 @@ export const createPaymentLink = async (lineItems, orderInfo = {}) => {
   try {
     console.log('Creating Square payment link with items:', lineItems);
 
-    const response = await fetch(`${API_PROXY_URL}/square/payment-link`, {
+    const response = await fetch(`${API_PROXY_URL}/square-payment-link`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -235,7 +252,7 @@ export const createPaymentLink = async (lineItems, orderInfo = {}) => {
     }
 
     const data = await response.json();
-    
+
     console.log('Square payment link created:', data);
 
     return {
@@ -264,7 +281,7 @@ export const initializeSquarePayments = async () => {
       SQUARE_CONFIG.applicationId,
       SQUARE_CONFIG.locationId
     );
-    
+
     return payments;
   } catch (error) {
     console.error('Failed to initialize Square payments:', error);
@@ -292,10 +309,10 @@ export const createCardPayment = async (payments, containerId) => {
 export const processPayment = async (card, amount) => {
   try {
     const result = await card.tokenize();
-    
+
     if (result.status === 'OK') {
       // Send token to backend to process payment
-      const response = await fetch(`${API_PROXY_URL}/square/process-payment`, {
+      const response = await fetch(`${API_PROXY_URL}/square-process-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -314,7 +331,9 @@ export const processPayment = async (card, amount) => {
 
       return await response.json();
     } else {
-      throw new Error(result.errors?.[0]?.message || 'Card tokenization failed');
+      throw new Error(
+        result.errors?.[0]?.message || 'Card tokenization failed'
+      );
     }
   } catch (error) {
     console.error('Payment processing error:', error);
