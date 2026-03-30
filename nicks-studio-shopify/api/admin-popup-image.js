@@ -54,9 +54,11 @@ module.exports = async (req, res) => {
 
     try {
       const ext = mimeType === 'image/jpeg' ? 'jpg' : mimeType.split('/')[1];
-      const blob = await put(`${IMAGE_PATH}.${ext}`, buffer, {
+      const imagePath = `${IMAGE_PATH}.${ext}`;
+      const blob = await put(imagePath, buffer, {
         access: 'public',
         allowOverwrite: true,
+        addRandomSuffix: false,
         token: process.env.BLOB_READ_WRITE_TOKEN,
         contentType: mimeType,
       });
@@ -64,6 +66,7 @@ module.exports = async (req, res) => {
       await put(CONFIG_PATH, JSON.stringify({ imageUrl: blob.url, updatedAt: new Date().toISOString() }), {
         access: 'public',
         allowOverwrite: true,
+        addRandomSuffix: false,
         token: process.env.BLOB_READ_WRITE_TOKEN,
         contentType: 'application/json',
       });
