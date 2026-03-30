@@ -107,7 +107,6 @@
   .nav-cart {
     position: fixed;
     top: 0.6rem;
-    padding: 1.5rem;
     right: var(--space-md);
     z-index: var(--z-tooltip);
     border: none;

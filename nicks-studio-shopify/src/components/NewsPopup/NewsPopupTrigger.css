@@ -111,10 +111,8 @@
 
 @media (max-width: 480px) {
   .news-trigger.floating {
-    padding: 8px 12px;
     font-size: 0.8em;
     border-radius: 20px;
-    bottom: 90px;
   }
 
   .news-trigger.bottom-center {
