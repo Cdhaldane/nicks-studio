@@ -239,11 +239,11 @@
   flex: 1;
   padding: 11px 14px;
   border: 2px solid var(--border, #e0e0e0);
-  border-radius: 25px;
+  border-radius: 8px;
   font-size: 0.95em;
   outline: none;
   transition: border-color 0.2s ease;
-  background: var(--bg, #fff);
+  background: var(--bg-primary, #fff);
   color: var(--text, #333);
   min-width: 0;
 }
@@ -259,6 +259,7 @@
 
 .submit-btn {
   flex-shrink: 0;
+  border-radius: 8px;
 }
 
 .submit-btn.loading {
