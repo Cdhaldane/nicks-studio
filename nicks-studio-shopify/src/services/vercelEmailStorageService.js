@@ -67,7 +67,7 @@ class VercelEmailStorageService {
 
   async getPopupImage() {
     try {
-      const response = await fetch(`${API_BASE}/admin-popup-image`);
+      const response = await fetch(`${API_BASE}/admin-popup-image?t=${Date.now()}`);
       const data = await response.json();
       return data.imageUrl || null;
     } catch {
