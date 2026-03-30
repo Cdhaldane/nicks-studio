@@ -29,7 +29,10 @@ module.exports = async (req, res) => {
   if (req.method === 'GET') {
     try {
       const config = await getConfig();
-      return res.status(200).json({ imageUrl: config.imageUrl || null });
+      if (!config.imageUrl) return res.status(200).json({ imageUrl: null });
+      // Cache-bust the image URL so browsers don't serve stale images
+      const separator = config.imageUrl.includes('?') ? '&' : '?';
+      return res.status(200).json({ imageUrl: `${config.imageUrl}${separator}t=${Date.now()}` });
     } catch (error) {
       return res.status(200).json({ imageUrl: null });
     }
