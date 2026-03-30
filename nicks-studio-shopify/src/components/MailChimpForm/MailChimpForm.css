@@ -56,15 +56,15 @@
 }
 
 .mc__alert--error {
-  color: var(--red);
+  color: var(--error);
 }
 
 .mc__alert--success {
-  color: var(--green);
+  color: var(--success);
 }
 
 .mc__alert--sending {
-  color: var(--yellow);
+  color: var(--warning);
 }
 
 @media screen and (max-width: 768px) {

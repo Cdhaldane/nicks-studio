@@ -59,7 +59,7 @@ app.get('/api/health', (req, res) => {
 /**
  * Get all catalog items (products)
  */
-app.get('/api/square/catalog/items', async (req, res) => {
+app.get('/api/square-catalog-items', async (req, res) => {
   try {
     const response = await squareClient.catalog.list({ types: 'ITEM' });
     

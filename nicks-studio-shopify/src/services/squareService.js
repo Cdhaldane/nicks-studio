@@ -32,7 +32,7 @@ export const fetchAllProducts = async () => {
   try {
     console.log('Fetching products from Square...');
 
-    const response = await fetch(`${API_PROXY_URL}/square/catalog/items`, {
+    const response = await fetch(`${API_PROXY_URL}/square-catalog-items`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
