@@ -12,7 +12,7 @@ const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 async function getConfig() {
   try {
     const meta = await head(CONFIG_PATH, { token: process.env.BLOB_READ_WRITE_TOKEN });
-    const res = await fetch(meta.url);
+    const res = await fetch(`${meta.url}?t=${Date.now()}`, { cache: 'no-store' });
     return await res.json();
   } catch {
     return {};

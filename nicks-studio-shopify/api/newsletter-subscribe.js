@@ -10,7 +10,7 @@ const BLOB_PATHNAME = 'newsletter/subscribers.json';
 async function readSubscribers() {
   try {
     const meta = await head(BLOB_PATHNAME, { token: process.env.BLOB_READ_WRITE_TOKEN });
-    const res = await fetch(meta.url);
+    const res = await fetch(`${meta.url}?t=${Date.now()}`, { cache: 'no-store' });
     return await res.json();
   } catch {
     return [];
