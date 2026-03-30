@@ -3,14 +3,14 @@
  * GET    /api/newsletter-subscribers        → list all subscribers
  * DELETE /api/newsletter-subscribers        { email } → remove one
  */
-const { head, put } = require('@vercel/blob');
+const { head, put, download } = require('@vercel/blob');
 
 const BLOB_PATHNAME = 'newsletter/subscribers.json';
 
 async function readSubscribers() {
   try {
     const meta = await head(BLOB_PATHNAME, { token: process.env.BLOB_READ_WRITE_TOKEN });
-    const res = await fetch(meta.url);
+    const res = await download(meta.url, { token: process.env.BLOB_READ_WRITE_TOKEN });
     return await res.json();
   } catch {
     return [];
@@ -19,7 +19,7 @@ async function readSubscribers() {
 
 async function writeSubscribers(subscribers) {
   await put(BLOB_PATHNAME, JSON.stringify(subscribers), {
-    access: 'public',
+    access: 'private',
     allowOverwrite: true,
     token: process.env.BLOB_READ_WRITE_TOKEN,
     contentType: 'application/json',

@@ -2,7 +2,7 @@
  * Newsletter Subscribe
  * POST /api/newsletter-subscribe  { email, source? }
  */
-const { head, put } = require('@vercel/blob');
+const { head, put, download } = require('@vercel/blob');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BLOB_PATHNAME = 'newsletter/subscribers.json';
@@ -10,7 +10,7 @@ const BLOB_PATHNAME = 'newsletter/subscribers.json';
 async function readSubscribers() {
   try {
     const meta = await head(BLOB_PATHNAME, { token: process.env.BLOB_READ_WRITE_TOKEN });
-    const res = await fetch(meta.url);
+    const res = await download(meta.url, { token: process.env.BLOB_READ_WRITE_TOKEN });
     return await res.json();
   } catch {
     return [];
@@ -19,7 +19,7 @@ async function readSubscribers() {
 
 async function writeSubscribers(subscribers) {
   await put(BLOB_PATHNAME, JSON.stringify(subscribers), {
-    access: 'public',
+    access: 'private',
     allowOverwrite: true,
     token: process.env.BLOB_READ_WRITE_TOKEN,
     contentType: 'application/json',
@@ -64,6 +64,6 @@ module.exports = async (req, res) => {
     return res.status(200).json({ success: true, message: 'Successfully subscribed!', subscriber });
   } catch (error) {
     console.error('Newsletter subscribe error:', error);
-    return res.status(500).json({ success: false, message: 'Failed to subscribe. Please try again.', _debug: error.message });
+    return res.status(500).json({ success: false, message: 'Failed to subscribe. Please try again.' });
   }
 };
