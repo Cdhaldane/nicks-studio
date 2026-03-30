@@ -64,6 +64,6 @@ module.exports = async (req, res) => {
     return res.status(200).json({ success: true, message: 'Successfully subscribed!', subscriber });
   } catch (error) {
     console.error('Newsletter subscribe error:', error);
-    return res.status(500).json({ success: false, message: 'Failed to subscribe. Please try again.' });
+    return res.status(500).json({ success: false, message: 'Failed to subscribe. Please try again.', _debug: error.message });
   }
 };
