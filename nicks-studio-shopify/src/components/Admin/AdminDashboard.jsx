@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import supabaseEmailStorageService from '../../services/supabaseEmailStorage';
+import vercelEmailStorageService from '../../services/vercelEmailStorageService';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -8,6 +8,8 @@ const AdminDashboard = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [popupImageUrl, setPopupImageUrl] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState('idle');
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -17,11 +19,13 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const subscriberData = await supabaseEmailStorageService.getSubscribers();
-      const analyticsData = await supabaseEmailStorageService.getAnalytics();
-      
+      const subscriberData = await vercelEmailStorageService.getSubscribers();
+      const analyticsData = await vercelEmailStorageService.getAnalytics();
+      const imageUrl = await vercelEmailStorageService.getPopupImage();
+
       setSubscribers(subscriberData);
       setAnalytics(analyticsData);
+      setPopupImageUrl(imageUrl);
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
@@ -30,16 +34,16 @@ const AdminDashboard = () => {
   };
 
   const handleExport = async () => {
-    await supabaseEmailStorageService.exportSubscribers();
+    await vercelEmailStorageService.exportSubscribers();
   };
 
   const handleDownloadJSON = async () => {
-    await supabaseEmailStorageService.downloadCurrentData();
+    await vercelEmailStorageService.downloadCurrentData();
   };
 
   const handleRemoveSubscriber = async (email) => {
     if (window.confirm(`Are you sure you want to remove ${email}?`)) {
-      const result = await supabaseEmailStorageService.removeSubscriber(email);
+      const result = await vercelEmailStorageService.removeSubscriber(email);
       if (result.success) {
         loadData(); // Refresh the list
         alert('Subscriber removed successfully');
@@ -53,6 +57,26 @@ const AdminDashboard = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       logout();
     }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be under 5 MB.');
+      return;
+    }
+    setUploadStatus('uploading');
+    const result = await vercelEmailStorageService.uploadPopupImage(file);
+    if (result.success) {
+      setPopupImageUrl(result.imageUrl);
+      setUploadStatus('success');
+      setTimeout(() => setUploadStatus('idle'), 3000);
+    } else {
+      setUploadStatus('error');
+      setTimeout(() => setUploadStatus('idle'), 3000);
+    }
+    e.target.value = '';
   };
 
   const formatDate = (dateString) => {
@@ -122,19 +146,23 @@ const AdminDashboard = () => {
             {/* Analytics Grid */}
             {analytics && (
               <div className="analytics-grid">
-                <div className="analytics-card">
+                <div className="analytics-card card-total">
+                  <div className="card-icon">📧</div>
                   <h3>Total Subscribers</h3>
                   <p className="analytics-number">{analytics.totalSubscribers}</p>
                 </div>
-                <div className="analytics-card">
+                <div className="analytics-card card-week">
+                  <div className="card-icon">🗓️</div>
                   <h3>This Week</h3>
                   <p className="analytics-number">{getRecentSubscribers(7).length}</p>
                 </div>
-                <div className="analytics-card">
+                <div className="analytics-card card-month">
+                  <div className="card-icon">📆</div>
                   <h3>This Month</h3>
                   <p className="analytics-number">{getRecentSubscribers(30).length}</p>
                 </div>
-                <div className="analytics-card">
+                <div className="analytics-card card-growth">
+                  <div className="card-icon">📈</div>
                   <h3>Growth Rate</h3>
                   <p className="analytics-number">
                     {subscribers.length > 0 ? '+' + Math.round((getRecentSubscribers(7).length / subscribers.length) * 100) + '%' : '0%'}
@@ -216,10 +244,9 @@ const AdminDashboard = () => {
                 </div>
                 {subscribers.map((subscriber) => (
                   <div key={subscriber.id} className="table-row">
-                    {console.log(subscriber)}
                     <span className="email">{subscriber.email}</span>
                     <span className="date">{formatDate(subscriber.subscribed_at)}</span>
-                    <span className="source">{subscriber.source}</span>
+                    <span className={`source-badge src-${subscriber.source}`}>{subscriber.source}</span>
                     <span className="actions">
                       <button 
                         onClick={() => handleRemoveSubscriber(subscriber.email)}
@@ -237,55 +264,88 @@ const AdminDashboard = () => {
 
         {activeTab === 'settings' && (
           <div className="settings-tab">
-            <h2>System Information</h2>
-            
+            <h2>⚙️ Settings</h2>
+
+            {/* Popup Hero Image */}
             <div className="settings-section">
-              <h3>Newsletter System</h3>
+              <h3>🖼️ Popup Hero Image</h3>
+              <p className="section-desc">This image appears in the newsletter signup popup shown to first-time visitors.</p>
+              <div className="image-upload-section">
+                <div className="image-preview-wrapper">
+                  {popupImageUrl ? (
+                    <img src={popupImageUrl} alt="Current popup hero" className="popup-image-preview" />
+                  ) : (
+                    <div className="image-placeholder">
+                      <span>🖼️</span>
+                      <p>Default image in use</p>
+                    </div>
+                  )}
+                </div>
+                <div className="upload-controls">
+                  <label
+                    className={`upload-zone${uploadStatus === 'uploading' ? ' uploading' : ''}`}
+                    htmlFor="popup-image-upload"
+                  >
+                    <input
+                      id="popup-image-upload"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageUpload}
+                      disabled={uploadStatus === 'uploading'}
+                      style={{ display: 'none' }}
+                    />
+                    <span className="upload-icon">📷</span>
+                    <span className="upload-label">
+                      {uploadStatus === 'uploading' ? 'Uploading…' : 'Click to upload a new image'}
+                    </span>
+                    <span className="upload-hint">JPG, PNG or WebP · Max 5 MB</span>
+                  </label>
+                  {uploadStatus === 'success' && (
+                    <p className="upload-feedback success">✓ Image updated! The popup will use the new photo.</p>
+                  )}
+                  {uploadStatus === 'error' && (
+                    <p className="upload-feedback error">Upload failed. Please try again.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* System Info */}
+            <div className="settings-section">
+              <h3>📋 System Information</h3>
               <div className="info-grid">
                 <div className="info-item">
-                  <label>Storage Method:</label>
-                  <span>Supabase Database (Production)</span>
+                  <label>Email Storage</label>
+                  <span>Vercel Blob</span>
                 </div>
                 <div className="info-item">
-                  <label>Data Format:</label>
-                  <span>PostgreSQL</span>
+                  <label>Hosting</label>
+                  <span>Vercel</span>
                 </div>
                 <div className="info-item">
-                  <label>Created:</label>
-                  <span>{analytics?.created ? formatDate(analytics.created) : 'Unknown'}</span>
+                  <label>Last Subscriber</label>
+                  <span>{analytics?.lastUpdated ? formatDate(analytics.lastUpdated) : 'None yet'}</span>
                 </div>
                 <div className="info-item">
-                  <label>Last Updated:</label>
-                  <span>{analytics?.lastUpdated ? formatDate(analytics.lastUpdated) : 'Never'}</span>
+                  <label>Total Subscribers</label>
+                  <span>{analytics?.totalSubscribers ?? 0}</span>
                 </div>
               </div>
             </div>
 
-            <div className="settings-section">
-              <h3>Production Notes</h3>
-              <div className="production-notes">
-                <p>� <strong>Production Mode:</strong> Data stored in Supabase database</p>
-                <p>� <strong>Real-time:</strong> Live updates and analytics</p>
-                <p>🔒 <strong>Security:</strong> Row Level Security enabled</p>
-                <p>☁️ <strong>Hosting:</strong> GitHub Pages with custom domain</p>
-                <p>� <strong>Scalable:</strong> Unlimited subscribers supported</p>
-              </div>
-            </div>
-
+            {/* Danger Zone */}
             <div className="settings-section danger-zone">
               <h3>Danger Zone</h3>
               <div className="danger-actions">
-                <button 
-                  onClick={() => {
-                    alert('Data deletion must be done through Supabase dashboard for security.');
-                  }}
+                <button
+                  onClick={() => alert('To delete all subscriber data, remove subscribers.json from your Vercel Blob store.')}
                   className="btn btn-error"
                   disabled
                 >
                   Clear All Data (Disabled)
                 </button>
                 <p className="danger-note">
-                  To delete subscriber data, use the Supabase dashboard for security.
+                  Manage data via Vercel Dashboard → Storage → Blob.
                 </p>
               </div>
             </div>
@@ -297,3 +357,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+ 

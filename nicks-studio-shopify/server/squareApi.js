@@ -35,7 +35,8 @@ const sendJSON = (res, data, status = 200) => {
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Initialize Square Client
 const squareClient = new SquareClient({
@@ -297,6 +298,87 @@ app.get('/api/square/order/:id', async (req, res) => {
       message: error.message 
     }, 500);
   }
+});
+
+// ── Newsletter routes (local dev — stores in data/newsletter-subscribers.json) ──
+const fs = require('fs');
+const SUBSCRIBERS_FILE = path.join(__dirname, '..', 'src', 'data', 'newsletter-subscribers.json');
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const readSubscribers = () => {
+  try {
+    return JSON.parse(fs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
+  } catch {
+    return [];
+  }
+};
+
+const writeSubscribers = (subscribers) => {
+  fs.mkdirSync(path.dirname(SUBSCRIBERS_FILE), { recursive: true });
+  fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
+};
+
+app.post('/api/newsletter-subscribe', (req, res) => {
+  const { email, source = 'website' } = req.body || {};
+  if (!email || !EMAIL_RE.test(email)) {
+    return res.status(400).json({ success: false, message: 'Invalid email address' });
+  }
+  const normalizedEmail = email.toLowerCase().trim();
+  const subscribers = readSubscribers();
+  if (subscribers.some(s => s.email === normalizedEmail)) {
+    return res.status(409).json({ success: false, message: 'Email already subscribed' });
+  }
+  const subscriber = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    email: normalizedEmail,
+    source,
+    status: 'active',
+    subscribed_at: new Date().toISOString(),
+  };
+  writeSubscribers([subscriber, ...subscribers]);
+  res.json({ success: true, message: 'Successfully subscribed!', subscriber });
+});
+
+app.get('/api/newsletter-subscribers', (req, res) => {
+  const subscribers = readSubscribers();
+  res.json({ subscribers, total: subscribers.length });
+});
+
+app.delete('/api/newsletter-subscribers', (req, res) => {
+  const { email } = req.body || {};
+  if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+  const normalizedEmail = email.toLowerCase().trim();
+  const updated = readSubscribers().filter(s => s.email !== normalizedEmail);
+  writeSubscribers(updated);
+  res.json({ success: true, message: 'Subscriber removed' });
+});
+
+// ── Popup image routes (local dev — stores in public/) ──
+const POPUP_CONFIG_FILE = path.join(__dirname, '..', 'src', 'data', 'popup-config.json');
+
+const readPopupConfig = () => {
+  try { return JSON.parse(fs.readFileSync(POPUP_CONFIG_FILE, 'utf8')); }
+  catch { return {}; }
+};
+
+app.get('/api/admin-popup-image', (req, res) => {
+  const config = readPopupConfig();
+  res.json({ imageUrl: config.imageUrl || null });
+});
+
+app.post('/api/admin-popup-image', (req, res) => {
+  const { imageData, mimeType } = req.body || {};
+  if (!imageData || !mimeType) {
+    return res.status(400).json({ success: false, message: 'Missing image data' });
+  }
+  const buffer = Buffer.from(imageData, 'base64');
+  const ext = mimeType === 'image/jpeg' ? 'jpg' : mimeType.split('/')[1];
+  const filename = `popup-hero.${ext}`;
+  fs.writeFileSync(path.join(__dirname, '..', 'public', filename), buffer);
+  const imageUrl = `/${filename}`;
+  fs.mkdirSync(path.dirname(POPUP_CONFIG_FILE), { recursive: true });
+  fs.writeFileSync(POPUP_CONFIG_FILE, JSON.stringify({ imageUrl, updatedAt: new Date().toISOString() }, null, 2));
+  res.json({ success: true, imageUrl });
 });
 
 // Start server

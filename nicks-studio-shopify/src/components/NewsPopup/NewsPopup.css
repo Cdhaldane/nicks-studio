@@ -16,6 +16,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -26,6 +27,7 @@
     transform: scale(0.8);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -161,8 +163,7 @@
     margin: 20px;
   }
 
-  .news-popup-image {
-  }
+  .news-popup-image {}
 
   .news-popup-content-text {
     padding: 15px;
@@ -201,8 +202,7 @@
     right: 10px;
   }
 
-  .news-popup-image {
-  }
+  .news-popup-image {}
 
   .news-popup-content-text {
     padding: 12px;
@@ -216,5 +216,113 @@
   .news-popup-content-text p {
     font-size: 0.9em;
     margin-bottom: 15px;
+  }
+}
+
+/* ── Email Signup Form ── */
+.email-signup-popup {
+  max-width: 600px;
+  width: 94vw;
+}
+
+.signup-form {
+  margin-bottom: 8px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.email-input {
+  flex: 1;
+  padding: 11px 14px;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 25px;
+  font-size: 0.95em;
+  outline: none;
+  transition: border-color 0.2s ease;
+  background: var(--bg, #fff);
+  color: var(--text, #333);
+  min-width: 0;
+}
+
+.email-input:focus {
+  border-color: var(--primary, #e74c3c);
+}
+
+.email-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  flex-shrink: 0;
+}
+
+.submit-btn.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.signup-error {
+  color: #e74c3c;
+  font-size: 0.85em;
+  margin: 6px 0 0 4px;
+  text-align: left;
+}
+
+.no-thanks-btn {
+  background: none;
+  border: none;
+  color: var(--text, #999);
+  font-size: 0.82em;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+  margin-top: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.no-thanks-btn:hover {
+  opacity: 1;
+}
+
+/* Success state */
+.signup-success {
+  padding: 40px 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.success-icon {
+  font-size: 3em;
+}
+
+.signup-success h2 {
+  margin: 0;
+  font-size: 1.8em;
+  color: var(--primary, #2c3e50);
+}
+
+.signup-success p {
+  margin: 0;
+  color: var(--text, #666);
+  font-size: 1em;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .input-row {
+    flex-direction: column;
+  }
+
+  .submit-btn {
+    width: 100%;
   }
 }

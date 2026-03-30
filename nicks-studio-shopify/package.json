@@ -1,5 +1,6 @@
 {
   "homepage": "https://nickolamagnolia.com/",
+  "proxy": "http://localhost:3001",
   "name": "nickolamagnolia",
   "version": "0.1.0",
   "private": true,

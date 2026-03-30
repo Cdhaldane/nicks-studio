@@ -259,7 +259,7 @@
 
 
   .modal-header {
-    flex-direction: column;
+    /* flex-direction: column; */
     gap: var(--space-sm);
     text-align: center;
   }

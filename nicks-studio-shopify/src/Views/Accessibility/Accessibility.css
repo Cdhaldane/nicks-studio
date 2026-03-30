@@ -1,7 +1,7 @@
 /* Accessibility Statement Page Styles */
 .accessibility-container {
   min-height: 100vh;
-  background: var(--bg-primary);
+  /* background: var(--bg-primary); */
   color: var(--text);
   padding: var(--nav-height) 0 var(--space-4xl) 0;
 }

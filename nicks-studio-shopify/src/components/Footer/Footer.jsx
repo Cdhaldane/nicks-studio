@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SOCIAL_MEDIA, NAVIGATION_ITEMS } from '../../utils/constants';
 import { validateEmail } from '../../utils/helpers';
-import supabaseEmailStorageService from '../../services/supabaseEmailStorage';
 import './Footer.css';
+import vercelEmailStorageService from '../../services/vercelEmailStorageService';
 
 function Footer() {
   const [email, setEmail] = useState('');
@@ -26,7 +26,7 @@ function Footer() {
     setMessage('');
 
     try {
-      const result = await supabaseEmailStorageService.addSubscriber(email);
+      const result = await vercelEmailStorageService.addSubscriber(email);
       
       if (result.success) {
         setIsSubscribed(true);

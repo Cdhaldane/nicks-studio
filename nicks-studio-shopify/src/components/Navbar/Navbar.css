@@ -81,7 +81,7 @@
 }
 
 .nav-button:hover {
-  color: var(--dpink) !important;
+  color: var(--primary) !important;
   transition: all 0.3s ease;
 }
 

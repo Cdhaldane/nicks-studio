@@ -7,7 +7,7 @@ class SupabaseEmailStorageService {
   }
 
   // Add new subscriber
-  async addSubscriber(email) {
+  async addSubscriber(email, source = 'website-footer') {
     try {
       // Check if email already exists
       const { data: existingSubscriber, error: checkError } = await supabase
@@ -29,7 +29,7 @@ class SupabaseEmailStorageService {
       const newSubscriber = {
         email: email.toLowerCase(),
         status: 'active',
-        source: 'website-footer',
+        source,
         subscribed_at: new Date().toISOString()
       };
 
@@ -203,6 +203,104 @@ class SupabaseEmailStorageService {
         callback
       )
       .subscribe();
+  }
+
+  // Get the current popup image URL from site settings
+  async getPopupImage() {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'popup_image_url')
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data?.value || null;
+    } catch (error) {
+      console.error('Error fetching popup image:', error);
+      return null;
+    }
+  }
+
+  // Upload a new popup image to Supabase Storage and persist the URL
+  async uploadPopupImage(file) {
+    try {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        return { success: false, message: 'File must be an image.' };
+      }
+
+      // Validate file size (max 5 MB)
+      if (file.size > 5 * 1024 * 1024) {
+        return { success: false, message: 'Image must be smaller than 5 MB.' };
+      }
+
+      // Remove all existing files in the bucket to keep it clean
+      const { data: existingFiles } = await supabase.storage
+        .from('popup-images')
+        .list();
+
+      if (existingFiles && existingFiles.length > 0) {
+        await supabase.storage
+          .from('popup-images')
+          .remove(existingFiles.map(f => f.name));
+      }
+
+      // Upload the new file
+      const ext = file.name.split('.').pop().toLowerCase();
+      const fileName = `popup-image-${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('popup-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('popup-images')
+        .getPublicUrl(fileName);
+
+      // Persist the URL in site_settings
+      const { error: settingsError } = await supabase
+        .from('site_settings')
+        .upsert(
+          { key: 'popup_image_url', value: publicUrl, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        );
+
+      if (settingsError) throw settingsError;
+
+      return { success: true, url: publicUrl };
+    } catch (error) {
+      console.error('Error uploading popup image:', error);
+      return { success: false, message: error.message || 'Upload failed. Please try again.' };
+    }
+  }
+
+  // Reset the popup image back to the default (removes the stored override)
+  async deletePopupImage() {
+    try {
+      const { data: existingFiles } = await supabase.storage
+        .from('popup-images')
+        .list();
+
+      if (existingFiles && existingFiles.length > 0) {
+        await supabase.storage
+          .from('popup-images')
+          .remove(existingFiles.map(f => f.name));
+      }
+
+      const { error } = await supabase
+        .from('site_settings')
+        .delete()
+        .eq('key', 'popup_image_url');
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('Error resetting popup image:', error);
+      return { success: false, message: error.message };
+    }
   }
 }
 
