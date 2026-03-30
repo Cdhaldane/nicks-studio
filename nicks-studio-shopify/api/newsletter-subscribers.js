@@ -9,10 +9,16 @@ const BLOB_PATHNAME = 'newsletter/subscribers.json';
 
 async function readSubscribers() {
   try {
+    console.log('[subscribers] token present:', !!process.env.BLOB_READ_WRITE_TOKEN);
     const meta = await head(BLOB_PATHNAME, { token: process.env.BLOB_READ_WRITE_TOKEN });
+    console.log('[subscribers] blob url:', meta.url);
     const res = await fetch(`${meta.url}?t=${Date.now()}`, { cache: 'no-store' });
-    return await res.json();
-  } catch {
+    console.log('[subscribers] fetch status:', res.status);
+    const data = await res.json();
+    console.log('[subscribers] count:', Array.isArray(data) ? data.length : 'not array', JSON.stringify(data).slice(0, 200));
+    return data;
+  } catch (err) {
+    console.error('[subscribers] readSubscribers error:', err.message);
     return [];
   }
 }
