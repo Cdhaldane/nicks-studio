@@ -75,7 +75,7 @@ module.exports = async (req, res) => {
         contentType: 'application/json',
       });
 
-      return res.status(200).json({ success: true, imageUrl: blob.url });
+      return res.status(200).json({ success: true, imageUrl: `${blob.url}?t=${Date.now()}` });
     } catch (error) {
       console.error('Popup image upload error:', error);
       return res.status(500).json({ success: false, message: 'Failed to upload image' });
