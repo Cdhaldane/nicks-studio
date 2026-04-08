@@ -1,0 +1,134 @@
+.social-feed {
+  width: 100%;
+  padding: 80px 20px;
+  background: var(--bg-secondary, #1a1a1a);
+  text-align: center;
+}
+
+.social-feed-heading {
+  font-family: var(--font-family-secondary, 'Pacifico', cursive);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: var(--text, #f3f3f3);
+  margin: 0 0 12px;
+}
+
+.social-feed-subtext {
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-size-base, 1rem);
+  max-width: 520px;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+.social-feed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto 48px;
+}
+
+.social-feed-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 36px 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--text, #f3f3f3);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.social-feed-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--card-accent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--card-accent);
+}
+
+.social-feed-card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--card-accent);
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.social-feed-card:hover .social-feed-card-icon {
+  background: var(--card-accent);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.social-feed-card-desc {
+  margin: 0;
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text-secondary, #b3b3b3);
+  line-height: 1.5;
+}
+
+.social-feed-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--card-accent);
+  margin-top: auto;
+  transition: gap 0.2s ease;
+}
+
+.social-feed-card:hover .social-feed-card-cta {
+  gap: 12px;
+}
+
+/* Spotify strip */
+.social-feed-spotify {
+  max-width: 640px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.social-feed-spotify-embed {
+  display: block;
+  border-radius: 12px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .social-feed {
+    padding: 56px 16px;
+  }
+
+  .social-feed-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    gap: 16px;
+  }
+
+  .social-feed-card {
+    padding: 28px 20px;
+    flex-direction: row;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .social-feed-card-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .social-feed-card-desc {
+    display: none;
+  }
+}

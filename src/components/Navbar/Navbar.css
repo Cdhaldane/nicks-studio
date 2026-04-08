@@ -1,0 +1,304 @@
+/* ===== Navbar Core ===== */
+.nav-links {
+  display: flex;
+  width: 90%;
+  height: fit-content;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  top: 100px !important;
+  left: 5%;
+  z-index: 100;
+}
+
+.nav-links > a {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+/* Desktop layout — no animations needed */
+.nav-desktop {
+  transition: none;
+}
+
+/* Mobile top bar — just title + hamburger */
+.nav-mobile {
+  position: fixed;
+  top: 0 !important;
+  left: 0;
+  width: 100%;
+  height: auto;
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(216, 59, 101, 0.3);
+  z-index: var(--z-modal, 1050);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ===== Title ===== */
+.nav-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 6em;
+  width: 4em;
+  color: var(--white);
+  font-weight: 700;
+  font-family: "Pacifico", cursive;
+  rotate: -5deg;
+  cursor: pointer;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.nav-title > span {
+  text-align: center;
+  line-height: 5rem;
+  position: absolute;
+  text-shadow: 2px 2px 2px var(--dpink);
+}
+
+.nav-title .back {
+  color: var(--primary);
+  z-index: -1;
+  transform: translateY(2%) translateX(5px);
+}
+
+.nav-mobile .nav-title {
+  font-size: clamp(1.4rem, 5vw, 2rem) !important;
+  rotate: 0deg;
+  width: auto;
+  margin: 0;
+  animation: none;
+}
+
+.nav-mobile .nav-title > span {
+  position: relative;
+  line-height: 1.2;
+}
+
+.nav-mobile .nav-title .back {
+  position: absolute;
+  transform: translateY(1px) translateX(2px);
+}
+
+/* ===== Nav Buttons (desktop) ===== */
+.nav-button {
+  height: fit-content;
+  color: var(--white);
+  text-shadow: 2px 2px 2px var(--black);
+  padding: 0% 1%;
+  font-family: "Rye", sans-serif;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 1.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.nav-button.active {
+  text-shadow: 2px 2px 4px var(--primary);
+  scale: 1.2;
+}
+
+.nav-button:hover {
+  color: var(--primary) !important;
+  transition: all 0.3s ease;
+}
+
+/* Tour nav button — reset button chrome */
+.tour-nav-btn {
+  background: none;
+  border: none;
+  outline: none;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+/* ===== Hamburger / Close Button ===== */
+.nav-links-bars {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--white, #fff);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  z-index: calc(var(--z-modal, 1050) + 10);
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md, 6px);
+}
+
+.nav-links-bars:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-links-bars.is-open {
+  transform: rotate(90deg);
+}
+
+.nav-links-bars i {
+  transition: transform 0.2s ease;
+}
+
+/* ===== Mobile Overlay (dark backdrop) ===== */
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: calc(var(--z-modal, 1050) - 2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== Mobile Drawer ===== */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80%;
+  max-width: 320px;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(216, 59, 101, 0.2);
+  z-index: calc(var(--z-modal, 1050) - 1);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+  padding-top: 80px;
+}
+
+.mobile-drawer.open {
+  transform: translateX(0);
+}
+
+/* ===== Mobile Links ===== */
+.mobile-links {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+  padding: var(--space-md, 16px);
+}
+
+.mobile-links .nav-button,
+.mobile-links a {
+  display: block;
+  color: var(--white, #fff);
+  font-size: 1.1rem;
+  text-decoration: none;
+  font-weight: 700;
+  font-family: "Rye", sans-serif;
+  text-transform: uppercase;
+  padding: 14px 20px;
+  border-radius: var(--radius-lg, 8px);
+  background: transparent;
+  transition: background 0.2s ease, transform 0.2s ease;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  text-shadow: none;
+}
+
+.mobile-links .nav-button:hover,
+.mobile-links a:hover {
+  background: rgba(216, 59, 101, 0.15);
+  color: var(--primary, #d83b65) !important;
+  transform: translateX(6px);
+}
+
+.mobile-links .nav-button.active,
+.mobile-links a.active {
+  background: rgba(216, 59, 101, 0.12);
+  color: var(--primary, #d83b65) !important;
+  border-left: 3px solid var(--primary, #d83b65);
+  scale: 1;
+  text-shadow: none;
+}
+
+.mobile-links .tour-nav-btn {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* ===== Cart ===== */
+.nav-cart {
+  position: fixed;
+  top: 0.6rem;
+  right: var(--space-md, 16px);
+  z-index: calc(var(--z-modal, 1050) + 5);
+}
+
+/* ===== Tour Modal Overrides ===== */
+.tour-modal-body {
+  overflow-y: auto;
+  max-height: calc(90vh - 80px);
+}
+
+.tour-modal-content {
+  max-width: 800px;
+}
+
+.tour-modal-body .tour-schedule-section {
+  min-height: auto;
+  padding: 24px 20px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.tour-modal-body .tour-title {
+  display: none;
+}
+
+/* ===== Touch Device Optimizations ===== */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-links .nav-button:hover,
+  .mobile-links a:hover {
+    transform: none;
+    background: transparent;
+  }
+
+  .mobile-links .nav-button:active,
+  .mobile-links a:active {
+    background: rgba(216, 59, 101, 0.2);
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+}
+
+/* ===== Small Mobile ===== */
+@media (max-width: 480px) {
+  .mobile-drawer {
+    width: 85%;
+  }
+
+  .nav-mobile {
+    padding: var(--space-sm, 8px) var(--space-md, 16px);
+  }
+
+  .mobile-links .nav-button,
+  .mobile-links a {
+    font-size: 1rem;
+    padding: 12px 16px;
+  }
+}
