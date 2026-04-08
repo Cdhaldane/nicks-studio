@@ -19,7 +19,7 @@ app.use(express.json());
 // Auto-load every handler in api/ (except _utils and this file)
 const apiDir = __dirname;
 fs.readdirSync(apiDir)
-  .filter(f => f.endsWith('.js') && !f.startsWith('_') && f !== 'dev-server.js')
+  .filter(f => f.endsWith('.js') && !f.startsWith('_'))
   .forEach(file => {
     const name = file.replace('.js', '');
     const handler = require(path.join(apiDir, file));

@@ -47,8 +47,8 @@
   },
   "scripts": {
     "start": "NODE_OPTIONS=--max-http-header-size=81920 PORT=3001 react-scripts start",
-    "api": "node api/dev-server.js",
-    "api:sandbox": "env-cmd -f .env.sandbox node api/dev-server.js",
+    "api": "node api/_dev-server.js",
+    "api:sandbox": "env-cmd -f .env.sandbox node api/_dev-server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
