@@ -1,9 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import vercelEmailStorageService from '../../services/vercelEmailStorageService';
 import './AdminDashboard.css';
 
 const EMPTY_DATE = { date: '', city: '', venue: '', ticketsUrl: '', note: '' };
+
+const parseLocalDate = (dateStr) => {
+  if (!dateStr) return null;
+  const [year, month, day] = dateStr.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+};
+
+const formatTourDate = (dateStr) => {
+  const d = parseLocalDate(dateStr);
+  if (!d) return null;
+  return d.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
+const getDateParts = (dateStr) => {
+  const d = parseLocalDate(dateStr);
+  if (!d) return null;
+  return {
+    month: d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+    day: d.getDate(),
+    weekday: d.toLocaleDateString('en-US', { weekday: 'short' }),
+    year: d.getFullYear(),
+  };
+};
 
 const AdminDashboard = () => {
   const [subscribers, setSubscribers] = useState([]);
@@ -83,6 +112,29 @@ const AdminDashboard = () => {
     setTourSaveStatus(result.success ? 'success' : 'error');
     setTimeout(() => setTourSaveStatus('idle'), 3000);
   };
+
+  const handleSortTourDates = () => {
+    setTourDates(prev => {
+      const withDates = prev.filter(d => d.date);
+      const withoutDates = prev.filter(d => !d.date);
+      withDates.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
+      return [...withDates, ...withoutDates];
+    });
+  };
+
+  const tourStats = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let upcoming = 0;
+    let past = 0;
+    tourDates.forEach(d => {
+      const parsed = parseLocalDate(d.date);
+      if (!parsed) return;
+      if (parsed >= today) upcoming += 1;
+      else past += 1;
+    });
+    return { upcoming, past };
+  }, [tourDates]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -295,9 +347,24 @@ const AdminDashboard = () => {
 
         {activeTab === 'tour' && (
           <div className="tour-tab">
-            <div className="tab-header">
-              <h2>Tour Dates</h2>
+            <div className="tab-header tour-tab-header">
+              <div className="tour-header-info">
+                <h2>Tour Dates</h2>
+                <div className="tour-stats">
+                  <span className="tour-stat tour-stat-upcoming">
+                    <span className="stat-dot" /> {tourStats.upcoming} upcoming
+                  </span>
+                  <span className="tour-stat tour-stat-past">
+                    <span className="stat-dot" /> {tourStats.past} past
+                  </span>
+                </div>
+              </div>
               <div className="header-actions">
+                {tourDates.length > 1 && (
+                  <button onClick={handleSortTourDates} className="btn btn-ghost btn-sm" title="Sort by date">
+                    ↕ Sort
+                  </button>
+                )}
                 <button onClick={handleAddTourDate} className="btn btn-secondary">
                   + Add Date
                 </button>
@@ -319,68 +386,111 @@ const AdminDashboard = () => {
             )}
 
             {tourDates.length === 0 ? (
-              <div className="empty-state">
-                <p>No tour dates yet. Click "+ Add Date" to create one.</p>
+              <div className="empty-state tour-empty-state">
+                <div className="empty-state-icon">🎤</div>
+                <h3>No tour dates yet</h3>
+                <p>Add your first show to get started.</p>
+                <button onClick={handleAddTourDate} className="btn btn-primary">
+                  + Add First Date
+                </button>
               </div>
             ) : (
               <div className="tour-editor-list">
-                {tourDates.map((show, index) => (
-                  <div key={index} className="tour-editor-row">
-                    <div className="tour-editor-fields">
-                      <label>
-                        Date
-                        <input
-                          type="date"
-                          value={show.date}
-                          onChange={(e) => handleTourDateChange(index, 'date', e.target.value)}
-                        />
-                      </label>
-                      <label>
-                        City
-                        <input
-                          type="text"
-                          value={show.city}
-                          placeholder="Toronto, ON"
-                          onChange={(e) => handleTourDateChange(index, 'city', e.target.value)}
-                        />
-                      </label>
-                      <label>
-                        Venue
-                        <input
-                          type="text"
-                          value={show.venue}
-                          placeholder="The Horseshoe Tavern"
-                          onChange={(e) => handleTourDateChange(index, 'venue', e.target.value)}
-                        />
-                      </label>
-                      <label>
-                        Tickets URL
-                        <input
-                          type="url"
-                          value={show.ticketsUrl}
-                          placeholder="https://..."
-                          onChange={(e) => handleTourDateChange(index, 'ticketsUrl', e.target.value)}
-                        />
-                      </label>
-                      <label>
-                        Note
-                        <input
-                          type="text"
-                          value={show.note}
-                          placeholder="w/ special guest"
-                          onChange={(e) => handleTourDateChange(index, 'note', e.target.value)}
-                        />
-                      </label>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveTourDate(index)}
-                      className="btn btn-sm btn-error tour-remove-btn"
-                      title="Remove this date"
+                {tourDates.map((show, index) => {
+                  const parts = getDateParts(show.date);
+                  const parsed = parseLocalDate(show.date);
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const isPast = parsed && parsed < today;
+                  const isIncomplete = !show.date || !show.city || !show.venue;
+
+                  return (
+                    <div
+                      key={index}
+                      className={`tour-card ${isPast ? 'is-past' : ''} ${isIncomplete ? 'is-incomplete' : ''}`}
                     >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+                      <div className="tour-card-date-block">
+                        {parts ? (
+                          <>
+                            <span className="tour-card-month">{parts.month}</span>
+                            <span className="tour-card-day">{parts.day}</span>
+                            <span className="tour-card-year">{parts.weekday} · {parts.year}</span>
+                          </>
+                        ) : (
+                          <span className="tour-card-empty-date">No date</span>
+                        )}
+                        {isPast && <span className="tour-card-badge">Past</span>}
+                      </div>
+
+                      <div className="tour-card-body">
+                        <div className="tour-card-row tour-card-row-primary">
+                          <label className="tour-field tour-field-date">
+                            <span className="tour-field-label">Date</span>
+                            <input
+                              type="date"
+                              value={show.date}
+                              onChange={(e) => handleTourDateChange(index, 'date', e.target.value)}
+                            />
+                          </label>
+                          <label className="tour-field">
+                            <span className="tour-field-label">City</span>
+                            <input
+                              type="text"
+                              value={show.city}
+                              placeholder="Toronto, ON"
+                              onChange={(e) => handleTourDateChange(index, 'city', e.target.value)}
+                            />
+                          </label>
+                          <label className="tour-field">
+                            <span className="tour-field-label">Venue</span>
+                            <input
+                              type="text"
+                              value={show.venue}
+                              placeholder="The Horseshoe Tavern"
+                              onChange={(e) => handleTourDateChange(index, 'venue', e.target.value)}
+                            />
+                          </label>
+                        </div>
+                        <div className="tour-card-row tour-card-row-secondary">
+                          <label className="tour-field">
+                            <span className="tour-field-label">🎟 Tickets URL</span>
+                            <input
+                              type="url"
+                              value={show.ticketsUrl}
+                              placeholder="https://..."
+                              onChange={(e) => handleTourDateChange(index, 'ticketsUrl', e.target.value)}
+                            />
+                          </label>
+                          <label className="tour-field">
+                            <span className="tour-field-label">📝 Note</span>
+                            <input
+                              type="text"
+                              value={show.note}
+                              placeholder="w/ special guest"
+                              onChange={(e) => handleTourDateChange(index, 'note', e.target.value)}
+                            />
+                          </label>
+                        </div>
+                        {formatTourDate(show.date) && (
+                          <div className="tour-card-preview">
+                            Preview: <strong>{formatTourDate(show.date)}</strong>
+                            {show.city && <> · {show.city}</>}
+                            {show.venue && <> · {show.venue}</>}
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => handleRemoveTourDate(index)}
+                        className="tour-card-remove"
+                        title="Remove this date"
+                        aria-label="Remove tour date"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
