@@ -2,9 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import fallbackDates from '../../data/tour-dates.json';
 import './TourSchedule.css';
 
+const parseDate = (dateStr) => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 const TourSchedule = ({ showAsSection = true }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [tourDates, setTourDates] = useState(fallbackDates);
+  const [tourDates, setTourDates] = useState([]);
 
   useEffect(() => {
     const apiBase =
@@ -30,8 +35,8 @@ const TourSchedule = ({ showAsSection = true }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return tourDates
-      .filter(show => new Date(show.date) >= today)
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+      .filter(show => parseDate(show.date) >= today)
+      .sort((a, b) => parseDate(a.date) - parseDate(b.date));
   }, [tourDates]);
 
   if (!showAsSection) {
@@ -68,7 +73,7 @@ const TourSchedule = ({ showAsSection = true }) => {
               <div key={index} className="tour-date-item">
                 <div className="tour-date-info">
                   <span className="tour-date">
-                    {new Date(show.date).toLocaleDateString('en-US', {
+                    {parseDate(show.date).toLocaleDateString('en-US', {
                       weekday: 'short',
                       year: 'numeric',
                       month: 'short',
