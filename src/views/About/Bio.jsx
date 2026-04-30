@@ -10,8 +10,8 @@ const Bio = () => {
     <>
       <SEOHelmet 
         title="About Nickola Magnolia | Country & Americana Artist Biography"
-        description="Learn about Nickola Magnolia, a Country & Americana artist from the Great Lakes region. Read her story, musical journey, and notable performances including opening for Chris Janson and Keith Whitley."
-        keywords="Nickola Magnolia biography, country artist bio, americana musician, great lakes artist, broken lonesome album, chris janson opener"
+        description="Learn about Nickola Magnolia, a Country & Americana artist from the Great Lakes region with roots in Northumberland County, Ontario. Her story, musical journey, and notable performances opening for Chris Janson and Keith Whitley."
+        keywords="Nickola Magnolia biography, country artist bio, americana musician, great lakes artist, broken lonesome album, chris janson opener, Northumberland County artist, Port Hope musician, Cobourg country artist, Peterborough live music, country music Ontario live, Calgary Stampede country artists, Nashville North lineup 2026"
         url={window.location.href}
         type="profile"
       />

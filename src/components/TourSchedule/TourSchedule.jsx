@@ -1,10 +1,56 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import fallbackDates from '../../data/tour-dates.json';
 import './TourSchedule.css';
 
 const parseDate = (dateStr) => {
   const [year, month, day] = dateStr.split('-').map(Number);
   return new Date(year, month - 1, day);
+};
+
+const buildEventSchema = (show) => {
+  const start = parseDate(show.date);
+  const isoDate = start.toISOString().split('T')[0];
+  const isHometown = /hometown|record release|album release/i.test(
+    `${show.note || ''} ${show.venue || ''}`
+  );
+  const baseName = isHometown
+    ? `Nickola Magnolia — Hometown Record Release Show`
+    : `Nickola Magnolia Live in ${show.city}`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MusicEvent',
+    name: show.note ? `${baseName} (${show.note})` : baseName,
+    startDate: isoDate,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    location: {
+      '@type': 'Place',
+      name: show.venue,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: show.city,
+        addressCountry: /ON|Ontario|Canada|AB|Alberta/i.test(show.city)
+          ? 'CA'
+          : 'US',
+      },
+    },
+    performer: {
+      '@type': 'MusicGroup',
+      name: 'Nickola Magnolia',
+    },
+    offers: show.ticketsUrl
+      ? {
+          '@type': 'Offer',
+          url: show.ticketsUrl,
+          availability: 'https://schema.org/InStock',
+        }
+      : undefined,
+    url:
+      typeof window !== 'undefined'
+        ? `${window.location.origin}/#tour`
+        : undefined,
+  };
 };
 
 const TourSchedule = ({ showAsSection = true }) => {
@@ -55,6 +101,18 @@ const TourSchedule = ({ showAsSection = true }) => {
 
   return (
     <section className="tour-schedule-section">
+      {upcomingDates.length > 0 && (
+        <Helmet>
+          {upcomingDates.map((show, idx) => (
+            <script
+              key={`tour-event-${idx}`}
+              type="application/ld+json"
+            >
+              {JSON.stringify(buildEventSchema(show))}
+            </script>
+          ))}
+        </Helmet>
+      )}
       <div className="tour-container">
         <h2 className="tour-title">Tour Dates</h2>
 

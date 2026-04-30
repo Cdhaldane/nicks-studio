@@ -155,8 +155,8 @@ const Music = () => {
     <div className="music-container" id="main-content">
       <SEOHelmet 
         title="Music - Nickola Magnolia | Albums & Songs"
-        description="Discover the latest albums and singles from Nickola Magnolia. Stream Country & Americana music from the Great Lakes region on Spotify and other platforms."
-        keywords="Nickola Magnolia music, country albums, americana songs, spotify artist, new music releases, great lakes country"
+        description="Latest albums and singles from Nickola Magnolia — Country & Americana from the Great Lakes. Hometown record release show June 11, 2026. Stream on Spotify and beyond."
+        keywords="Nickola Magnolia music, country albums, americana songs, spotify artist, new music releases, great lakes country, album release show Ontario, hometown record release June 11 2026, country music Ontario live, who is performing at Calgary Stampede 2026, Calgary Stampede 2026 lineup, Nashville North lineup 2026"
         image={albums[currentAlbum]?.images?.[0]?.url || "/nick-bio.jpg"}
         url={window.location.href}
         type="music.album"
