@@ -43,22 +43,3 @@
     <priority>0.3</priority>
   </url>
 </urlset>
-  <url>
-    <loc>https://nickolamagnolia.com/privacy</loc>
-    <lastmod>2024-12-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://nickolamagnolia.com/terms</loc>
-    <lastmod>2024-12-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://nickolamagnolia.com/accessibility</loc>
-    <lastmod>2024-12-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-</urlset>
