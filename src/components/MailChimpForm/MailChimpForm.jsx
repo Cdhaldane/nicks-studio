@@ -32,7 +32,7 @@ const MailchimpFormContainer = ({ onClose }) => {
           ? "http://localhost:4001"
           : "";
 
-      const res = await fetch(`${apiBase}/api/newsletter-subscribe`, {
+      const res = await fetch(`${apiBase}/api/newsletter`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

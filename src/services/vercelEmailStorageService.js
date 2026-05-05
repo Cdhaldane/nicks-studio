@@ -3,7 +3,7 @@ const API_BASE = process.env.REACT_APP_API_URL || '/api';
 class VercelEmailStorageService {
   async addSubscriber(email, source = 'website-footer') {
     try {
-      const response = await fetch(`${API_BASE}/newsletter-subscribe`, {
+      const response = await fetch(`${API_BASE}/newsletter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, source }),
@@ -24,7 +24,7 @@ class VercelEmailStorageService {
 
   async getSubscribers() {
     try {
-      const response = await fetch(`${API_BASE}/newsletter-subscribers`);
+      const response = await fetch(`${API_BASE}/newsletter`);
       const data = await response.json();
       return data.subscribers || [];
     } catch (error) {
@@ -35,7 +35,7 @@ class VercelEmailStorageService {
 
   async removeSubscriber(email) {
     try {
-      const response = await fetch(`${API_BASE}/newsletter-subscribers`, {
+      const response = await fetch(`${API_BASE}/newsletter`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -136,6 +136,17 @@ class VercelEmailStorageService {
     } catch (error) {
       console.error('Error saving tour dates:', error);
       return { success: false, message: 'Failed to save tour dates' };
+    }
+  }
+
+  async getSiteAnalytics() {
+    try {
+      const response = await fetch(`${API_BASE}/analytics?t=${Date.now()}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching site analytics:', error);
+      return null;
     }
   }
 }

@@ -23,11 +23,14 @@ import Navbar from './components/Navbar/Navbar.jsx';
 import NewsPopup from './components/NewsPopup/NewsPopup.jsx';
 import NewsPopupTrigger from './components/NewsPopup/NewsPopupTrigger.jsx';
 
+import usePageTracking from './hooks/usePageTracking';
+
 import './App.css';
 import './Styles-Mobile.css';
 
 function App() {
   const location = useLocation();
+  usePageTracking();
 
   return (
     <HelmetProvider>

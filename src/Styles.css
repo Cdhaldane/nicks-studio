@@ -11,7 +11,7 @@
   margin-top: -46px;
 }
 
-.home-container.animate-in {
+.animate-in {
   animation: fadeInUp 1s ease-out forwards;
 }
 

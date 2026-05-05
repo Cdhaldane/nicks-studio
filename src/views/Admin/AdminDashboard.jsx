@@ -37,6 +37,7 @@ const getDateParts = (dateStr) => {
 const AdminDashboard = () => {
   const [subscribers, setSubscribers] = useState([]);
   const [analytics, setAnalytics] = useState(null);
+  const [siteAnalytics, setSiteAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [popupImageUrl, setPopupImageUrl] = useState(null);
@@ -56,11 +57,13 @@ const AdminDashboard = () => {
       const analyticsData = await vercelEmailStorageService.getAnalytics();
       const imageUrl = await vercelEmailStorageService.getPopupImage();
       const tourData = await vercelEmailStorageService.getTourDates();
+      const siteData = await vercelEmailStorageService.getSiteAnalytics();
 
       setSubscribers(subscriberData);
       setAnalytics(analyticsData);
       setPopupImageUrl(imageUrl);
       setTourDates(tourData);
+      setSiteAnalytics(siteData);
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
@@ -213,6 +216,12 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('tour')}
         >
           Tour Dates ({tourDates.length})
+        </button>
+        <button 
+          className={`nav-tab ${activeTab === 'analytics' ? 'active' : ''}`}
+          onClick={() => setActiveTab('analytics')}
+        >
+          Analytics
         </button>
         <button 
           className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
@@ -492,6 +501,148 @@ const AdminDashboard = () => {
                   );
                 })}
               </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="analytics-tab">
+            <div className="tab-header">
+              <h2>Site Analytics</h2>
+              <button onClick={loadData} className="btn btn-secondary btn-sm">
+                🔄 Refresh
+              </button>
+            </div>
+
+            {!siteAnalytics ? (
+              <div className="empty-state">
+                <p>No analytics data yet. Data will appear once visitors start browsing the site.</p>
+              </div>
+            ) : (
+              <>
+                {/* Summary Cards */}
+                <div className="analytics-grid">
+                  <div className="analytics-card card-total">
+                    <div className="card-icon">👁️</div>
+                    <h3>Today</h3>
+                    <p className="analytics-number">{siteAnalytics.summary.today}</p>
+                  </div>
+                  <div className="analytics-card card-week">
+                    <div className="card-icon">📅</div>
+                    <h3>Last 7 Days</h3>
+                    <p className="analytics-number">{siteAnalytics.summary.last7d}</p>
+                  </div>
+                  <div className="analytics-card card-month">
+                    <div className="card-icon">📆</div>
+                    <h3>Last 30 Days</h3>
+                    <p className="analytics-number">{siteAnalytics.summary.last30d}</p>
+                  </div>
+                  <div className="analytics-card card-growth">
+                    <div className="card-icon">📊</div>
+                    <h3>All Time</h3>
+                    <p className="analytics-number">{siteAnalytics.summary.total}</p>
+                  </div>
+                </div>
+
+                {/* Daily Traffic Chart */}
+                {siteAnalytics.dailyViews && siteAnalytics.dailyViews.length > 0 && (
+                  <div className="analytics-section">
+                    <h3>Daily Traffic (Last 30 Days)</h3>
+                    <div className="daily-chart">
+                      {(() => {
+                        const max = Math.max(...siteAnalytics.dailyViews.map(d => d.views), 1);
+                        return siteAnalytics.dailyViews.map((day) => (
+                          <div key={day.date} className="chart-bar-wrapper" title={`${day.date}: ${day.views} views`}>
+                            <div
+                              className="chart-bar"
+                              style={{ height: `${(day.views / max) * 100}%` }}
+                            />
+                            <span className="chart-label">
+                              {new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                )}
+
+                {/* Traffic Sources & Top Pages side by side */}
+                <div className="analytics-two-col">
+                  {/* Traffic Sources */}
+                  <div className="analytics-section">
+                    <h3>Traffic Sources</h3>
+                    {siteAnalytics.sources && siteAnalytics.sources.length > 0 ? (
+                      <div className="analytics-list">
+                        {siteAnalytics.sources.map((s) => (
+                          <div key={s.source} className="analytics-list-item">
+                            <span className={`source-indicator src-${s.source}`}>{s.source}</span>
+                            <span className="analytics-list-value">{s.views}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-activity">No source data yet.</p>
+                    )}
+                  </div>
+
+                  {/* Top Pages */}
+                  <div className="analytics-section">
+                    <h3>Top Pages</h3>
+                    {siteAnalytics.topPages && siteAnalytics.topPages.length > 0 ? (
+                      <div className="analytics-list">
+                        {siteAnalytics.topPages.map((p) => (
+                          <div key={p.page} className="analytics-list-item">
+                            <span className="analytics-list-label">{p.page}</span>
+                            <span className="analytics-list-value">{p.views}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-activity">No page data yet.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Devices & Top Referrers side by side */}
+                <div className="analytics-two-col">
+                  {/* Device Breakdown */}
+                  <div className="analytics-section">
+                    <h3>Devices</h3>
+                    {siteAnalytics.devices && siteAnalytics.devices.length > 0 ? (
+                      <div className="analytics-list">
+                        {siteAnalytics.devices.map((d) => (
+                          <div key={d.device} className="analytics-list-item">
+                            <span className="analytics-list-label">
+                              {d.device === 'mobile' ? '📱' : d.device === 'tablet' ? '📋' : '🖥️'} {d.device}
+                            </span>
+                            <span className="analytics-list-value">{d.views}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-activity">No device data yet.</p>
+                    )}
+                  </div>
+
+                  {/* Top Referrers */}
+                  <div className="analytics-section">
+                    <h3>Top Referrers</h3>
+                    {siteAnalytics.topReferrers && siteAnalytics.topReferrers.length > 0 ? (
+                      <div className="analytics-list">
+                        {siteAnalytics.topReferrers.map((r) => (
+                          <div key={r.referrer} className="analytics-list-item">
+                            <span className="analytics-list-label">{r.referrer}</span>
+                            <span className="analytics-list-value">{r.views}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-activity">No referrer data yet.</p>
+                    )}
+                  </div>
+                </div>
+              </>
             )}
           </div>
         )}
