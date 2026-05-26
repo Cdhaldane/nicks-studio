@@ -132,8 +132,12 @@ const Home = () => {
         <div className="hero-overlay">
           <Parallax speed={-5}>
             <div className="hero-content">
+              <img
+                src={`${process.env.PUBLIC_URL}/logo-trans.png`}
+                alt="Nickola Magnolia"
+                className="hero-logo"
+              />
               <h1 className="hero-title animate-in">
-                <span className="hero-name">Nickola Magnolia</span>
                 <span className="hero-subtitle">Country & Americana</span>
               </h1>
             </div>

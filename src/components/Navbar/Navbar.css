@@ -6,8 +6,8 @@
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  position: relative;
-  top: 100px !important;
+  position: absolute;
+  top: 30px !important;
   left: 5%;
   z-index: 100;
 }
@@ -50,9 +50,29 @@
   color: var(--white);
   font-weight: 700;
   font-family: "Pacifico", cursive;
-  rotate: -5deg;
+  /* rotate: -5deg; */
   cursor: pointer;
   animation: glow 2s ease-in-out infinite alternate;
+}
+
+.nav-logo {
+  object-fit: contain;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.6));
+  transition: transform 0.3s ease;
+}
+
+.nav-logo:hover {
+  transform: scale(1.05);
+}
+
+.nav-logo-full {
+  height: 200px;
+  width: auto;
+}
+
+.nav-logo-initials {
+  height: 40px;
+  width: auto;
 }
 
 .nav-title > span {

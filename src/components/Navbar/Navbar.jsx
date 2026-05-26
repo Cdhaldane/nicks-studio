@@ -114,8 +114,20 @@ const Navbar = () => {
           className={`nav-title ${isMobile ? 'mobile-title' : ''}`}
           onClick={() => navigate('/')}
         >
-          <span>Nickola Magnolia</span>
-          <span className="back">Nickola Magnolia</span>
+          
+          {isMobile ? (
+            <img
+              src={`${process.env.PUBLIC_URL}/logo-init.png`}
+              alt="Nickola Magnolia"
+              className="nav-logo nav-logo-initials"
+            />
+          ) : (
+            <img
+              src={`${process.env.PUBLIC_URL}/logo-init.png`}
+              alt="Nickola Magnolia"
+              className="nav-logo nav-logo-full"
+            />
+          )}
         </div>
 
         {/* Desktop: right links */}

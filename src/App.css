@@ -1,10 +1,10 @@
 /* CSS Custom Properties - Dynamic Color System */
 :root {
   /* Primary Colors */
-  --primary: #ff0000;
-  --primary-light: #e85578;
-  --primary-dark: #922e4a;
-  --primary-alpha: rgba(216, 59, 101, 0.1);
+  --primary: #641c14;
+  --primary-light: #8b2a1f;
+  --primary-dark: #3d110c;
+  --primary-alpha: rgba(100, 28, 20, 0.1);
   
   /* Secondary Colors */
   --secondary: #000000;
@@ -25,7 +25,7 @@
   --bg-tertiary: #2d2d2d;
   --bg-overlay: rgba(0, 0, 0, 0.7);
   --bg-glass: rgba(255, 255, 255, 0.1);
-  --bg-glass-pink: rgba(248, 88, 130, 0.3);
+  --bg-glass-pink: rgba(255, 0, 0, 0.3);
   
   /* Accent Colors */
   --accent-blue: #527af9;
@@ -99,7 +99,7 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  --shadow-glow: 0 0 20px rgba(216, 59, 101, 0.3);
+  --shadow-glow: 0 0 20px rgba(255, 0, 0, 0.3);
   
   /* Border Radius */
   --radius-sm: 0.125rem;
@@ -132,7 +132,7 @@
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
   
   /* Layout */
-  --nav-height: 200px;
+  --nav-height: 270px;
   --nav-height-mobile: 60px;
   --container-max-width: 1200px;
   --container-padding: var(--space-md);
@@ -562,7 +562,7 @@ body {
 /* High contrast mode */
 @media (prefers-contrast: high) {
   :root {
-    --primary: #ff0066;
+    --primary: #ff0000;
     --bg-glass: rgba(255, 255, 255, 0.9);
   }
 }
