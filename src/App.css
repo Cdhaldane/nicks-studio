@@ -1,7 +1,7 @@
 /* CSS Custom Properties - Dynamic Color System */
 :root {
   /* Primary Colors */
-  --primary: #d83b65;
+  --primary: #ff0000;
   --primary-light: #e85578;
   --primary-dark: #922e4a;
   --primary-alpha: rgba(216, 59, 101, 0.1);
