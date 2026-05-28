@@ -81,13 +81,13 @@ export const CONSTANTS = {
 
   // Theme colors (matching CSS variables)
   COLORS: {
-    PRIMARY: '#d83b65',
+    PRIMARY: 'var(--primary)',
     SECONDARY: '#000000',
     TEXT: '#f3f3f3',
     BLUE: '#527af9',
     BLACK: '#141414',
     WHITE: '#ffffff',
-    PINK: '#d83b65',
+    PINK: 'var(--primary)',
     DPINK: '#962344',
     GREEN: '#2cd37a',
     RED: '#e26262',

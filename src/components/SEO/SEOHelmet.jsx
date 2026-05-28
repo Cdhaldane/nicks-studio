@@ -72,8 +72,8 @@ const SEOHelmet = ({
       </script>
       
       {/* Additional Meta Tags */}
-      <meta name="theme-color" content="#d83b65" />
-      <meta name="msapplication-TileColor" content="#d83b65" />
+      <meta name="theme-color" content="var(--primary)" />
+      <meta name="msapplication-TileColor" content="var(--primary)" />
       <meta name="application-name" content="Nickola Magnolia" />
       
       {/* Geo Tags */}

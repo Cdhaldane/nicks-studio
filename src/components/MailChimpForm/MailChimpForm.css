@@ -51,7 +51,7 @@
 }
 
 .mc__field-container input:focus {
-  border-color: #d83b65;
+  border-color: var(--primary);
 }
 
 .mc__form input[type="submit"],
@@ -60,7 +60,7 @@
   height: 42px;
   margin-top: 6px;
   padding: 0 16px;
-  background: #d83b65;
+  background: var(--primary);
   color: #fff;
   border: none;
   border-radius: 6px;
