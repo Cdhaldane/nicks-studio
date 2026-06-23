@@ -26,7 +26,8 @@
     "react-scripts": "5.0.1",
     "react-scroll-parallax": "^3.4.5",
     "shopify-buy": "^2.21.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
