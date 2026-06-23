@@ -22,7 +22,7 @@ const OrderConfirmation = () => {
   useEffect(() => {
     if (!orderId) return;
 
-    fetch(`/api/square-order?id=${encodeURIComponent(orderId)}`)
+    fetch(`/api/square?action=order&id=${encodeURIComponent(orderId)}`)
       .then(r => r.json())
       .then(data => {
         if (data.error) throw new Error(data.message || data.error);

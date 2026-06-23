@@ -32,7 +32,7 @@ export const fetchAllProducts = async () => {
   try {
     console.log('Fetching products from Square...');
 
-    const response = await fetch(`${API_PROXY_URL}/square-catalog-items`, {
+    const response = await fetch(`${API_PROXY_URL}/square?action=catalog-items`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ const transformSquareProducts = catalogItems => {
 export const fetchProduct = async productId => {
   try {
     const response = await fetch(
-      `${API_PROXY_URL}/square-catalog-item?id=${productId}`,
+      `${API_PROXY_URL}/square?action=catalog-item&id=${productId}`,
       {
         method: 'GET',
         headers: {
@@ -163,7 +163,7 @@ export const fetchProduct = async productId => {
 export const fetchProductsByCategory = async categoryId => {
   try {
     const response = await fetch(
-      `${API_PROXY_URL}/square-catalog-category?id=${categoryId}`,
+      `${API_PROXY_URL}/square?action=catalog-category&id=${categoryId}`,
       {
         method: 'GET',
         headers: {
@@ -194,7 +194,7 @@ export const createCheckout = async lineItems => {
   try {
     console.log('Creating Square checkout with items:', lineItems);
 
-    const response = await fetch(`${API_PROXY_URL}/square-checkout`, {
+    const response = await fetch(`${API_PROXY_URL}/square?action=checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -237,7 +237,7 @@ export const createPaymentLink = async (lineItems, orderInfo = {}) => {
   try {
     console.log('Creating Square payment link with items:', lineItems);
 
-    const response = await fetch(`${API_PROXY_URL}/square-payment-link`, {
+    const response = await fetch(`${API_PROXY_URL}/square?action=payment-link`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -325,7 +325,7 @@ export const processPayment = async (card, amount) => {
 
     if (result.status === 'OK') {
       // Send token to backend to process payment
-      const response = await fetch(`${API_PROXY_URL}/square-process-payment`, {
+      const response = await fetch(`${API_PROXY_URL}/square?action=process-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

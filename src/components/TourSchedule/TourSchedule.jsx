@@ -63,7 +63,7 @@ const TourSchedule = ({ showAsSection = true }) => {
         ? 'http://localhost:4001'
         : '';
 
-    fetch(`${apiBase}/api/admin-tour-dates?t=${Date.now()}`)
+    fetch(`${apiBase}/api/admin?resource=tour-dates&t=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         console.log('Fetched tour dates:', data);
