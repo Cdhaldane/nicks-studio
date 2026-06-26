@@ -246,6 +246,25 @@ class VercelEmailStorageService {
   }
 
   // ── Booking Requests ──
+  // Public submission from the booking form → stored for the admin Bookings panel.
+  async submitBookingRequest(payload) {
+    try {
+      const response = await fetch(`${API_BASE}/booking-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return { success: false, message: data.message || 'Failed to submit request.' };
+      }
+      return { success: true, message: data.message };
+    } catch (error) {
+      console.error('Booking request error:', error);
+      return { success: false, message: 'Something went wrong. Please try again.' };
+    }
+  }
+
   async getBookingRequests() {
     try {
       const response = await fetch(`${API_BASE}/admin?resource=booking-requests&t=${Date.now()}`);
@@ -281,32 +300,6 @@ class VercelEmailStorageService {
       return { success: response.ok };
     } catch (error) {
       return { success: false };
-    }
-  }
-
-  // ── Link-in-Bio ──
-  async getLinks() {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=links&t=${Date.now()}`);
-      const data = await response.json();
-      return data.links || [];
-    } catch (error) {
-      console.error('Error fetching links:', error);
-      return [];
-    }
-  }
-
-  async saveLinks(links) {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=links`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ links }),
-      });
-      const data = await response.json();
-      return { success: response.ok, links: data.links };
-    } catch (error) {
-      return { success: false, message: 'Failed to save links' };
     }
   }
 

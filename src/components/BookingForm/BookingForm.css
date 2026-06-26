@@ -1,0 +1,178 @@
+/* Booking modal sizing (overrides the default 900px shop modal) */
+.booking-modal-content {
+  max-width: 640px;
+}
+
+.booking-modal-body {
+  padding: 24px 28px 28px;
+  overflow-y: auto;
+}
+
+@media (max-width: 480px) {
+  .booking-modal-body {
+    padding: 18px 18px 22px;
+  }
+}
+
+.booking-intro {
+  margin: 0 0 4px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.booking-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.booking-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.booking-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.booking-required {
+  color: var(--primary, #772117);
+}
+
+.booking-field input,
+.booking-field select,
+.booking-field textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  padding: 11px 14px;
+  color: #f3f3f3;
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.booking-field textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.booking-field input::placeholder,
+.booking-field textarea::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.booking-field input:focus,
+.booking-field select:focus,
+.booking-field textarea:focus {
+  outline: none;
+  border-color: var(--primary, #772117);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.booking-field select option {
+  background: #1a1a24;
+  color: #f3f3f3;
+}
+
+/* Honeypot — visually hidden but still in the DOM for bots to find */
+.booking-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.booking-error {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--error, #e26262);
+}
+
+.booking-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 22px;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.booking-btn-primary {
+  background: var(--primary, #772117);
+  color: #fff;
+}
+
+.booking-btn-primary:hover {
+  background: var(--primary-light, #8b2a1f);
+  box-shadow: 0 6px 18px rgba(119, 33, 23, 0.35);
+}
+
+.booking-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.booking-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f3f3f3;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 18px;
+}
+
+.booking-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Success state */
+.booking-success {
+  text-align: center;
+  padding: 16px 8px 8px;
+}
+
+.booking-success-icon {
+  font-size: 3rem;
+  color: var(--success, #2cd37a);
+  display: block;
+  margin-bottom: 14px;
+}
+
+.booking-success h2 {
+  font-size: 1.4rem;
+  color: #f3f3f3;
+  margin: 0 0 10px;
+}
+
+.booking-success p {
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 420px;
+}
+
+@media (max-width: 560px) {
+  .booking-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

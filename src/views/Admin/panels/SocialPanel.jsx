@@ -1,8 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import vercelEmailStorageService from '../../../services/vercelEmailStorageService';
+import { SOCIAL_MEDIA } from '../../../utils/constants';
+
+// The footer's canonical link list, shaped for this panel. Used to seed the
+// panel the first time (or when stored data predates the links-based model).
+const seedPlatforms = () =>
+  SOCIAL_MEDIA.map(({ platform, label, icon, url }) => ({
+    id: platform,
+    name: label,
+    icon,
+    url,
+    active: true,
+  }));
+
+// Stored data is the new links model only when every entry carries an icon —
+// older saved data tracked follower counts and had no icon, so we re-seed.
+const isLinksModel = (platforms) =>
+  Array.isArray(platforms) &&
+  platforms.length > 0 &&
+  platforms.every((p) => typeof p.icon === 'string' && p.icon);
 
 const SocialPanel = ({ Icons }) => {
-  const [social, setSocial] = useState(null);
+  const [platforms, setPlatforms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('idle');
 
@@ -13,36 +32,38 @@ const SocialPanel = ({ Icons }) => {
   const loadSocial = async () => {
     setLoading(true);
     const data = await vercelEmailStorageService.getSocialStats();
-    setSocial(data);
+    setPlatforms(isLinksModel(data?.platforms) ? data.platforms : seedPlatforms());
     setLoading(false);
   };
 
   const handleChange = (id, field, value) => {
-    setSocial(prev => ({
-      ...prev,
-      platforms: prev.platforms.map(p =>
-        p.id === id ? { ...p, [field]: value } : p
-      ),
-    }));
+    setPlatforms((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
   };
 
   const handleToggle = (id) => {
-    setSocial(prev => ({
-      ...prev,
-      platforms: prev.platforms.map(p =>
-        p.id === id ? { ...p, active: !p.active } : p
-      ),
-    }));
+    setPlatforms((prev) => prev.map((p) => (p.id === id ? { ...p, active: !p.active } : p)));
+  };
+
+  const handleMove = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= platforms.length) return;
+    const updated = [...platforms];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    setPlatforms(updated);
+  };
+
+  const handleReset = () => {
+    setPlatforms(seedPlatforms());
   };
 
   const handleSave = async () => {
     setSaveStatus('saving');
-    const result = await vercelEmailStorageService.saveSocialStats(social);
+    const result = await vercelEmailStorageService.saveSocialStats({ platforms });
     setSaveStatus(result.success ? 'success' : 'error');
     setTimeout(() => setSaveStatus('idle'), 3000);
   };
 
-  const totalFollowers = social?.platforms?.reduce((sum, p) => sum + (Number(p.followers || p.subscribers || 0)), 0) || 0;
+  const activeCount = platforms.filter((p) => p.active).length;
 
   if (loading) {
     return (
@@ -54,80 +75,74 @@ const SocialPanel = ({ Icons }) => {
 
   return (
     <div className="social-panel">
-      <div className="stat-grid">
-        <div className="stat-card">
-          <div className="stat-card-icon icon-purple">
-            <Icons.Globe />
-          </div>
-          <div className="stat-card-info">
-            <span className="stat-card-label">Total Reach</span>
-            <span className="stat-card-value">{totalFollowers.toLocaleString()}</span>
-          </div>
+      <div className="tab-toolbar">
+        <div className="toolbar-info">
+          <span className="toolbar-count">{activeCount} of {platforms.length} shown in footer</span>
         </div>
-        <div className="stat-card">
-          <div className="stat-card-icon icon-blue">
-            <Icons.TrendingUp />
-          </div>
-          <div className="stat-card-info">
-            <span className="stat-card-label">Active Platforms</span>
-            <span className="stat-card-value">{social?.platforms?.filter(p => p.active).length || 0}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="panel">
-        <div className="panel-header">
-          <h2 className="panel-title"><Icons.Globe /> Social Platforms</h2>
+        <div className="toolbar-actions">
+          <button onClick={handleReset} className="btn btn-ghost btn-sm">Reset to defaults</button>
           <button onClick={handleSave} className="btn btn-primary btn-sm" disabled={saveStatus === 'saving'}>
             {saveStatus === 'saving' ? 'Saving...' : <><Icons.Check /> Save</>}
           </button>
         </div>
+      </div>
+
+      {saveStatus === 'success' && (
+        <div className="toast toast-success"><Icons.Check /> Social links saved</div>
+      )}
+      {saveStatus === 'error' && (
+        <div className="toast toast-error">Couldn't save. Please try again.</div>
+      )}
+
+      <div className="panel">
+        <div className="panel-header">
+          <div className="panel-header-text">
+            <h2 className="panel-title"><Icons.Globe /> Footer Social Links</h2>
+            <span className="panel-subtitle">Reorder, edit URLs, and toggle which links appear in the site footer.</span>
+          </div>
+        </div>
         <div className="panel-body">
-          {saveStatus === 'success' && (
-            <div className="toast toast-success"><Icons.Check /> Social stats saved</div>
-          )}
           <div className="social-list">
-            {social?.platforms?.map(platform => (
+            {platforms.map((platform, index) => (
               <div key={platform.id} className={`social-item ${!platform.active ? 'social-inactive' : ''}`}>
-                <div className="social-item-header">
-                  <label className="social-toggle">
-                    <input
-                      type="checkbox"
-                      checked={platform.active}
-                      onChange={() => handleToggle(platform.id)}
-                    />
-                    <span className="toggle-slider" />
-                  </label>
+                <div className="social-reorder">
+                  <button
+                    onClick={() => handleMove(index, -1)}
+                    className="btn-icon"
+                    disabled={index === 0}
+                    aria-label={`Move ${platform.name} up`}
+                  >▲</button>
+                  <button
+                    onClick={() => handleMove(index, 1)}
+                    className="btn-icon"
+                    disabled={index === platforms.length - 1}
+                    aria-label={`Move ${platform.name} down`}
+                  >▼</button>
+                </div>
+
+                <span className="social-icon-preview" aria-hidden="true">
+                  <i className={platform.icon} />
+                </span>
+
+                <div className="social-item-main">
                   <span className="social-platform-name">{platform.name}</span>
+                  <input
+                    type="url"
+                    className="social-url-input"
+                    value={platform.url}
+                    placeholder="https://..."
+                    onChange={(e) => handleChange(platform.id, 'url', e.target.value)}
+                  />
                 </div>
-                <div className="social-item-fields">
-                  <label className="tour-field">
-                    <span className="tour-field-label">Handle / Username</span>
-                    <input
-                      type="text"
-                      value={platform.handle}
-                      placeholder="@username"
-                      onChange={(e) => handleChange(platform.id, 'handle', e.target.value)}
-                    />
-                  </label>
-                  <label className="tour-field">
-                    <span className="tour-field-label">Followers</span>
-                    <input
-                      type="number"
-                      value={platform.followers || platform.subscribers || 0}
-                      onChange={(e) => handleChange(platform.id, 'followers', parseInt(e.target.value) || 0)}
-                    />
-                  </label>
-                  <label className="tour-field">
-                    <span className="tour-field-label">Profile URL</span>
-                    <input
-                      type="url"
-                      value={platform.url}
-                      placeholder="https://..."
-                      onChange={(e) => handleChange(platform.id, 'url', e.target.value)}
-                    />
-                  </label>
-                </div>
+
+                <label className="social-toggle" title={platform.active ? 'Shown in footer' : 'Hidden from footer'}>
+                  <input
+                    type="checkbox"
+                    checked={platform.active}
+                    onChange={() => handleToggle(platform.id)}
+                  />
+                  <span className="toggle-slider" />
+                </label>
               </div>
             ))}
           </div>

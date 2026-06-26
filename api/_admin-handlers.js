@@ -37,41 +37,18 @@ async function writeBlobJson(pathname, data) {
 
 const methodNotAllowed = (res) => res.status(405).json({ error: 'Method not allowed' });
 
-/* ── Link-in-Bio ── */
-const LINKS_PATH = 'admin/links.json';
-const DEFAULT_LINKS = [
-  { id: '1', title: 'Spotify', url: '', icon: 'spotify', active: true, order: 0 },
-  { id: '2', title: 'Apple Music', url: '', icon: 'apple-music', active: true, order: 1 },
-  { id: '3', title: 'Tour Dates', url: '', icon: 'calendar', active: true, order: 2 },
-  { id: '4', title: 'Merch Store', url: '', icon: 'shopping', active: true, order: 3 },
-  { id: '5', title: 'Instagram', url: '', icon: 'instagram', active: true, order: 4 },
-  { id: '6', title: 'TikTok', url: '', icon: 'tiktok', active: true, order: 5 },
-];
-
-async function links(req, res) {
-  if (req.method === 'GET') {
-    return res.status(200).json({ links: await readBlobJson(LINKS_PATH, DEFAULT_LINKS) });
-  }
-  if (req.method === 'PUT') {
-    const { links: incoming } = req.body || {};
-    if (!Array.isArray(incoming)) {
-      return res.status(400).json({ success: false, message: 'Invalid links data' });
-    }
-    await writeBlobJson(LINKS_PATH, incoming);
-    return res.status(200).json({ success: true, links: incoming });
-  }
-  return methodNotAllowed(res);
-}
-
 /* ── Social Media ── */
 const SOCIAL_PATH = 'admin/social-stats.json';
+// Mirrors the footer's SOCIAL_MEDIA list (src/utils/constants.js) so the admin
+// panel is the source of truth for the links rendered in the site footer.
 const DEFAULT_SOCIAL = {
   platforms: [
-    { id: 'instagram', name: 'Instagram', handle: '', followers: 0, url: '', active: true },
-    { id: 'tiktok', name: 'TikTok', handle: '', followers: 0, url: '', active: true },
-    { id: 'youtube', name: 'YouTube', handle: '', subscribers: 0, url: '', active: true },
-    { id: 'twitter', name: 'X / Twitter', handle: '', followers: 0, url: '', active: true },
-    { id: 'facebook', name: 'Facebook', handle: '', followers: 0, url: '', active: false },
+    { id: 'instagram', name: 'Instagram', icon: 'fa-brands fa-instagram', url: 'https://www.instagram.com/nickolamagnolia', active: true },
+    { id: 'youtube', name: 'YouTube', icon: 'fa-brands fa-youtube', url: 'https://www.youtube.com/channel/UC18RGyNPiUxzPAEUFNuvH_Q', active: true },
+    { id: 'facebook', name: 'Facebook', icon: 'fa-brands fa-facebook', url: 'https://www.facebook.com/musicmagnolia/', active: true },
+    { id: 'tiktok', name: 'TikTok', icon: 'fa-brands fa-tiktok', url: 'https://www.tiktok.com/@nickolamagnolia', active: true },
+    { id: 'spotify', name: 'Spotify', icon: 'fa-brands fa-spotify', url: 'https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4', active: true },
+    { id: 'apple', name: 'Apple Music', icon: 'fa-brands fa-apple', url: 'https://music.apple.com/ca/artist/nickola-magnolia/1588557558', active: true },
   ],
   lastUpdated: null,
 };
@@ -288,7 +265,6 @@ async function popupImage(req, res) {
 }
 
 module.exports = {
-  links,
   social,
   'press-kit': pressKit,
   'tour-dates': tourDates,

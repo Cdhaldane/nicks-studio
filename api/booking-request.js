@@ -7,6 +7,10 @@ const { head, put } = require('@vercel/blob');
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BLOB_PATHNAME = 'admin/booking-requests.json';
 
+// Per-field length caps so a bad/automated submission can't bloat the blob.
+const MAX = { name: 200, email: 200, eventDate: 30, venue: 200, city: 200, budget: 100, eventType: 50, message: 5000 };
+const clean = (value, max) => (typeof value === 'string' ? value.trim().slice(0, max) : '');
+
 async function readRequests() {
   try {
     const meta = await head(BLOB_PATHNAME, { token: process.env.BLOB_READ_WRITE_TOKEN });
@@ -38,7 +42,17 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, email, eventDate, venue, city, budget, message, eventType } = req.body || {};
+  const body = req.body || {};
+
+  // Honeypot: a hidden field real users never see. If it's filled, a bot did it —
+  // report success but store nothing, so the bot can't tell it was rejected.
+  if (body.company) {
+    return res.status(201).json({ success: true, message: 'Booking request submitted successfully' });
+  }
+
+  const name = clean(body.name, MAX.name);
+  const email = clean(body.email, MAX.email).toLowerCase();
+  const message = clean(body.message, MAX.message);
 
   if (!name || !email || !message) {
     return res.status(400).json({ success: false, message: 'Name, email, and message are required' });
@@ -51,14 +65,14 @@ module.exports = async (req, res) => {
   const requests = await readRequests();
   const newRequest = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-    name: name.trim(),
-    email: email.toLowerCase().trim(),
-    eventDate: eventDate || null,
-    venue: venue || '',
-    city: city || '',
-    budget: budget || '',
-    message: message.trim(),
-    eventType: eventType || 'private',
+    name,
+    email,
+    eventDate: clean(body.eventDate, MAX.eventDate) || null,
+    venue: clean(body.venue, MAX.venue),
+    city: clean(body.city, MAX.city),
+    budget: clean(body.budget, MAX.budget),
+    message,
+    eventType: clean(body.eventType, MAX.eventType) || 'private',
     status: 'pending',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

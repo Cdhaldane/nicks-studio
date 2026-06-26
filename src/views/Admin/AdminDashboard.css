@@ -1694,6 +1694,18 @@
    SOCIAL PANEL
    ═══════════════════════════════════════════════════ */
 
+/* Stacked title + subtitle in a panel header */
+.panel-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.panel-subtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
 .social-panel .social-list {
   display: flex;
   flex-direction: column;
@@ -1702,97 +1714,135 @@
 
 .social-item {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: auto auto 1fr auto;
   align-items: center;
   gap: 16px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  transition: border-color 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s, opacity 0.2s;
 }
 
 .social-item:hover {
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.social-item-info {
+.social-item.social-inactive {
+  opacity: 0.5;
+}
+
+/* Up / down reorder controls */
+.social-reorder {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
-.social-item-platform {
+.social-reorder .btn-icon {
+  width: 24px;
+  height: 18px;
+  font-size: 10px;
+  line-height: 1;
+  border-radius: 5px;
+}
+
+.social-reorder .btn-icon:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f3f3f3;
+}
+
+.social-reorder .btn-icon:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* Brand icon badge */
+.social-icon-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f3f3f3;
+  font-size: 18px;
+}
+
+/* Platform name + profile URL */
+.social-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.social-platform-name {
   font-size: 13px;
   font-weight: 600;
   color: #f3f3f3;
-  text-transform: capitalize;
 }
 
-.social-item-handle {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.social-item-followers {
-  font-size: 14px;
-  font-weight: 600;
+.social-url-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 7px 10px;
   color: #f3f3f3;
+  font-size: 12px;
+  font-family: inherit;
 }
 
+.social-url-input:focus {
+  outline: none;
+  border-color: var(--primary, #772117);
+}
+
+/* Visibility toggle (also used by the Links panel) */
 .social-toggle {
   position: relative;
-  width: 36px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  border: none;
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+  flex-shrink: 0;
   cursor: pointer;
+}
+
+.social-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.social-toggle .toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 11px;
   transition: background 0.2s;
 }
 
-.social-toggle.active {
-  background: var(--primary, #772117);
-}
-
-.social-toggle::after {
+.social-toggle .toggle-slider::after {
   content: '';
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   background: #fff;
   border-radius: 50%;
   transition: transform 0.2s;
 }
 
-.social-toggle.active::after {
+.social-toggle input:checked + .toggle-slider {
+  background: var(--primary, #772117);
+}
+
+.social-toggle input:checked + .toggle-slider::after {
   transform: translateX(16px);
-}
-
-.social-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-  margin-top: 16px;
-}
-
-.social-form input {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: #f3f3f3;
-  font-size: 13px;
-}
-
-.social-form input:focus {
-  outline: none;
-  border-color: var(--primary, #772117);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -2202,10 +2252,15 @@
    EMAIL PANEL
    ═══════════════════════════════════════════════════ */
 
-.email-panel .email-composer {
+.email-layout {
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: 20px;
+  align-items: start;
+}
+
+.email-panel .email-composer {
+  min-width: 0;
 }
 
 .email-form {
@@ -2236,27 +2291,69 @@
   resize: vertical;
 }
 
+/* Action button row (also reused by the subscriber import preview) */
+.email-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* Normalize icon sizes so buttons share a consistent height
+   (the source SVGs range from 14–18px, which otherwise makes the
+   buttons different heights). */
+.email-actions .btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .email-templates {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.email-template-btn {
-  padding: 10px 14px;
+.template-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.template-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 14px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
   color: #f3f3f3;
-  font-size: 12px;
   cursor: pointer;
   text-align: left;
-  transition: all 0.15s;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.email-template-btn:hover {
+.template-item:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--primary, #772117);
+}
+
+.template-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f3f3f3;
+}
+
+.template-subject {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .email-preview {
@@ -2277,125 +2374,6 @@
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
   white-space: pre-wrap;
-}
-
-/* ═══════════════════════════════════════════════════
-   LINKS PANEL (Link in Bio)
-   ═══════════════════════════════════════════════════ */
-
-.links-panel {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 24px;
-  align-items: start;
-}
-
-.links-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.link-card {
-  display: grid;
-  grid-template-columns: 20px 1fr auto auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  cursor: grab;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.link-card:hover {
-  transform: translateX(2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.link-card-drag {
-  color: rgba(255, 255, 255, 0.2);
-  cursor: grab;
-}
-
-.link-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.link-card-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: #f3f3f3;
-}
-
-.link-card-url {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 300px;
-}
-
-.phone-preview {
-  background: #1a1a24;
-  border-radius: 28px;
-  padding: 40px 16px 24px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  max-width: 280px;
-  margin: 0 auto;
-}
-
-.phone-preview-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.phone-preview-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--primary, #772117);
-  margin: 0 auto 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.phone-preview-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #f3f3f3;
-}
-
-.phone-preview-links {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.phone-link-btn {
-  display: block;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: #f3f3f3;
-  text-decoration: none;
-  transition: background 0.15s;
-}
-
-.phone-link-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -2510,7 +2488,7 @@
     grid-template-columns: 1fr;
   }
 
-  .email-panel .email-composer {
+  .email-layout {
     grid-template-columns: 1fr;
   }
 

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SOCIAL_MEDIA, NAVIGATION_ITEMS } from '../../utils/constants';
 import { validateEmail } from '../../utils/helpers';
 import './Footer.css';
 import vercelEmailStorageService from '../../services/vercelEmailStorageService';
+import BookingForm from '../BookingForm/BookingForm';
+import '../Modal/Modal.css';
 
 function Footer() {
   const [email, setEmail] = useState('');
@@ -11,7 +13,45 @@ function Footer() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  // Social links are managed in the admin panel; SOCIAL_MEDIA is the fallback
+  // used until the admin data loads (or if the request fails).
+  const [socialLinks, setSocialLinks] = useState(SOCIAL_MEDIA);
+  const [showBooking, setShowBooking] = useState(false);
   const location = useLocation();
+
+  // Close the booking modal on Escape.
+  useEffect(() => {
+    if (!showBooking) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setShowBooking(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [showBooking]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    vercelEmailStorageService
+      .getSocialStats()
+      .then((data) => {
+        if (cancelled || !data || !Array.isArray(data.platforms)) return;
+
+        const links = data.platforms
+          .filter((p) => p.active && p.url && p.icon)
+          .map((p) => ({ platform: p.id, url: p.url, icon: p.icon, label: p.name }));
+
+        // Only override the hardcoded fallback when admin data has usable links.
+        if (links.length > 0) setSocialLinks(links);
+      })
+      .catch(() => {
+        /* keep the SOCIAL_MEDIA fallback */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
@@ -67,7 +107,7 @@ function Footer() {
   };
 
   const renderSocialLinks = () => {
-    return SOCIAL_MEDIA.map(({ platform, url, icon, label }) => (
+    return socialLinks.map(({ platform, url, icon, label }) => (
       <a
         key={platform}
         href={url}
@@ -84,6 +124,7 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
+    <>
     <footer className="footer">
       <div className="footer-container">
         {/* Header Section */}
@@ -92,6 +133,14 @@ function Footer() {
           <p className="footer-tagline">
             Intertwining classic Country melodies with intimate Rock and Americana influences from the shores of the Great Lakes.
           </p>
+          <button
+            type="button"
+            className="footer-booking-btn"
+            onClick={() => setShowBooking(true)}
+          >
+            <i className="fa-solid fa-microphone-lines" aria-hidden="true" />
+            Booking Inquiries
+          </button>
         </div>
 
         {/* Links Section */}
@@ -187,6 +236,33 @@ function Footer() {
         </div>
       </div>
     </footer>
+
+    {showBooking && (
+      <div
+        className="modal"
+        onClick={(e) => { if (e.target === e.currentTarget) setShowBooking(false); }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Booking request form"
+      >
+        <div className="modal-content booking-modal-content">
+          <div className="modal-header">
+            <h2 className="modal-title">Booking Requests</h2>
+            <button
+              className="modal-close"
+              onClick={() => setShowBooking(false)}
+              aria-label="Close booking form"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="booking-modal-body">
+            <BookingForm />
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 

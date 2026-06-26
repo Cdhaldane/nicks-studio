@@ -86,6 +86,35 @@
   line-height: 1.6;
 }
 
+/* Booking inquiry button */
+.footer-booking-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+  padding: 0.7rem 1.4rem;
+  background: var(--primary);
+  color: var(--white);
+  border: 1px solid transparent;
+  border-radius: 30px;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.footer-booking-btn:hover {
+  background: var(--primary-light, #8b2a1f);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(119, 33, 23, 0.35);
+}
+
+.footer-booking-btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Links Section */
 .footer-links {
   display: flex;
