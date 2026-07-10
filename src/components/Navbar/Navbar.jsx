@@ -104,9 +104,9 @@ const Navbar = () => {
       <div className={`nav-links ${isMobile ? 'nav-mobile' : 'nav-desktop'}`}>
         {/* Desktop: left links */}
         {!isMobile && (
-          <>
+          <div className="nav-side nav-side-left">
             {navItems.slice(0, 3).map(item => renderNavLink(item))}
-          </>
+          </div>
         )}
 
         {/* Title — always visible */}
@@ -132,10 +132,10 @@ const Navbar = () => {
 
         {/* Desktop: right links */}
         {!isMobile && (
-          <>
+          <div className="nav-side nav-side-right">
             {navItems.slice(3).map(item => renderNavLink(item))}
             {renderTourButton(handleTourToggle)}
-          </>
+          </div>
         )}
 
         {/* Mobile: hamburger / close button */}

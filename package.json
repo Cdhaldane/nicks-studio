@@ -26,17 +26,22 @@
     "react-scripts": "5.0.1",
     "react-scroll-parallax": "^3.4.5",
     "shopify-buy": "^2.21.1",
+    "square": "^44.2.0",
     "web-vitals": "^2.1.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
     "env-cmd": "^11.0.0",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "express": "^5.2.1",
     "imagemin": "^9.0.1",
     "imagemin-mozjpeg": "^10.0.0",
     "imagemin-pngquant": "^10.0.0",
@@ -47,7 +52,7 @@
     "vercel": "^50.41.0"
   },
   "scripts": {
-    "start": "NODE_OPTIONS=--max-http-header-size=81920 PORT=3001 react-scripts start",
+    "start": "cross-env NODE_OPTIONS=--max-http-header-size=81920 PORT=3001 react-scripts start",
     "api": "node api/_dev-server.js",
     "api:sandbox": "env-cmd -f .env.sandbox node api/_dev-server.js",
     "build": "react-scripts build",

@@ -45,6 +45,20 @@
   align-items: center;
   justify-content: center;
   z-index: 1;
+  /* Keep hero content clear of the socials pill at the bottom */
+  padding-top: 70px;
+  padding-bottom: 120px;
+  box-sizing: border-box;
+}
+
+/* Desktop nav (>1250px) floats its big monogram over the hero — anchor the
+   hero logo just below it (30px nav offset + logo height + small gap) so the
+   lockup reads as one stack and can never overlap */
+@media (min-width: 1251px) {
+  .hero-overlay {
+    align-items: flex-start;
+    padding-top: calc(clamp(100px, 19vh, 200px) + 45px);
+  }
 }
 
 .hero-content {
@@ -55,6 +69,8 @@
 
 .hero-logo {
   max-width: clamp(200px, 40vw, 400px);
+  /* Cap by viewport height too — keeps it clear of the navbar logo on low-res laptops */
+  max-height: clamp(180px, 38vh, 400px);
   height: auto;
   filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.7));
   margin-bottom: 1rem;

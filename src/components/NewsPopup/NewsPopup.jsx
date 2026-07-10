@@ -82,8 +82,8 @@ const NewsPopup = ({ forceShow = false, onForceClose = null }) => {
               />
             </div>
             <div className="news-popup-content-text">
-              <h2>Stay in the Loop 🎶</h2>
-              <p>Get exclusive updates on new music, tour dates, and behind-the-scenes content — straight to your inbox.</p>
+              <h2>The first to hear. The first to know.</h2>
+              <p>Tour announcements, new music, special evenings and everything before everyone else.</p>
               <form className="signup-form" onSubmit={handleSubmit} noValidate>
                 <div className="input-row">
                   <input

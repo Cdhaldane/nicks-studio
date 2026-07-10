@@ -20,6 +20,18 @@
 /* Desktop layout — no animations needed */
 .nav-desktop {
   transition: none;
+  /* Equal 1fr sides keep the center logo truly centered (aligned with the hero logo)
+     regardless of how many links sit on each side */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.nav-side {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10px;
 }
 
 /* Mobile top bar — just title + hamburger */
@@ -66,7 +78,8 @@
 }
 
 .nav-logo-full {
-  height: 200px;
+  /* Scale with viewport height so it can't collide with the hero logo on short screens */
+  height: clamp(100px, 19vh, 200px);
   width: auto;
 }
 
