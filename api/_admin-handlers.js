@@ -211,6 +211,89 @@ async function bookingRequests(req, res) {
   return methodNotAllowed(res);
 }
 
+/* ── Announcement Popup ── */
+const ANNOUNCEMENT_PATH = 'admin/announcement.json';
+const ANNOUNCEMENT_IMAGE_PATH = 'admin/announcement-image';
+// Seeded so the popup works before the admin ever saves; the Announcement tab
+// in the admin dashboard overwrites this blob.
+const DEFAULT_ANNOUNCEMENT = {
+  enabled: true,
+  eyebrow: 'Upcoming Show',
+  title: 'Nickola Magnolia Unplugged',
+  description:
+    'For one night only at the legendary Gores Landing Hall — unplugged and stripped down, for an intimate performance.\n\nFriday, September 18 · 8 PM\nGores Landing Hall, 5199 Burnham St N, Gores Landing, ON',
+  linkUrl:
+    'https://www.eventbrite.ca/e/nickola-magnolia-unplugged-at-gores-landing-hall-tickets-1994517979969',
+  linkText: 'Get Tickets',
+  imageUrl: '',
+  showSignup: false,
+  updatedAt: '2026-07-20T00:00:00.000Z',
+};
+
+async function announcement(req, res) {
+  if (req.method === 'GET') {
+    return res
+      .status(200)
+      .json({ announcement: await readBlobJson(ANNOUNCEMENT_PATH, DEFAULT_ANNOUNCEMENT) });
+  }
+  if (req.method === 'PUT') {
+    const { announcement: incoming } = req.body || {};
+    if (!incoming || typeof incoming !== 'object') {
+      return res.status(400).json({ success: false, message: 'Announcement data required' });
+    }
+    if (incoming.enabled && !(incoming.title || '').trim()) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'An enabled announcement needs a title' });
+    }
+    const updated = {
+      enabled: Boolean(incoming.enabled),
+      eyebrow: (incoming.eyebrow || '').trim(),
+      title: (incoming.title || '').trim(),
+      description: (incoming.description || '').trim(),
+      linkUrl: (incoming.linkUrl || '').trim(),
+      linkText: (incoming.linkText || '').trim(),
+      imageUrl: (incoming.imageUrl || '').trim(),
+      showSignup: Boolean(incoming.showSignup),
+      updatedAt: new Date().toISOString(),
+    };
+    await writeBlobJson(ANNOUNCEMENT_PATH, updated);
+    return res.status(200).json({ success: true, announcement: updated });
+  }
+  // POST uploads the popup image and returns its URL; the URL is persisted
+  // into the announcement via PUT when the admin hits Save.
+  if (req.method === 'POST') {
+    const { imageData, mimeType } = req.body || {};
+    if (!imageData || !mimeType) {
+      return res.status(400).json({ success: false, message: 'Missing image data' });
+    }
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(mimeType)) {
+      return res.status(400).json({ success: false, message: 'Only JPG, PNG and WebP are supported' });
+    }
+    const buffer = Buffer.from(imageData, 'base64');
+    if (buffer.length > MAX_IMAGE_BYTES) {
+      return res.status(400).json({ success: false, message: 'Image must be under 5 MB' });
+    }
+    try {
+      const ext = mimeType === 'image/jpeg' ? 'jpg' : mimeType.split('/')[1];
+      const blob = await put(`${ANNOUNCEMENT_IMAGE_PATH}.${ext}`, buffer, {
+        access: 'public',
+        allowOverwrite: true,
+        addRandomSuffix: false,
+        token: TOKEN(),
+        contentType: mimeType,
+      });
+      // Version the URL so replacing the image busts browser/CDN caches.
+      return res.status(200).json({ success: true, imageUrl: `${blob.url}?v=${Date.now()}` });
+    } catch (error) {
+      console.error('Announcement image upload error:', error);
+      return res.status(500).json({ success: false, message: 'Failed to upload image' });
+    }
+  }
+  return methodNotAllowed(res);
+}
+
 /* ── Popup Hero Image ── */
 const IMAGE_PATH = 'popup/hero-image';
 const POPUP_CONFIG_PATH = 'popup/config.json';
@@ -271,4 +354,5 @@ module.exports = {
   setlists,
   'booking-requests': bookingRequests,
   'popup-image': popupImage,
+  announcement,
 };

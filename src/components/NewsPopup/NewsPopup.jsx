@@ -29,6 +29,8 @@ const NewsPopup = ({ forceShow = false, onForceClose = null }) => {
     setShowPopup(false);
     if (!forceShow) setHasSeenSignup(true);
     if (onForceClose) onForceClose();
+    // Lets the announcement popup know it can appear now (first-visit case).
+    window.dispatchEvent(new Event('news-popup-closed'));
   };
 
   const handleBackdropClick = (e) => {

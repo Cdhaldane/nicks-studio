@@ -329,6 +329,54 @@ class VercelEmailStorageService {
     }
   }
 
+  // ── Announcement Popup ──
+  async getAnnouncement() {
+    try {
+      const response = await fetch(`${API_BASE}/admin?resource=announcement&t=${Date.now()}`);
+      const data = await response.json();
+      return data.announcement || null;
+    } catch (error) {
+      console.error('Error fetching announcement:', error);
+      return null;
+    }
+  }
+
+  async saveAnnouncement(announcement) {
+    try {
+      const response = await fetch(`${API_BASE}/admin?resource=announcement`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ announcement }),
+      });
+      const data = await response.json();
+      return { success: response.ok, message: data.message, announcement: data.announcement };
+    } catch (error) {
+      return { success: false, message: 'Failed to save announcement' };
+    }
+  }
+
+  async uploadAnnouncementImage(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const [header, imageData] = reader.result.split(',');
+          const mimeType = header.match(/:(.*?);/)[1];
+          const response = await fetch(`${API_BASE}/admin?resource=announcement`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageData, mimeType, fileName: file.name }),
+          });
+          resolve(await response.json());
+        } catch {
+          resolve({ success: false, message: 'Upload failed' });
+        }
+      };
+      reader.onerror = () => resolve({ success: false, message: 'Failed to read file' });
+      reader.readAsDataURL(file);
+    });
+  }
+
   // ── Social Media ──
   async getSocialStats() {
     try {

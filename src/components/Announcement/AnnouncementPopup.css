@@ -1,0 +1,365 @@
+/* Announcement modal — sits one z-index step below the NewsPopup overlay so
+   the newsletter popup wins if both are ever open.
+   Layout: stacked card by default; with an image it becomes a two-column
+   poster + text layout on wider screens. */
+.announcement-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 9998;
+  animation: announcementFadeIn 0.25s ease-out;
+}
+
+@keyframes announcementFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes announcementSlideIn {
+  from {
+    transform: scale(0.94) translateY(12px);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.announcement-content {
+  background: var(--secondary-light, #1a1a1a);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  position: relative;
+  text-align: center;
+  animation: announcementSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.25),
+    0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.announcement-image {
+  width: 100%;
+  /* Leave room below the image for the text and button on short screens */
+  max-height: min(52vh, calc(90vh - 240px));
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d0d0d;
+  border-radius: 16px 16px 0 0;
+}
+
+.announcement-image img {
+  width: 100%;
+  height: auto;
+  max-height: min(52vh, calc(90vh - 240px));
+  object-fit: contain;
+  display: block;
+}
+
+.announcement-body {
+  padding: 40px 32px 32px;
+}
+
+.announcement-image + .announcement-body {
+  padding-top: 26px;
+}
+
+.announcement-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.announcement-close:hover {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(1.08);
+}
+
+.announcement-eyebrow {
+  display: inline-block;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  /* Lightened brand maroon — the raw --primary fails contrast at this size */
+  color: #d98874;
+  margin-bottom: 12px;
+}
+
+.announcement-title {
+  margin: 0 0 12px 0;
+  font-size: clamp(1.5em, 3.5vw, 1.9em);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text, #f3f3f3);
+}
+
+.announcement-description {
+  margin: 0 0 24px 0;
+  font-size: 1em;
+  line-height: 1.55;
+  color: var(--text-secondary, #c9c9c9);
+  white-space: pre-line;
+}
+
+.announcement-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 36px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  min-width: 150px;
+  background: var(--primary, #772117);
+  color: white;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.announcement-cta:hover {
+  background: var(--primary-light, #8b2a1f);
+  transform: translateY(-2px);
+  color: white;
+  text-decoration: none;
+}
+
+/* ── Newsletter sign-up (optional, toggled from admin) ── */
+.announcement-signup {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.announcement-signup-label {
+  display: block;
+  font-size: 0.86em;
+  font-weight: 600;
+  color: var(--text-secondary, #c9c9c9);
+  margin-bottom: 10px;
+}
+
+.announcement-signup-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.announcement-signup-row input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text, #f3f3f3);
+  font-size: 0.95em;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.announcement-signup-row input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.announcement-signup-row input:focus {
+  border-color: #d98874;
+}
+
+.announcement-signup-row input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.announcement-signup-row button {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary, #772117);
+  color: #fff;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.announcement-signup-row button:hover {
+  background: var(--primary-light, #8b2a1f);
+}
+
+.announcement-signup-row button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.announcement-signup-error {
+  color: #ff9c8a;
+  font-size: 0.85em;
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+.announcement-signup-success {
+  color: #8fd694;
+  font-size: 0.95em;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ── Two-column poster layout on wider screens ── */
+@media (min-width: 760px) {
+  .announcement-content.has-image {
+    display: grid;
+    grid-template-columns: minmax(0, 45%) minmax(0, 1fr);
+    max-width: 820px;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .announcement-content.has-image .announcement-image {
+    height: 100%;
+    max-height: none;
+    border-radius: 16px 0 0 16px;
+  }
+
+  .announcement-content.has-image .announcement-image img {
+    height: 100%;
+    max-height: 90vh;
+    object-fit: cover;
+  }
+
+  .announcement-content.has-image .announcement-body {
+    padding: 44px 40px 36px;
+    overflow: auto;
+    max-height: 90vh;
+    align-self: center;
+  }
+
+  .announcement-content.has-image .announcement-image + .announcement-body {
+    padding-top: 44px;
+  }
+}
+
+/* ── Floating reopen button (bottom-right, icon only) ── */
+.announcement-trigger {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary, #772117);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9997;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.announcement-trigger:hover {
+  background: var(--primary-light, #8b2a1f);
+  transform: scale(1.08);
+}
+
+/* ── Accessibility ── */
+.announcement-close:focus-visible,
+.announcement-cta:focus-visible,
+.announcement-trigger:focus-visible,
+.announcement-signup-row input:focus-visible,
+.announcement-signup-row button:focus-visible {
+  outline: 2px solid #d98874;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-overlay,
+  .announcement-content {
+    animation: none;
+  }
+
+  .announcement-close,
+  .announcement-cta,
+  .announcement-trigger {
+    transition: none;
+  }
+
+  .announcement-cta:hover,
+  .announcement-close:hover,
+  .announcement-trigger:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .announcement-body {
+    padding: 34px 20px 24px;
+  }
+
+  .announcement-trigger {
+    bottom: 16px;
+    right: 16px;
+    width: 46px;
+    height: 46px;
+  }
+
+  .announcement-image + .announcement-body {
+    padding-top: 18px;
+  }
+
+  .announcement-description {
+    font-size: 0.95em;
+  }
+
+  .announcement-signup-row {
+    flex-direction: column;
+  }
+
+  .announcement-signup-row button {
+    width: 100%;
+  }
+}

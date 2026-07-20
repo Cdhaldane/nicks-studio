@@ -21,7 +21,7 @@ import OrderConfirmation from './views/OrderConfirmation/OrderConfirmation.jsx';
 import Footer from './components/Footer/Footer.jsx';
 import Navbar from './components/Navbar/Navbar.jsx';
 import NewsPopup from './components/NewsPopup/NewsPopup.jsx';
-import NewsPopupTrigger from './components/NewsPopup/NewsPopupTrigger.jsx';
+import AnnouncementPopup from './components/Announcement/AnnouncementPopup.jsx';
 
 import usePageTracking from './hooks/usePageTracking';
 
@@ -39,6 +39,7 @@ function App() {
         <AlertProvider>
           <Alert />
           <NewsPopup />
+          <AnnouncementPopup />
           <ParallaxProvider>
             <div
               className="main"
@@ -65,14 +66,6 @@ function App() {
                 location.pathname !== '/admin' &&
                 location.pathname !== '/order-confirmation' && <Footer />}
             </div>
-            {/* Floating trigger for news popup - appears on all pages except admin */}
-            {location.pathname === "/" && (
-              <NewsPopupTrigger
-                triggerText="🎵 New Album"
-                position="bottom-right"
-                style="floating"
-              />
-            )}
           </ParallaxProvider>
         </AlertProvider>
       </AuthProvider>

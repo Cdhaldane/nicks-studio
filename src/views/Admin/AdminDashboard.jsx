@@ -14,6 +14,7 @@ const BookingPanel = lazy(() => import('./panels/BookingPanel'));
 const EmailPanel = lazy(() => import('./panels/EmailPanel'));
 const RevenuePanel = lazy(() => import('./panels/RevenuePanel'));
 const FanMapPanel = lazy(() => import('./panels/FanMapPanel'));
+const AnnouncementPanel = lazy(() => import('./panels/AnnouncementPanel'));
 
 /* ── SVG Icon Components ── */
 const Icons = {
@@ -170,6 +171,11 @@ const Icons = {
   Inbox: () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+    </svg>
+  ),
+  Megaphone: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 11l18-5v12L3 14v-3z" /><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
     </svg>
   ),
 };
@@ -447,6 +453,13 @@ const AdminDashboard = () => {
             )}
           </button>
           <button
+            className={`sidebar-link ${activeTab === 'announcement' ? 'active' : ''}`}
+            onClick={() => setActiveTab('announcement')}
+          >
+            <Icons.Megaphone />
+            <span>Announcement</span>
+          </button>
+          <button
             className={`sidebar-link ${activeTab === 'analytics' ? 'active' : ''}`}
             onClick={() => setActiveTab('analytics')}
           >
@@ -546,6 +559,7 @@ const AdminDashboard = () => {
               {activeTab === 'overview' && 'Overview'}
               {activeTab === 'subscribers' && 'Subscribers'}
               {activeTab === 'tour' && 'Tour Dates'}
+              {activeTab === 'announcement' && 'Announcement Popup'}
               {activeTab === 'analytics' && 'Analytics'}
               {activeTab === 'settings' && 'Settings'}
               {activeTab === 'spotify' && 'Spotify Stats'}
@@ -1362,6 +1376,7 @@ const AdminDashboard = () => {
             {activeTab === 'email' && <EmailPanel Icons={Icons} />}
             {activeTab === 'revenue' && <RevenuePanel Icons={Icons} />}
             {activeTab === 'fanMap' && <FanMapPanel Icons={Icons} />}
+            {activeTab === 'announcement' && <AnnouncementPanel Icons={Icons} />}
           </Suspense>
         </main>
       </div>

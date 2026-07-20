@@ -14,7 +14,9 @@ const app = express();
 const PORT = process.env.API_DEV_PORT || 4001;
 
 app.use(cors());
-app.use(express.json());
+// Image uploads arrive as base64 JSON (~1.33x the file size); the handlers
+// enforce the real 5 MB limit after decoding, so allow headroom here.
+app.use(express.json({ limit: '8mb' }));
 
 // Auto-load every handler in api/ (except _utils and this file)
 const apiDir = __dirname;
