@@ -1,6 +1,58 @@
+import { authHeaders } from './adminAuth';
+
 const API_BASE = process.env.REACT_APP_API_URL || '/api';
 
 class VercelEmailStorageService {
+  // ── Email campaigns ──
+  // These hit admin-only endpoints and carry the session token issued at login.
+
+  /** Sends a single preview copy so the client can check it before the real blast. */
+  async sendTestEmail({ to, subject, body }) {
+    try {
+      const response = await fetch(`${API_BASE}/newsletter?action=test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ to, subject, body }),
+      });
+      const data = await response.json();
+      return { success: response.ok, message: data.message };
+    } catch (error) {
+      console.error('Test send error:', error);
+      return { success: false, message: 'Could not reach the server. Please try again.' };
+    }
+  }
+
+  /** Queues a campaign to every active subscriber. */
+  async sendCampaign({ subject, body }) {
+    try {
+      const response = await fetch(`${API_BASE}/newsletter?action=send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ subject, body }),
+      });
+      const data = await response.json();
+      return { success: response.ok, message: data.message, campaign: data.campaign || null };
+    } catch (error) {
+      console.error('Send campaign error:', error);
+      return { success: false, message: 'Could not reach the server. Please try again.' };
+    }
+  }
+
+  /** Campaign history plus today's remaining send allowance. */
+  async getCampaigns() {
+    try {
+      const response = await fetch(`${API_BASE}/newsletter?action=campaigns&t=${Date.now()}`, {
+        headers: authHeaders(),
+      });
+      if (!response.ok) return { campaigns: [], quota: null };
+      const data = await response.json();
+      return { campaigns: data.campaigns || [], quota: data.quota || null };
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      return { campaigns: [], quota: null };
+    }
+  }
+
   async addSubscriber(email, source = 'website-footer') {
     try {
       const response = await fetch(`${API_BASE}/newsletter`, {

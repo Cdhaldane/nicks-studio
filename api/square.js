@@ -6,7 +6,10 @@
  *
  *   GET|POST /api/square?action=<name>
  *   actions: catalog-items, catalog-item, catalog-category, catalog-image,
- *            checkout, payment-link, process-payment, order, orders
+ *            checkout, payment-link, process-payment, order, orders, notify-order
+ *
+ *   notify-order emails the shop owner about a completed sale. The order
+ *   confirmation page calls it once Square sends the buyer back from checkout.
  */
 const handlers = require('./_square-handlers');
 

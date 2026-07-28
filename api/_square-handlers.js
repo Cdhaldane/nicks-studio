@@ -9,6 +9,7 @@
  * Behavior is preserved verbatim from the original square-*.js endpoints.
  */
 const { getSquareClient, getLocationId, sendJSON } = require('./_utils');
+const { notifyOrder } = require('./_order-alert');
 
 /* ── List catalog items (with image URLs) ── */
 async function catalogItems(req, res) {
@@ -295,4 +296,5 @@ module.exports = {
   'process-payment': processPayment,
   order,
   orders,
+  'notify-order': notifyOrder,
 };

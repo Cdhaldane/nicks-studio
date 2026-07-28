@@ -36,6 +36,8 @@ export const CONSTANTS = {
     SPOTIFY: 'https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4',
     APPLE_MUSIC:
       'https://music.apple.com/ca/artist/nickola-magnolia/1588557558',
+    // Short link supplied for the Patreon button. Editable in Admin → Social.
+    PATREON: 'https://tr.ee/RFrnLBUPdk',
   },
 
   // Image rotation settings
@@ -145,6 +147,12 @@ export const SOCIAL_MEDIA = [
     url: CONSTANTS.SOCIAL_LINKS.APPLE_MUSIC,
     icon: 'fa-brands fa-apple',
     label: 'Apple Music',
+  },
+  {
+    platform: 'patreon',
+    url: CONSTANTS.SOCIAL_LINKS.PATREON,
+    icon: 'fa-brands fa-patreon',
+    label: 'Patreon',
   },
 ];
 

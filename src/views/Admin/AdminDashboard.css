@@ -2741,3 +2741,185 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   EMAIL CAMPAIGNS
+   ═══════════════════════════════════════════════════ */
+
+.email-preview-subject {
+  font-size: 14px;
+  color: #f3f3f3;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.email-preview-body p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.65;
+  margin: 0 0 10px;
+}
+
+.email-preview-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  color: var(--text-secondary, #b3b3b3);
+}
+
+/* Test send row */
+
+.email-test-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.email-test-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1a1a24;
+  color: #f3f3f3;
+  font-size: 13px;
+}
+
+.email-test-row input:focus {
+  outline: none;
+  border-color: var(--accent-purple, #9b59b6);
+}
+
+/* Confirmation step before a real send */
+
+.email-confirm {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(226, 98, 98, 0.35);
+  background: rgba(226, 98, 98, 0.08);
+}
+
+.email-confirm-text {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #f3f3f3;
+}
+
+.email-hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary, #b3b3b3);
+}
+
+/* In-flight campaign progress */
+
+.campaign-progress-panel {
+  margin-bottom: 20px;
+}
+
+.campaign-progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 14px;
+  color: #f3f3f3;
+  margin-bottom: 10px;
+}
+
+.campaign-progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.campaign-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #9b59b6, #527af9);
+  transition: width 0.4s ease;
+}
+
+.campaign-progress-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary, #b3b3b3);
+}
+
+/* Campaign history list */
+
+.campaign-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.campaign-history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.campaign-history-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.campaign-history-subject {
+  font-size: 13px;
+  color: #f3f3f3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaign-history-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary, #b3b3b3);
+}
+
+.campaign-history-error {
+  font-size: 11px;
+  color: #e26262;
+  line-height: 1.5;
+}
+
+.campaign-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.campaign-badge-sent {
+  background: rgba(44, 211, 122, 0.15);
+  color: #2cd37a;
+}
+
+.campaign-badge-sending,
+.campaign-badge-queued {
+  background: rgba(221, 192, 54, 0.15);
+  color: #ddc036;
+}
+
+.campaign-badge-failed {
+  background: rgba(226, 98, 98, 0.15);
+  color: #e26262;
+}

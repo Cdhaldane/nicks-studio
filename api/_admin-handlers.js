@@ -13,6 +13,13 @@
  */
 const { head, put } = require('@vercel/blob');
 
+const {
+  verifyAdminPassword,
+  createSessionToken,
+  verifySessionToken,
+  SESSION_TTL_MS,
+} = require('./_auth');
+
 const TOKEN = () => process.env.BLOB_READ_WRITE_TOKEN;
 
 async function readBlobJson(pathname, fallback) {
@@ -49,13 +56,33 @@ const DEFAULT_SOCIAL = {
     { id: 'tiktok', name: 'TikTok', icon: 'fa-brands fa-tiktok', url: 'https://www.tiktok.com/@nickolamagnolia', active: true },
     { id: 'spotify', name: 'Spotify', icon: 'fa-brands fa-spotify', url: 'https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4', active: true },
     { id: 'apple', name: 'Apple Music', icon: 'fa-brands fa-apple', url: 'https://music.apple.com/ca/artist/nickola-magnolia/1588557558', active: true },
+    { id: 'patreon', name: 'Patreon', icon: 'fa-brands fa-patreon', url: 'https://tr.ee/RFrnLBUPdk', active: true },
   ],
   lastUpdated: null,
 };
 
+/**
+ * Appends any default platform missing from saved data.
+ *
+ * Without this, adding a new platform would be invisible to anyone whose
+ * settings were already stored — the panel has no "delete", only an active
+ * toggle, so a platform absent from storage is always a new one rather than a
+ * deliberate removal. Stored order and edited URLs are preserved.
+ */
+const withNewDefaults = (stored) => {
+  if (!stored || !Array.isArray(stored.platforms) || stored.platforms.length === 0) {
+    return DEFAULT_SOCIAL;
+  }
+  const knownIds = new Set(stored.platforms.map((p) => p && p.id));
+  const missing = DEFAULT_SOCIAL.platforms.filter((p) => !knownIds.has(p.id));
+  if (missing.length === 0) return stored;
+  return { ...stored, platforms: [...stored.platforms, ...missing] };
+};
+
 async function social(req, res) {
   if (req.method === 'GET') {
-    return res.status(200).json({ social: await readBlobJson(SOCIAL_PATH, DEFAULT_SOCIAL) });
+    const stored = await readBlobJson(SOCIAL_PATH, null);
+    return res.status(200).json({ social: withNewDefaults(stored) });
   }
   if (req.method === 'PUT') {
     const { social: incoming } = req.body || {};
@@ -347,6 +374,65 @@ async function popupImage(req, res) {
   return methodNotAllowed(res);
 }
 
+// ── Auth ──
+
+/**
+ * Failed-attempt counter, keyed by nothing more than process lifetime.
+ * Serverless instances are recycled so this is a speed bump rather than a
+ * durable lockout — paired with the fixed delay below it makes online
+ * brute-forcing impractical without needing shared state.
+ */
+const FAILED_ATTEMPT_DELAY_MS = 600;
+let recentFailures = 0;
+
+/** POST /api/admin?resource=login — exchange the password for a session token. */
+async function login(req, res) {
+  if (req.method !== 'POST') return methodNotAllowed(res);
+
+  const { password } = req.body || {};
+
+  let valid;
+  try {
+    valid = verifyAdminPassword(password);
+  } catch (error) {
+    console.error('Login misconfiguration:', error.message);
+    return res
+      .status(500)
+      .json({ success: false, message: 'Login is not configured on the server.' });
+  }
+
+  if (!valid) {
+    recentFailures += 1;
+    // Escalating delay, capped so a legitimate typo isn't punished for long.
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.min(recentFailures, 5) * FAILED_ATTEMPT_DELAY_MS)
+    );
+    return res.status(401).json({ success: false, message: 'Invalid password' });
+  }
+
+  recentFailures = 0;
+  return res.status(200).json({
+    success: true,
+    message: 'Login successful',
+    token: createSessionToken(),
+    expiresIn: SESSION_TTL_MS,
+  });
+}
+
+/** GET /api/admin?resource=session — lets the client confirm a stored token still works. */
+async function session(req, res) {
+  if (req.method !== 'GET') return methodNotAllowed(res);
+
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : '';
+
+  try {
+    return res.status(200).json({ valid: verifySessionToken(token) });
+  } catch {
+    return res.status(200).json({ valid: false });
+  }
+}
+
 module.exports = {
   social,
   'press-kit': pressKit,
@@ -355,4 +441,6 @@ module.exports = {
   'booking-requests': bookingRequests,
   'popup-image': popupImage,
   announcement,
+  login,
+  session,
 };

@@ -13,15 +13,14 @@ const AdminLogin = () => {
     setIsLoading(true);
     setError('');
 
-    // Small delay for better UX
-    setTimeout(() => {
-      const result = login(password);
-      if (!result.success) {
-        setError(result.message);
-        setPassword('');
-      }
-      setIsLoading(false);
-    }, 500);
+    // The password is checked on the server now, so the round-trip supplies
+    // the latency the old artificial delay was faking.
+    const result = await login(password);
+    if (!result.success) {
+      setError(result.message);
+      setPassword('');
+    }
+    setIsLoading(false);
   };
 
   return (

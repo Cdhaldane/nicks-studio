@@ -12,5 +12,8 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "crons": [
+    { "path": "/api/newsletter?action=drain", "schedule": "0 10 * * *" }
   ]
 }

@@ -32,6 +32,20 @@ const OrderConfirmation = () => {
       .finally(() => setLoading(false));
   }, [orderId]);
 
+  // Square only ever emails the buyer, so this is what tells the shop the order
+  // came in. Fire-and-forget: the server sends at most one alert per order, and a
+  // failure here is never the buyer's problem to see.
+  useEffect(() => {
+    if (!orderId) return;
+
+    fetch('/api/square?action=notify-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId }),
+      keepalive: true,
+    }).catch(() => {});
+  }, [orderId]);
+
   const formatMoney = (amount, currency = 'CAD') => {
     const dollars = Number(amount) / 100;
     return new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format(dollars);
