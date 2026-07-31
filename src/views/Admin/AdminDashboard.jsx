@@ -178,6 +178,16 @@ const Icons = {
       <path d="M3 11l18-5v12L3 14v-3z" /><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
     </svg>
   ),
+  Menu: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  ),
+  X: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  ),
 };
 
 const EMPTY_DATE = { date: '', city: '', venue: '', ticketsUrl: '', note: '' };
@@ -217,6 +227,7 @@ const AdminDashboard = () => {
   const [siteAnalytics, setSiteAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [popupImageUrl, setPopupImageUrl] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('idle');
   const [tourDates, setTourDates] = useState([]);
@@ -230,6 +241,27 @@ const AdminDashboard = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  /* Close the mobile drawer on Escape, and lock body scroll while it's open */
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setSidebarOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [sidebarOpen]);
+
+  /* Navigating always closes the drawer — on desktop it's a no-op */
+  const selectTab = (tab) => {
+    setActiveTab(tab);
+    setSidebarOpen(false);
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -417,24 +449,38 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+      {/* Mobile drawer backdrop */}
+      <div
+        className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* Sidebar */}
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
           <Icons.Music />
           <span className="brand-text">NM Admin</span>
+          <button
+            className="sidebar-close"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation menu"
+          >
+            <Icons.X />
+          </button>
         </div>
 
         <nav className="sidebar-nav">
           <button
             className={`sidebar-link ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
+            onClick={() => selectTab('overview')}
           >
             <Icons.BarChart />
             <span>Overview</span>
           </button>
           <button
             className={`sidebar-link ${activeTab === 'subscribers' ? 'active' : ''}`}
-            onClick={() => setActiveTab('subscribers')}
+            onClick={() => selectTab('subscribers')}
           >
             <Icons.Users />
             <span>Subscribers</span>
@@ -444,7 +490,7 @@ const AdminDashboard = () => {
           </button>
           <button
             className={`sidebar-link ${activeTab === 'tour' ? 'active' : ''}`}
-            onClick={() => setActiveTab('tour')}
+            onClick={() => selectTab('tour')}
           >
             <Icons.MapPin />
             <span>Tour Dates</span>
@@ -454,21 +500,21 @@ const AdminDashboard = () => {
           </button>
           <button
             className={`sidebar-link ${activeTab === 'announcement' ? 'active' : ''}`}
-            onClick={() => setActiveTab('announcement')}
+            onClick={() => selectTab('announcement')}
           >
             <Icons.Megaphone />
             <span>Announcement</span>
           </button>
           <button
             className={`sidebar-link ${activeTab === 'analytics' ? 'active' : ''}`}
-            onClick={() => setActiveTab('analytics')}
+            onClick={() => selectTab('analytics')}
           >
             <Icons.Eye />
             <span>Analytics</span>
           </button>
           <button
             className={`sidebar-link ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
+            onClick={() => selectTab('settings')}
           >
             <Icons.Settings />
             <span>Settings</span>
@@ -479,63 +525,63 @@ const AdminDashboard = () => {
 
           <button
             className={`sidebar-link ${activeTab === 'spotify' ? 'active' : ''}`}
-            onClick={() => setActiveTab('spotify')}
+            onClick={() => selectTab('spotify')}
           >
             <Icons.Music />
             <span>Spotify</span>
           </button>
           <button
             className={`sidebar-link ${activeTab === 'social' ? 'active' : ''}`}
-            onClick={() => setActiveTab('social')}
+            onClick={() => selectTab('social')}
           >
             <Icons.Globe />
             <span>Social Media</span>
           </button>
           {/* <button
             className={`sidebar-link ${activeTab === 'merch' ? 'active' : ''}`}
-            onClick={() => setActiveTab('merch')}
+            onClick={() => selectTab('merch')}
           >
             <Icons.ShoppingBag />
             <span>Merch Sales</span>
           </button> */}
           {/* <button
             className={`sidebar-link ${activeTab === 'pressKit' ? 'active' : ''}`}
-            onClick={() => setActiveTab('pressKit')}
+            onClick={() => selectTab('pressKit')}
           >
             <Icons.FileText />
             <span>Press Kit</span>
           </button>
           <button
             className={`sidebar-link ${activeTab === 'setlists' ? 'active' : ''}`}
-            onClick={() => setActiveTab('setlists')}
+            onClick={() => selectTab('setlists')}
           >
             <Icons.ListMusic />
             <span>Setlists</span>
           </button> */}
           <button
             className={`sidebar-link ${activeTab === 'booking' ? 'active' : ''}`}
-            onClick={() => setActiveTab('booking')}
+            onClick={() => selectTab('booking')}
           >
             <Icons.Inbox />
             <span>Booking</span>
           </button>
           <button
             className={`sidebar-link ${activeTab === 'email' ? 'active' : ''}`}
-            onClick={() => setActiveTab('email')}
+            onClick={() => selectTab('email')}
           >
             <Icons.Mail />
             <span>Email</span>
           </button>
           {/* <button
             className={`sidebar-link ${activeTab === 'revenue' ? 'active' : ''}`}
-            onClick={() => setActiveTab('revenue')}
+            onClick={() => selectTab('revenue')}
           >
             <Icons.DollarSign />
             <span>Revenue</span>
           </button> */}
           <button
             className={`sidebar-link ${activeTab === 'fanMap' ? 'active' : ''}`}
-            onClick={() => setActiveTab('fanMap')}
+            onClick={() => selectTab('fanMap')}
           >
             <Icons.MapPin />
             <span>Fan Map</span>
@@ -555,6 +601,14 @@ const AdminDashboard = () => {
         {/* Top Bar */}
         <header className="admin-topbar">
           <div className="topbar-left">
+            <button
+              className="sidebar-toggle"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open navigation menu"
+              aria-expanded={sidebarOpen}
+            >
+              <Icons.Menu />
+            </button>
             <h1 className="page-title">
               {activeTab === 'overview' && 'Overview'}
               {activeTab === 'subscribers' && 'Subscribers'}
@@ -635,7 +689,7 @@ const AdminDashboard = () => {
                 <div className="panel">
                   <div className="panel-header">
                     <h2 className="panel-title">Recent Subscribers</h2>
-                    <button className="panel-action" onClick={() => setActiveTab('subscribers')}>
+                    <button className="panel-action" onClick={() => selectTab('subscribers')}>
                       View all
                     </button>
                   </div>
@@ -680,7 +734,7 @@ const AdminDashboard = () => {
                           <span className="action-item-desc">Download JSON backup</span>
                         </div>
                       </button>
-                      <button onClick={() => setActiveTab('tour')} className="action-item">
+                      <button onClick={() => selectTab('tour')} className="action-item">
                         <div className="action-item-icon">
                           <Icons.MapPin />
                         </div>
@@ -689,7 +743,7 @@ const AdminDashboard = () => {
                           <span className="action-item-desc">Add or edit shows</span>
                         </div>
                       </button>
-                      <button onClick={() => setActiveTab('settings')} className="action-item">
+                      <button onClick={() => selectTab('settings')} className="action-item">
                         <div className="action-item-icon">
                           <Icons.Image />
                         </div>
@@ -698,7 +752,7 @@ const AdminDashboard = () => {
                           <span className="action-item-desc">Change hero image</span>
                         </div>
                       </button>
-                      <button onClick={() => setActiveTab('analytics')} className="action-item">
+                      <button onClick={() => selectTab('analytics')} className="action-item">
                         <div className="action-item-icon">
                           <Icons.BarChart />
                         </div>
@@ -717,7 +771,7 @@ const AdminDashboard = () => {
                 <div className="panel">
                   <div className="panel-header">
                     <h2 className="panel-title">Upcoming Shows</h2>
-                    <button className="panel-action" onClick={() => setActiveTab('tour')}>
+                    <button className="panel-action" onClick={() => selectTab('tour')}>
                       Manage
                     </button>
                   </div>
