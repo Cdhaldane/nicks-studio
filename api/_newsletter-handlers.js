@@ -33,15 +33,46 @@ const MAX_SUBJECT_LEN = 200;
 const MAX_BODY_LEN = 20000;
 const MAX_STORED_FAILURES = 25;
 
+/** One verification copy per instalment; a long drip shouldn't grow unbounded. */
+const MAX_STORED_VERIFICATIONS = 30;
+
 /** Consecutive failed drains before a campaign stops retrying. */
 const MAX_DRAIN_FAILURES = 3;
 
 /** Spacing between batch calls — Resend allows 10 req/s, this stays well under. */
 const BATCH_SPACING_MS = 350;
 
+/**
+ * Sends held back from campaigns each day, so a test send and the verification
+ * copy always fit inside the provider's ceiling no matter how the drip lands.
+ */
+const DAILY_RESERVE = 5;
+
+/** Where a copy of every campaign goes, so the send can be eyeballed for real. */
+const DEFAULT_VERIFY_ADDRESS = 'xcdhaldane@gmail.com';
+
+/** The provider's hard ceiling for the day — Resend's free tier allows 100. */
 const dailyLimit = () => {
   const configured = Number(process.env.NEWSLETTER_DAILY_LIMIT);
   return Number.isFinite(configured) && configured > 0 ? configured : 100;
+};
+
+/**
+ * What a campaign may consume in a day. Sits below `dailyLimit()` by
+ * DAILY_RESERVE so there is always headroom left for test sends — and it scales
+ * with the ceiling, so raising NEWSLETTER_DAILY_LIMIT on a paid plan still works.
+ */
+const campaignDailyLimit = () => {
+  const configured = Number(process.env.NEWSLETTER_CAMPAIGN_DAILY_LIMIT);
+  if (Number.isFinite(configured) && configured > 0) return Math.min(configured, dailyLimit());
+  return Math.max(1, dailyLimit() - DAILY_RESERVE);
+};
+
+/** Empty string disables the verification copy entirely. */
+const verifyAddress = () => {
+  const configured = process.env.NEWSLETTER_VERIFY_ADDRESS;
+  const address = (configured === undefined ? DEFAULT_VERIFY_ADDRESS : configured).trim();
+  return EMAIL_RE.test(address) ? address.toLowerCase() : null;
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -98,6 +129,33 @@ const validateContent = ({ subject, body }) => {
   return { subject: cleanSubject, body: cleanBody };
 };
 
+/**
+ * One message per person, whatever the stored list looks like.
+ *
+ * Subscribe and import both normalise case and reject repeats, so new rows are
+ * clean — but rows predating that can still hold `Fan@Example.com` alongside
+ * `fan@example.com`, and `remove` only ever matched the lowercase form. A
+ * campaign therefore never trusts the list: it collapses case variants and
+ * duplicates before a single message is built.
+ */
+const uniqueRecipients = (subscribers) => [
+  ...new Set(activeSubscribers(subscribers).map((s) => s.email.trim().toLowerCase())),
+];
+
+/** Addresses already mailed, as `{ email, at }`. Absent on pre-tracking campaigns. */
+const sentLog = (campaign) => (Array.isArray(campaign.sent) ? campaign.sent : []);
+
+const pendingList = (campaign) => (Array.isArray(campaign.pending) ? campaign.pending : []);
+
+/**
+ * Pruned campaigns no longer carry their queue, so the outstanding figure has to
+ * come from the counts instead of the (now empty) list.
+ */
+const pendingCountOf = (campaign) =>
+  campaign.recipientsPruned
+    ? Math.max(0, campaign.totalRecipients - campaign.sentCount)
+    : pendingList(campaign).length;
+
 const publicCampaign = (campaign) => ({
   id: campaign.id,
   subject: campaign.subject,
@@ -108,8 +166,12 @@ const publicCampaign = (campaign) => ({
   totalRecipients: campaign.totalRecipients,
   sentCount: campaign.sentCount,
   failedCount: campaign.failures ? campaign.failures.length : 0,
-  pendingCount: campaign.pending ? campaign.pending.length : 0,
+  pendingCount: pendingCountOf(campaign),
   lastError: campaign.lastError || null,
+  // Whether ?action=recipients can still itemise this campaign.
+  recipientsPruned: Boolean(campaign.recipientsPruned),
+  // One per instalment, oldest first — proof each day's batch went out.
+  verifications: campaign.verifications || [],
 });
 
 /**
@@ -117,15 +179,16 @@ const publicCampaign = (campaign) => ({
  * Pure with respect to storage — returns updated copies for the caller to persist.
  */
 async function drainCampaign(campaign, quota) {
-  const remainingQuota = dailyLimit() - usedToday(quota);
+  const remainingQuota = campaignDailyLimit() - usedToday(quota);
   if (remainingQuota <= 0) {
     return { campaign, quota, sentNow: 0, reason: 'daily-limit-reached' };
   }
-  if (campaign.pending.length === 0) {
+  const queue = pendingList(campaign);
+  if (queue.length === 0) {
     return { campaign, quota, sentNow: 0, reason: 'nothing-pending' };
   }
 
-  const targets = campaign.pending.slice(0, remainingQuota);
+  const targets = queue.slice(0, remainingQuota);
   const sent = [];
   const failures = [];
   let batchError = null;
@@ -152,17 +215,35 @@ async function drainCampaign(campaign, quota) {
   }
 
   const sentSet = new Set(sent);
-  const pending = campaign.pending.filter((email) => !sentSet.has(email));
+  const pending = queue.filter((email) => !sentSet.has(email));
   const consecutiveFailures = batchError ? (campaign.consecutiveFailures || 0) + 1 : 0;
 
   const exhausted = consecutiveFailures >= MAX_DRAIN_FAILURES;
   const complete = pending.length === 0;
+  const at = new Date().toISOString();
+
+  // Nothing reached a subscriber, so there is nothing to verify — don't spend a
+  // send proving the same failure twice.
+  const quotaAfterBatch = recordUsage(quota, sent.length);
+  const copy =
+    sent.length > 0
+      ? await sendVerificationCopy(campaign, quotaAfterBatch, sent)
+      : { quota: quotaAfterBatch, verification: null };
 
   const updated = {
     ...campaign,
     pending,
+    // Append-only delivery log so the admin panel can show exactly who was
+    // mailed on which instalment of the drip.
+    sent: [...sentLog(campaign), ...sent.map((email) => ({ email, at }))],
     sentCount: campaign.sentCount + sent.length,
     failures: [...(campaign.failures || []), ...failures].slice(0, MAX_STORED_FAILURES),
+    // One entry per instalment that mailed a copy — the audit trail for "did
+    // today's drip actually run?".
+    verifications: [
+      ...(campaign.verifications || []),
+      ...(copy.verification ? [copy.verification] : []),
+    ].slice(-MAX_STORED_VERIFICATIONS),
     consecutiveFailures,
     lastError: batchError,
     lastRunAt: new Date().toISOString(),
@@ -172,17 +253,82 @@ async function drainCampaign(campaign, quota) {
 
   return {
     campaign: updated,
-    quota: recordUsage(quota, sent.length),
+    quota: copy.quota,
     sentNow: sent.length,
     reason: batchError ? 'batch-error' : complete ? 'complete' : 'daily-limit-reached',
   };
 }
 
+/**
+ * Mails one copy of a campaign to the verification address, identical to what
+ * subscribers receive.
+ *
+ * Sent once per instalment that actually delivers — so a campaign dripped over
+ * four days produces four copies, each one proof that day's cron fired. Charged
+ * to the reserve rather than the campaign's own allowance, so it never costs a
+ * subscriber their place in the day's batch.
+ *
+ * Never throws: a failed verification copy is worth reporting, not worth
+ * derailing a campaign that has already gone out to real people.
+ */
+async function sendVerificationCopy(campaign, quota, instalment) {
+  const address = verifyAddress();
+  const skip = (reason) => ({ quota, verification: null, skipped: reason });
+
+  if (!address) return skip('not-configured');
+  // In today's batch already — one copy a day is the point, not two.
+  if (instalment.includes(address)) return skip('already-in-this-batch');
+  if (usedToday(quota) >= dailyLimit()) return skip('daily-limit-reached');
+
+  try {
+    await sendOne(
+      buildMessage({ email: address, subject: campaign.subject, body: campaign.body }),
+      // Keyed on the instalment's start position so a retry replays the same
+      // copy, but the next day's copy is a distinct send.
+      { idempotencyKey: `verify-${campaign.id}-${campaign.sentCount}` }
+    );
+    return {
+      quota: recordUsage(quota, 1),
+      verification: {
+        email: address,
+        at: new Date().toISOString(),
+        instalmentSize: instalment.length,
+        error: null,
+      },
+      skipped: null,
+    };
+  } catch (error) {
+    console.error('Verification copy failed:', error.message);
+    return {
+      quota,
+      verification: {
+        email: address,
+        at: new Date().toISOString(),
+        instalmentSize: instalment.length,
+        error: error.message,
+      },
+      skipped: null,
+    };
+  }
+}
+
+/** The tail of a response message describing this run's verification copy. */
+const verificationNote = (campaign, moreToCome) => {
+  const latest = (campaign.verifications || []).slice(-1)[0];
+  if (!latest) return '';
+  if (latest.error) return ` Your verification copy could not be sent: ${latest.error}`;
+  return ` A copy was sent to ${latest.email} so you can check it${
+    moreToCome ? ', and another follows with each daily batch' : ''
+  }.`;
+};
+
 /** Finds the oldest campaign still owing sends, or null. */
 const nextQueuedCampaign = (campaigns) =>
   [...campaigns]
     .reverse()
-    .find((c) => (c.status === 'queued' || c.status === 'sending') && c.pending.length > 0) || null;
+    .find(
+      (c) => (c.status === 'queued' || c.status === 'sending') && pendingList(c).length > 0
+    ) || null;
 
 // ── Handlers ──
 
@@ -351,7 +497,7 @@ async function send(req, res) {
     });
   }
 
-  const recipients = activeSubscribers(await readSubscribers()).map((s) => s.email);
+  const recipients = uniqueRecipients(await readSubscribers());
   if (recipients.length === 0) {
     return res.status(400).json({ success: false, message: 'No active subscribers to send to.' });
   }
@@ -364,35 +510,39 @@ async function send(req, res) {
     createdAt: new Date().toISOString(),
     totalRecipients: recipients.length,
     pending: recipients,
+    sent: [],
     sentCount: 0,
     failures: [],
     consecutiveFailures: 0,
   };
 
   const result = await drainCampaign(campaign, state.quota);
+  const saved = result.campaign;
 
   await writeCampaignState({
-    campaigns: [result.campaign, ...state.campaigns],
+    campaigns: [saved, ...state.campaigns],
     quota: result.quota,
   });
 
   if (result.sentNow === 0 && result.reason === 'batch-error') {
     return res.status(502).json({
       success: false,
-      message: `Sending failed: ${result.campaign.lastError}`,
-      campaign: publicCampaign(result.campaign),
+      message: `Sending failed: ${saved.lastError}`,
+      campaign: publicCampaign(saved),
     });
   }
 
-  const remaining = result.campaign.pending.length;
-  const days = Math.ceil(remaining / dailyLimit());
+  const remaining = saved.pending.length;
+  const days = Math.ceil(remaining / campaignDailyLimit());
+  const verifyNote = verificationNote(saved, remaining > 0);
 
   return res.status(200).json({
     success: true,
-    message: remaining
-      ? `Sent to ${result.sentNow} of ${recipients.length}. The remaining ${remaining} will go out automatically over the next ${days} day${days === 1 ? '' : 's'}.`
-      : `Sent to all ${result.sentNow} subscribers.`,
-    campaign: publicCampaign(result.campaign),
+    message:
+      (remaining
+        ? `Sent to ${result.sentNow} of ${recipients.length}. The remaining ${remaining} will go out automatically over the next ${days} day${days === 1 ? '' : 's'}.`
+        : `Sent to all ${result.sentNow} subscribers.`) + verifyNote,
+    campaign: publicCampaign(saved),
   });
 }
 
@@ -412,9 +562,13 @@ async function drain(req, res) {
     quota: result.quota,
   });
 
+  const stillPending = result.campaign.pending.length;
+
   return res.status(200).json({
     success: true,
-    message: `Sent ${result.sentNow} for "${campaign.subject}". ${result.campaign.pending.length} remaining.`,
+    message:
+      `Sent ${result.sentNow} for "${campaign.subject}". ${stillPending} remaining.` +
+      verificationNote(result.campaign, stillPending > 0),
     sent: result.sentNow,
     campaign: publicCampaign(result.campaign),
   });
@@ -425,7 +579,52 @@ async function campaigns(req, res) {
   const state = await readCampaignState();
   return res.status(200).json({
     campaigns: state.campaigns.map(publicCampaign),
-    quota: { limit: dailyLimit(), usedToday: usedToday(state.quota) },
+    quota: {
+      limit: dailyLimit(),
+      campaignLimit: campaignDailyLimit(),
+      usedToday: usedToday(state.quota),
+    },
+    verifyAddress: verifyAddress(),
+  });
+}
+
+/**
+ * GET (admin) — who has and hasn't been mailed for one campaign.
+ *
+ * "Sent" means Resend accepted the message, which is not the same as it landing
+ * in an inbox; the panel labels it accordingly.
+ */
+async function campaignRecipients(req, res) {
+  const id = typeof req.query.id === 'string' ? req.query.id.trim() : '';
+  if (!id) {
+    return res.status(400).json({ success: false, message: 'A campaign id is required.' });
+  }
+
+  const state = await readCampaignState();
+  const campaign = state.campaigns.find((c) => c.id === id);
+  if (!campaign) {
+    return res.status(404).json({ success: false, message: 'Campaign not found.' });
+  }
+
+  const sent = sentLog(campaign)
+    .filter((entry) => entry && entry.email)
+    .map((entry) => ({ email: entry.email, at: entry.at || null }));
+
+  const failed = (campaign.failures || [])
+    .filter((entry) => entry && entry.email)
+    .map((entry) => ({ email: entry.email, error: entry.error || null }));
+
+  return res.status(200).json({
+    success: true,
+    campaign: publicCampaign(campaign),
+    sent,
+    pending: [...pendingList(campaign)],
+    failed,
+    // Campaigns queued before delivery logging existed, and ones whose detail has
+    // aged out, report counts but cannot itemise. The panel says so rather than
+    // rendering an empty list as "nobody".
+    sentListComplete: !campaign.recipientsPruned && sent.length === campaign.sentCount,
+    pendingListComplete: !campaign.recipientsPruned,
   });
 }
 
@@ -497,5 +696,6 @@ module.exports = {
   send,
   drain,
   campaigns,
+  campaignRecipients,
   unsubscribe,
 };

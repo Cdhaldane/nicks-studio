@@ -38,7 +38,7 @@ function App() {
 
         <AlertProvider>
           <Alert />
-          <NewsPopup />
+          {/* <NewsPopup /> */}
           <AnnouncementPopup />
           <ParallaxProvider>
             <div

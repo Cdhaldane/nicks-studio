@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import vercelEmailStorageService from '../../../services/vercelEmailStorageService';
+import CampaignRecipientsModal from './CampaignRecipientsModal';
 
 const TEMPLATES = [
   {
@@ -41,6 +42,7 @@ const EmailPanel = ({ Icons }) => {
   const [subscribers, setSubscribers] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [quota, setQuota] = useState(null);
+  const [verifyAddress, setVerifyAddress] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [subject, setSubject] = useState('');
@@ -51,6 +53,7 @@ const EmailPanel = ({ Icons }) => {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(null); // 'test' | 'send'
   const [feedback, setFeedback] = useState(null); // { type, message }
+  const [inspectingId, setInspectingId] = useState(null); // campaign open in the recipients modal
 
   const load = useCallback(async () => {
     const [subscriberData, campaignData] = await Promise.all([
@@ -60,6 +63,7 @@ const EmailPanel = ({ Icons }) => {
     setSubscribers(subscriberData);
     setCampaigns(campaignData.campaigns);
     setQuota(campaignData.quota);
+    setVerifyAddress(campaignData.verifyAddress);
     setLoading(false);
   }, []);
 
@@ -77,8 +81,21 @@ const EmailPanel = ({ Icons }) => {
     [campaigns]
   );
 
+  // Held by id rather than by value so the modal follows the refreshed campaign
+  // after a send or drain updates the counts underneath it.
+  const inspecting = useMemo(
+    () => campaigns.find((c) => c.id === inspectingId) || null,
+    [campaigns, inspectingId]
+  );
+
+  const closeInspector = useCallback(() => setInspectingId(null), []);
+
   const canCompose = subject.trim().length > 0 && body.trim().length > 0;
-  const remainingToday = quota ? Math.max(0, quota.limit - quota.usedToday) : null;
+
+  // Campaigns are capped below the provider's daily ceiling so test sends and the
+  // verification copy always have room; the stat card reports the campaign figure.
+  const campaignLimit = quota ? quota.campaignLimit ?? quota.limit : null;
+  const remainingToday = quota ? Math.max(0, campaignLimit - quota.usedToday) : null;
 
   const handleTemplate = (template) => {
     setSubject(template.subject);
@@ -159,8 +176,11 @@ const EmailPanel = ({ Icons }) => {
               <Icons.Mail />
             </div>
             <div className="stat-card-info">
-              <span className="stat-card-label">Sends Left Today</span>
+              <span className="stat-card-label">Campaign Sends Left Today</span>
               <span className="stat-card-value">{remainingToday}</span>
+              <span className="stat-card-sub">
+                of {campaignLimit} · {Math.max(0, quota.limit - campaignLimit)} held back for tests
+              </span>
             </div>
           </div>
         )}
@@ -187,6 +207,13 @@ const EmailPanel = ({ Icons }) => {
               {inFlight.pendingCount} remaining. The next batch goes out automatically tomorrow —
               no action needed.
             </p>
+            <button
+              onClick={() => setInspectingId(inFlight.id)}
+              className="btn btn-ghost btn-sm"
+              style={{ marginTop: 12 }}
+            >
+              <Icons.Users /> See who has received it
+            </button>
           </div>
         </div>
       )}
@@ -295,9 +322,13 @@ const EmailPanel = ({ Icons }) => {
                     {remainingToday !== null && activeCount > remainingToday && (
                       <>
                         {' '}
-                        Today&apos;s limit allows {remainingToday}; the rest send automatically over
-                        the following days.
+                        Today&apos;s campaign limit allows {remainingToday}; the rest send
+                        automatically over the following days.
                       </>
+                    )}
+                    {verifyAddress && (
+                      <> A copy goes to {verifyAddress} with each daily batch, so you can see every
+                        one land.</>
                     )}
                   </p>
                   <div className="email-actions">
@@ -353,13 +384,20 @@ const EmailPanel = ({ Icons }) => {
                 <ul className="campaign-history">
                   {campaigns.slice(0, 6).map((c) => (
                     <li key={c.id} className="campaign-history-item">
-                      <span className="campaign-history-subject">{c.subject}</span>
-                      <span className="campaign-history-meta">
-                        <span className={`campaign-badge campaign-badge-${c.status}`}>
-                          {STATUS_LABELS[c.status] || c.status}
+                      <button
+                        type="button"
+                        className="campaign-history-button"
+                        onClick={() => setInspectingId(c.id)}
+                        title="View recipients"
+                      >
+                        <span className="campaign-history-subject">{c.subject}</span>
+                        <span className="campaign-history-meta">
+                          <span className={`campaign-badge campaign-badge-${c.status}`}>
+                            {STATUS_LABELS[c.status] || c.status}
+                          </span>
+                          {c.sentCount}/{c.totalRecipients} · {formatDate(c.createdAt)}
                         </span>
-                        {c.sentCount}/{c.totalRecipients} · {formatDate(c.createdAt)}
-                      </span>
+                      </button>
                       {c.lastError && <span className="campaign-history-error">{c.lastError}</span>}
                     </li>
                   ))}
@@ -369,6 +407,14 @@ const EmailPanel = ({ Icons }) => {
           </div>
         </div>
       </div>
+
+      {inspecting && (
+        <CampaignRecipientsModal
+          campaign={inspecting}
+          Icons={Icons}
+          onClose={closeInspector}
+        />
+      )}
     </div>
   );
 };

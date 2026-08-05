@@ -13,6 +13,13 @@ const CAMPAIGNS_PATH = 'newsletter/campaigns.json';
 /** Keep the stored history bounded — the panel only ever shows recent sends. */
 const MAX_CAMPAIGNS = 50;
 
+/**
+ * How many campaigns keep their per-recipient address lists. Each list is one
+ * entry per subscriber, so the detail is what makes this blob grow; older
+ * finished campaigns keep their counts but drop the addresses.
+ */
+const MAX_DETAILED_CAMPAIGNS = 10;
+
 const token = () => process.env.BLOB_READ_WRITE_TOKEN;
 
 /** Reads a JSON blob, returning `fallback` when it doesn't exist yet. */
@@ -66,10 +73,26 @@ async function readCampaignState() {
   };
 }
 
+/** A campaign that will never send again — safe to drop its address lists. */
+const isFinished = (campaign) => campaign.status === 'sent' || campaign.status === 'failed';
+
+/**
+ * Drops the address lists from campaigns past MAX_DETAILED_CAMPAIGNS, leaving a
+ * marker so the admin panel can say "detail no longer stored" rather than
+ * showing an empty list as though nobody was mailed. Unfinished campaigns are
+ * always left intact — their `pending` list is the queue itself.
+ */
+const pruneRecipientDetail = (campaigns) =>
+  campaigns.map((campaign, index) =>
+    index >= MAX_DETAILED_CAMPAIGNS && isFinished(campaign) && !campaign.recipientsPruned
+      ? { ...campaign, sent: [], pending: [], recipientsPruned: true }
+      : campaign
+  );
+
 const writeCampaignState = (state) =>
   writeBlob(CAMPAIGNS_PATH, {
     ...state,
-    campaigns: state.campaigns.slice(0, MAX_CAMPAIGNS),
+    campaigns: pruneRecipientDetail(state.campaigns.slice(0, MAX_CAMPAIGNS)),
   });
 
 /** UTC day key. The quota ledger resets when this changes. */
@@ -87,6 +110,8 @@ const recordUsage = (quota, count) => ({
 module.exports = {
   SUBSCRIBERS_PATH,
   CAMPAIGNS_PATH,
+  MAX_DETAILED_CAMPAIGNS,
+  pruneRecipientDetail,
   readSubscribers,
   writeSubscribers,
   activeSubscribers,

@@ -44,12 +44,45 @@ class VercelEmailStorageService {
       const response = await fetch(`${API_BASE}/newsletter?action=campaigns&t=${Date.now()}`, {
         headers: authHeaders(),
       });
-      if (!response.ok) return { campaigns: [], quota: null };
+      if (!response.ok) return { campaigns: [], quota: null, verifyAddress: null };
       const data = await response.json();
-      return { campaigns: data.campaigns || [], quota: data.quota || null };
+      return {
+        campaigns: data.campaigns || [],
+        quota: data.quota || null,
+        verifyAddress: data.verifyAddress || null,
+      };
     } catch (error) {
       console.error('Error fetching campaigns:', error);
-      return { campaigns: [], quota: null };
+      return { campaigns: [], quota: null, verifyAddress: null };
+    }
+  }
+
+  /**
+   * Per-recipient breakdown for one campaign: who has been mailed, who is still
+   * queued, and who failed. Returns null when the detail can't be fetched.
+   */
+  async getCampaignRecipients(id) {
+    try {
+      const response = await fetch(
+        `${API_BASE}/newsletter?action=recipients&id=${encodeURIComponent(id)}&t=${Date.now()}`,
+        { headers: authHeaders() }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        return { success: false, message: data.message || 'Could not load recipients.' };
+      }
+      return {
+        success: true,
+        campaign: data.campaign || null,
+        sent: data.sent || [],
+        pending: data.pending || [],
+        failed: data.failed || [],
+        sentListComplete: data.sentListComplete !== false,
+        pendingListComplete: data.pendingListComplete !== false,
+      };
+    } catch (error) {
+      console.error('Error fetching campaign recipients:', error);
+      return { success: false, message: 'Could not reach the server. Please try again.' };
     }
   }
 
