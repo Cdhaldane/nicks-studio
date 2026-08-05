@@ -19,6 +19,7 @@
  *     POST   /api/newsletter?action=send           { subject, body }      queue campaign
  *     GET    /api/newsletter?action=campaigns                             history + quota
  *     GET    /api/newsletter?action=recipients&id=…                       who was mailed
+ *     POST   /api/newsletter?action=preview        { subject, body }      render the email
  *
  *   Cron (Bearer CRON_SECRET)
  *     POST   /api/newsletter?action=drain                                 send daily instalment
@@ -32,6 +33,7 @@ const ADMIN_ACTIONS = {
   send: { method: 'POST', handler: handlers.send },
   campaigns: { method: 'GET', handler: handlers.campaigns },
   recipients: { method: 'GET', handler: handlers.campaignRecipients },
+  preview: { method: 'POST', handler: handlers.preview },
 };
 
 module.exports = async (req, res) => {

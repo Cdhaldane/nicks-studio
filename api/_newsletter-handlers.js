@@ -574,6 +574,35 @@ async function drain(req, res) {
   });
 }
 
+/**
+ * POST (admin) — renders the composer's text through the real email template.
+ *
+ * The panel used to approximate the layout itself and got it wrong, showing
+ * plain paragraphs for something that ships with links, bold and a branded
+ * shell. Rendering server-side means the preview cannot drift from the send.
+ */
+async function preview(req, res) {
+  const content = validateContent(req.body || {});
+  if (content.error) {
+    return res.status(400).json({ success: false, message: content.error });
+  }
+
+  return res.status(200).json({
+    success: true,
+    html: renderCampaignHtml({
+      subject: content.subject,
+      body: content.body,
+      // Placeholder — a real token is minted per recipient at send time.
+      unsubscribeUrl: `${SITE_URL}/api/newsletter?action=unsubscribe&token=preview`,
+    }),
+    text: renderCampaignText({
+      subject: content.subject,
+      body: content.body,
+      unsubscribeUrl: `${SITE_URL}/api/newsletter?action=unsubscribe&token=preview`,
+    }),
+  });
+}
+
 /** GET (admin) — campaign history for the panel, newest first. */
 async function campaigns(req, res) {
   const state = await readCampaignState();
@@ -697,5 +726,6 @@ module.exports = {
   drain,
   campaigns,
   campaignRecipients,
+  preview,
   unsubscribe,
 };

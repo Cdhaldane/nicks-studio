@@ -38,6 +38,28 @@ class VercelEmailStorageService {
     }
   }
 
+  /**
+   * Renders the composer's text through the real email template, so the preview
+   * is the actual email rather than the panel's guess at it.
+   */
+  async renderPreview({ subject, body }) {
+    try {
+      const response = await fetch(`${API_BASE}/newsletter?action=preview`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ subject, body }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return { success: false, message: data.message || 'Could not render the preview.' };
+      }
+      return { success: true, html: data.html };
+    } catch (error) {
+      console.error('Preview render error:', error);
+      return { success: false, message: 'Could not reach the server. Please try again.' };
+    }
+  }
+
   /** Campaign history plus today's remaining send allowance. */
   async getCampaigns() {
     try {

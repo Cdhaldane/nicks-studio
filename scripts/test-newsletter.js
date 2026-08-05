@@ -166,6 +166,63 @@ const check = (name, fn) => {
     assert.ok(html.includes('href="https://example.com"')));
   check('unsubscribe url present', () => assert.ok(html.includes('https://site/u?token=abc')));
 
+  console.log('\n── Body formatting ──');
+  const { renderCampaignText: renderText } = require(resolve('_email-template.js'));
+  const fmt = (body) => renderCampaignHtml({ subject: 'S', body, unsubscribeUrl: 'https://u' });
+
+  check('**bold** becomes strong', () =>
+    assert.ok(fmt('Hello **world** now').includes('Hello <strong>world</strong> now')));
+  check('[label](url) links with the label as the visible text', () => {
+    const out = fmt('Grab [Reserve Your Seat](https://tickets.example.com/x) today');
+    assert.ok(out.includes('>Reserve Your Seat</a>'));
+    assert.ok(out.includes('href="https://tickets.example.com/x"'));
+    assert.ok(!out.includes('>https://tickets.example.com/x</a>'));
+  });
+  check('a link alone on a line becomes a button', () => {
+    const out = fmt('Intro\n\n[Reserve Your Seat](https://tickets.example.com/x)\n\nOutro');
+    assert.ok(/background-color:#ddc036/.test(out));
+    assert.ok(out.includes('>Reserve Your Seat</a>'));
+  });
+  check('bare urls still auto-link, showing the url', () =>
+    assert.ok(fmt('See https://example.com/a').includes('>https://example.com/a</a>')));
+  check('a labelled link is not double-wrapped by the bare-url pass', () => {
+    const out = fmt('[Tickets](https://example.com/a)');
+    assert.strictEqual((out.match(/<a href="https:\/\/example\.com\/a"/g) || []).length, 1);
+  });
+  check('query strings survive escaping', () =>
+    assert.ok(fmt('https://e.ca/x?a=1&b=2').includes('href="https://e.ca/x?a=1&amp;b=2"')));
+  check('javascript: urls are refused — left as inert text, never an anchor', () => {
+    const out = fmt('[Click](javascript:alert(1))');
+    assert.ok(!/<a[^>]+href="javascript/i.test(out));
+    assert.ok(!/href="[^"]*alert/i.test(out));
+    // Still visible to the author as the literal text they typed, so the
+    // mistake is obvious in the preview rather than silently dropped.
+    assert.ok(out.includes('[Click]'));
+  });
+  check('data: and vbscript: urls are refused too', () => {
+    assert.ok(!/<a[^>]+href="data:/i.test(fmt('[X](data:text/html;base64,PHN2Zz4=)')));
+    assert.ok(!/<a[^>]+href="vbscript:/i.test(fmt('[X](vbscript:msgbox)')));
+  });
+  check('a label cannot smuggle markup', () => {
+    const out = fmt('[<img src=x onerror=alert(1)>](https://example.com)');
+    assert.ok(!out.includes('<img src=x'));
+  });
+  check('numbers in prose are untouched by the placeholder pass', () => {
+    const out = fmt('Doors at 7 30 pm, 18 seats, 2026 tour');
+    assert.ok(out.includes('Doors at 7 30 pm, 18 seats, 2026 tour'));
+    assert.ok(!out.includes('undefined'));
+  });
+  check('the plain-text alternative strips the markers', () => {
+    const text = renderText({
+      subject: 'S',
+      body: 'A **bold** word and [Tickets](https://e.ca/x)',
+      unsubscribeUrl: 'https://u',
+    });
+    assert.ok(text.includes('A bold word'));
+    assert.ok(text.includes('Tickets: https://e.ca/x'));
+    assert.ok(!text.includes('**'));
+  });
+
   console.log('\n── Router auth gates ──');
   reset();
   let res = mkRes();

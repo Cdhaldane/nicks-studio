@@ -48,6 +48,8 @@ const EmailPanel = ({ Icons }) => {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [previewMode, setPreviewMode] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState(null);
+  const [previewError, setPreviewError] = useState(null);
   const [testAddress, setTestAddress] = useState('');
 
   const [confirming, setConfirming] = useState(false);
@@ -89,6 +91,28 @@ const EmailPanel = ({ Icons }) => {
   );
 
   const closeInspector = useCallback(() => setInspectingId(null), []);
+
+  // Rendered server-side by the same template the send uses. Re-fetched while
+  // the preview is open so edits show up, debounced so typing isn't chatty.
+  useEffect(() => {
+    if (!previewMode || !subject.trim() || !body.trim()) {
+      setPreviewHtml(null);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const result = await vercelEmailStorageService.renderPreview({ subject, body });
+      if (cancelled) return;
+      setPreviewHtml(result.success ? result.html : null);
+      setPreviewError(result.success ? null : result.message);
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [previewMode, subject, body]);
 
   const canCompose = subject.trim().length > 0 && body.trim().length > 0;
 
@@ -258,25 +282,34 @@ const EmailPanel = ({ Icons }) => {
                       className="press-textarea email-body-textarea"
                       rows={10}
                       value={body}
-                      placeholder="Write your message to fans... Plain text is fine — it gets wrapped in the branded template automatically. Paste links and they'll become clickable."
+                      placeholder="Write your message to fans... Plain text is fine — it gets wrapped in the branded template automatically."
                       onChange={(e) => setBody(e.target.value)}
                     />
                   </label>
+                  <p className="email-format-hint">
+                    Blank lines start new paragraphs. <code>**bold**</code> for bold,{' '}
+                    <code>[Reserve your seat](https://...)</code> for a named link — put one on its
+                    own line and it becomes a button. Bare URLs link themselves.
+                  </p>
                 </div>
               ) : (
                 <div className="email-preview">
-                  <div className="email-preview-subject">
-                    <strong>Subject:</strong> {subject || '(no subject)'}
-                  </div>
-                  <div className="email-preview-body">
-                    {body ? (
-                      body.split('\n').map((line, i) => <p key={i}>{line || <br />}</p>)
-                    ) : (
-                      <p className="no-activity">Empty message</p>
-                    )}
-                  </div>
+                  {previewError && <div className="toast toast-error">{previewError}</div>}
+                  {previewHtml ? (
+                    <iframe
+                      title="Email preview"
+                      className="email-preview-frame"
+                      sandbox=""
+                      srcDoc={previewHtml}
+                    />
+                  ) : (
+                    <p className="no-activity">
+                      {canCompose ? 'Rendering preview...' : 'Add a subject and message to preview.'}
+                    </p>
+                  )}
                   <div className="email-preview-footer">
-                    Sending to {activeCount} active subscriber{activeCount === 1 ? '' : 's'}
+                    Exactly what lands in the inbox · sending to {activeCount} active subscriber
+                    {activeCount === 1 ? '' : 's'}
                   </div>
                 </div>
               )}

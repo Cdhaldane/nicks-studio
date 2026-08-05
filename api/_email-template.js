@@ -33,17 +33,60 @@ const escapeHtml = (value) =>
 
 const URL_RE = /(https?:\/\/[^\s<]+)/g;
 
-/** Turns bare URLs into anchors. Input must already be HTML-escaped. */
-const linkify = (escaped) =>
-  escaped.replace(
-    URL_RE,
-    (url) =>
-      `<a href="${url}" style="color:${COLORS.accent};text-decoration:underline;">${url}</a>`
-  );
+/**
+ * The small formatting vocabulary the admin panel supports. Deliberately tiny —
+ * the client types prose, not markup, and everything here degrades to readable
+ * plain text in the text/plain alternative.
+ *
+ *   **bold**              → <strong>
+ *   [label](https://…)    → a link showing `label` instead of the raw URL
+ *   a line that is only a link → a centred call-to-action button
+ *   https://… on its own  → auto-linked, as before
+ */
+const BOLD_RE = /\*\*(.+?)\*\*/g;
+const MD_LINK_RE = /\[([^\]\n]+)\]\(([^)\s]+)\)/g;
+const BUTTON_BLOCK_RE = /^\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)$/;
+
+/** Only http(s) becomes a link — blocks `javascript:` and friends. */
+const SAFE_URL_RE = /^https?:\/\//i;
+
+const anchorHtml = (url, label) =>
+  `<a href="${url}" style="color:${COLORS.accent};text-decoration:underline;">${label}</a>`;
+
+/** Table-wrapped so Outlook renders the background; padding lives on the anchor. */
+const buttonHtml = (url, label) =>
+  `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px auto 22px;">
+  <tr>
+    <td align="center" style="background-color:${COLORS.accent};border-radius:6px;">
+      <a href="${escapeHtml(url)}" style="display:inline-block;padding:14px 30px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;color:${COLORS.page};text-decoration:none;">${escapeHtml(label)}</a>
+    </td>
+  </tr>
+</table>`;
+
+/**
+ * Escapes, then applies the inline vocabulary.
+ *
+ * Finished anchors are parked behind placeholders before the bare-URL pass runs,
+ * otherwise it would find the `href` of a link it had just built and nest a
+ * second anchor inside it.
+ */
+const renderInline = (raw) => {
+  const parked = [];
+  const park = (html) => `\u0000${parked.push(html) - 1}\u0000`;
+
+  const html = escapeHtml(raw)
+    .replace(BOLD_RE, '<strong>$1</strong>')
+    .replace(MD_LINK_RE, (match, label, url) =>
+      SAFE_URL_RE.test(url) ? park(anchorHtml(url, label)) : match
+    )
+    .replace(URL_RE, (url) => park(anchorHtml(url, url)));
+
+  return html.replace(/\u0000(\d+)\u0000/g, (_, index) => parked[Number(index)]);
+};
 
 /**
  * Splits on blank lines into paragraphs, preserving single newlines as <br>.
- * Escaping happens before linkifying so user text can never inject markup.
+ * Escaping happens before formatting so user text can never inject markup.
  */
 const renderBody = (body) =>
   String(body)
@@ -51,14 +94,25 @@ const renderBody = (body) =>
     .map((block) => block.trim())
     .filter(Boolean)
     .map((block) => {
-      const html = linkify(escapeHtml(block)).replace(/\n/g, '<br />');
+      const asButton = block.match(BUTTON_BLOCK_RE);
+      if (asButton) return buttonHtml(asButton[2], asButton[1]);
+
+      const html = renderInline(block).replace(/\n/g, '<br />');
       return `<p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:${COLORS.text};">${html}</p>`;
     })
     .join('\n');
 
+/** Strips the formatting markers for the text/plain alternative and preheader. */
+const toPlainText = (body) =>
+  String(body)
+    .replace(BOLD_RE, '$1')
+    .replace(MD_LINK_RE, (match, label, url) =>
+      SAFE_URL_RE.test(url) ? `${label}: ${url}` : match
+    );
+
 /** First ~110 chars of the body, shown as inbox preview text next to the subject. */
 const buildPreheader = (body) => {
-  const flat = String(body).replace(/\s+/g, ' ').trim();
+  const flat = toPlainText(body).replace(/\s+/g, ' ').trim();
   return escapeHtml(flat.length > 110 ? `${flat.slice(0, 107)}...` : flat);
 };
 
@@ -139,7 +193,7 @@ const renderCampaignText = ({ subject, body, unsubscribeUrl }) =>
     '',
     subject,
     '',
-    String(body).trim(),
+    toPlainText(body).trim(),
     '',
     '—',
     `You're receiving this because you subscribed at ${SITE_URL}.`,
