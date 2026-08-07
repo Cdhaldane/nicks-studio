@@ -5,7 +5,7 @@ A modern, responsive React application for artist Nickola Magnolia featuring mus
 ## 🎵 Features
 
 - **Music Streaming**: Spotify integration with interactive vinyl records
-- **E-Commerce**: Shopify integration for merchandise sales
+- **E-Commerce**: Square integration for merchandise sales
 - **Fan Engagement**: Email newsletter signup and social media links
 - **Responsive Design**: Mobile-first design with smooth animations
 - **Performance Optimized**: Lazy loading, code splitting, and optimized images
@@ -14,7 +14,7 @@ A modern, responsive React application for artist Nickola Magnolia featuring mus
 
 - **Frontend**: React 18, React Router Dom
 - **State Management**: Redux Toolkit
-- **E-Commerce**: Shopify Hydrogen React
+- **E-Commerce**: Square (server-side checkout via `/api`)
 - **Styling**: CSS3 with CSS Variables
 - **Animations**: CSS Animations, React Scroll Parallax
 - **Music Integration**: Spotify Web API
@@ -45,8 +45,8 @@ src/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/nicks-studio-shopify.git
-   cd nicks-studio-shopify
+   git clone https://github.com/Cdhaldane/nicks-studio.git
+   cd nicks-studio
    ```
 
 2. **Install dependencies**
@@ -67,10 +67,10 @@ src/
 
 ## 🔧 Configuration
 
-### Shopify Setup
-1. Create a Shopify store
-2. Generate Storefront API credentials
-3. Add your store domain and tokens to `.env`
+### Square Setup
+1. Create a Square account and application
+2. Copy the access token and location ID from the Square Developer dashboard
+3. Add `SQUARE_ACCESS_TOKEN` and `SQUARE_LOCATION_ID` to `.env` (server-side only)
 
 ### Spotify Integration
 1. Create a Spotify Developer account
@@ -100,7 +100,7 @@ src/
 - Album artwork display
 
 ### E-Commerce
-- Shopify integration for product management
+- Square integration for product management
 - Shopping cart functionality
 - Secure checkout process
 - Order management

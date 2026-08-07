@@ -7,7 +7,7 @@ This project is now configured to deploy both the React frontend and Square API 
 ## Project Structure
 
 ```
-nicks-studio-shopify/
+nicks-studio/
 ├── api/                          # Serverless functions (backend)
 │   ├── _utils.js                # Shared utilities
 │   ├── health.js                # GET /api/health
@@ -56,14 +56,14 @@ In your Vercel project settings (or via `.env` for local testing), set:
 1. Go to [vercel.com](https://vercel.com)
 2. Click "Import Project"
 3. Connect your GitHub repository
-4. Set the root directory to: `nicks-studio-shopify`
+4. Set the root directory to: `nicks-studio`
 5. Add all environment variables
 6. Click "Deploy"
 
 ### 4. Deploy via CLI
 
 ```bash
-cd nicks-studio-shopify
+cd nicks-studio
 vercel
 ```
 

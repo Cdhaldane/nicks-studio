@@ -103,7 +103,7 @@ const Privacy = () => {
                 <li>Spotify for music streaming</li>
                 <li>YouTube for video content</li>
                 <li>Instagram for social media</li>
-                <li>Shopify for e-commerce</li>
+                <li>Square for e-commerce and payment processing</li>
               </ul>
               <p>
                 These services have their own privacy policies, and we are not 

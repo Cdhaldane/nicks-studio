@@ -6,8 +6,6 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.0.1",
-    "@shopify/hydrogen-react": "^2023.10.1",
-    "@shopify/shopify-api": "^9.0.1",
     "@supabase/supabase-js": "^2.50.3",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -25,7 +23,6 @@
     "react-router-dom": "^6.19.0",
     "react-scripts": "5.0.1",
     "react-scroll-parallax": "^3.4.5",
-    "shopify-buy": "^2.21.1",
     "square": "^44.2.0",
     "web-vitals": "^2.1.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"

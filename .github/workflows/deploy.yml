@@ -38,8 +38,6 @@ jobs:
         CI: false
         REACT_APP_SUPABASE_URL: ${{ secrets.REACT_APP_SUPABASE_URL }}
         REACT_APP_SUPABASE_ANON_KEY: ${{ secrets.REACT_APP_SUPABASE_ANON_KEY }}
-        REACT_APP_SHOPIFY_DOMAIN: ${{ secrets.REACT_APP_SHOPIFY_DOMAIN }}
-        REACT_APP_SHOPIFY_ACCESS_TOKEN: ${{ secrets.REACT_APP_SHOPIFY_ACCESS_TOKEN }}
         REACT_APP_MAILCHIMP_URL: ${{ secrets.REACT_APP_MAILCHIMP_URL }}
         
     - name: Setup Pages

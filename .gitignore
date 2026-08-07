@@ -9,8 +9,8 @@
 /coverage
 
 # production
-# Unanchored so nested build output is covered too — a committed
-# nicks-studio-shopify/build bundle is what leaked the Shopify token.
+# Unanchored so nested build output is covered too — a committed bundle in a
+# nested build/ is what leaked an API token once.
 build/
 
 # misc

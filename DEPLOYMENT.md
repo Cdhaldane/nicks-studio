@@ -2,7 +2,7 @@
 
 ## Prerequisites ✅
 - ✅ Custom domain: `nickolamagnolia.com` 
-- ✅ GitHub repository: `nicks-studio-shopify`
+- ✅ GitHub repository: `nicks-studio`
 - ✅ Supabase project set up
 - ✅ Build scripts configured
 
@@ -17,8 +17,6 @@ Add these repository secrets:
 |-------------|-------|----------|
 | `REACT_APP_SUPABASE_URL` | Your Supabase project URL | ✅ Yes |
 | `REACT_APP_SUPABASE_ANON_KEY` | Your Supabase anon key | ✅ Yes |
-| `REACT_APP_SHOPIFY_DOMAIN` | Your Shopify store URL | ⚠️ Optional |
-| `REACT_APP_SHOPIFY_ACCESS_TOKEN` | Your Shopify access token | ⚠️ Optional |
 | `REACT_APP_MAILCHIMP_URL` | Your MailChimp URL | ⚠️ Optional |
 
 ### 2. Enable GitHub Pages

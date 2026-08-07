@@ -61,7 +61,6 @@ export const CONSTANTS = {
   ERROR_MESSAGES: {
     SPOTIFY_AUTH_FAILED: 'Failed to authenticate with Spotify',
     SPOTIFY_FETCH_FAILED: 'Failed to fetch albums',
-    SHOPIFY_FETCH_FAILED: 'Failed to fetch products',
     NETWORK_ERROR: 'Network error occurred',
     GENERIC_ERROR: 'An error occurred. Please try again.',
   },
