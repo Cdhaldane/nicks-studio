@@ -18,7 +18,8 @@ A modern, responsive React application for artist Nickola Magnolia featuring mus
 - **Styling**: CSS3 with CSS Variables
 - **Animations**: CSS Animations, React Scroll Parallax
 - **Music Integration**: Spotify Web API
-- **Email Marketing**: MailChimp
+- **Email**: Resend — newsletter campaigns, plus order and booking alerts
+- **Hosting**: Vercel (static site + serverless functions in `api/`, data in Vercel Blob)
 
 ## 🏗️ Project Structure
 
@@ -75,21 +76,23 @@ src/
 ### Spotify Integration
 1. Create a Spotify Developer account
 2. Register your application
-3. Add Client ID and Secret to `.env`
+3. Add `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` to `.env` (server-side only — never `REACT_APP_`)
 
-### MailChimp Setup
-1. Create a MailChimp account
-2. Set up an audience
-3. Add your MailChimp URL to `.env`
+### Newsletter, alerts and data
+Every server-side variable (Resend, admin auth, order/booking alerts,
+`BLOB_PATH_SECRET`) is documented in `.env.example`.
 
 ## 🎯 Available Scripts
 
 - `npm start` - Start development server
+- `npm run api` - Run the `api/` functions locally on port 4001
 - `npm run build` - Build for production
 - `npm test` - Run tests
-- `npm run deploy` - Deploy to GitHub Pages
+- `npm run test:api` - Run the API test suites (mocked — no real emails, payments or storage)
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
+
+The site is hosted on Vercel — see `VERCEL_DEPLOYMENT.md`.
 
 ## 🌟 Key Features
 
