@@ -702,5 +702,82 @@ const check = (name, fn) => {
   });
   process.env.NEWSLETTER_DAILY_LIMIT = '100';
 
+  console.log('\n── Subscriber list routes need an admin session ──');
+  reset();
+  res = mkRes();
+  await router(mkReq({ method: 'GET' }), res);
+  check('listing subscribers without a token is refused', () => {
+    assert.strictEqual(res.statusCode, 401);
+    assert.strictEqual(res.body.subscribers, undefined);
+  });
+  res = mkRes();
+  await router(mkReq({ method: 'DELETE', body: { email: 'fan1@example.com' } }), res);
+  check('removing a subscriber without a token is refused', () => {
+    assert.strictEqual(res.statusCode, 401);
+    assert.ok(subscribers.some((s) => s.email === 'fan1@example.com'));
+  });
+  res = mkRes();
+  await router(mkReq({ method: 'POST', body: { subscribers: [{ email: 'planted@example.com' }] } }), res);
+  check('bulk import without a token is refused', () => {
+    assert.strictEqual(res.statusCode, 401);
+    assert.ok(!subscribers.some((s) => s.email === 'planted@example.com'));
+  });
+  res = mkRes();
+  await router(authReq({ method: 'GET' }), res);
+  check('an admin can still list subscribers', () => {
+    assert.strictEqual(res.statusCode, 200);
+    assert.strictEqual(res.body.total, 300);
+  });
+
+  console.log('\n── Admin "remove" keeps the opt-out on record ──');
+  reset();
+  subscribers.push({ id: 'legacy', email: 'Mixed.Case@Example.com', status: 'active' });
+  res = mkRes();
+  await router(authReq({ method: 'DELETE', body: { email: 'fan2@example.com' } }), res);
+  check('removal answers as an unsubscribe', () => {
+    assert.strictEqual(res.statusCode, 200);
+    assert.strictEqual(res.body.message, 'Subscriber unsubscribed');
+  });
+  check('the row is kept and marked unsubscribed by the admin', () => {
+    const row = subscribers.find((s) => s.email === 'fan2@example.com');
+    assert.ok(row, 'row should still exist');
+    assert.strictEqual(row.status, 'unsubscribed');
+    assert.strictEqual(row.unsubscribed_by, 'admin');
+    assert.ok(row.unsubscribed_at);
+    assert.strictEqual(subscribers.length, 301);
+  });
+  res = mkRes();
+  await router(authReq({ method: 'DELETE', body: { email: 'mixed.case@example.com' } }), res);
+  check('a mixed-case legacy row is matched too', () =>
+    assert.strictEqual(subscribers.find((s) => s.id === 'legacy').status, 'unsubscribed'));
+  res = mkRes();
+  await router(
+    authReq({
+      method: 'POST',
+      body: { subscribers: [{ email: 'fan2@example.com' }, { email: 'MIXED.case@example.com' }] },
+    }),
+    res
+  );
+  check('a later import cannot re-add someone who opted out', () => {
+    assert.strictEqual(res.body.imported, 0);
+    assert.strictEqual(res.body.duplicates, 2);
+    assert.strictEqual(subscribers.find((s) => s.email === 'fan2@example.com').status, 'unsubscribed');
+  });
+  res = await sendCampaign('After removal');
+  check('campaigns skip admin-unsubscribed rows', () => {
+    const all = sentBatches.flatMap((b) => b.messages.map((m) => m.to[0]));
+    assert.ok(!all.includes('fan2@example.com'));
+    assert.ok(!all.includes('mixed.case@example.com'));
+  });
+
+  res = mkRes();
+  await router(mkReq({ method: 'POST', body: { email: 'new.fan@example.com', source: '=HYPERLINK("x")' + 'a'.repeat(100) } }), res);
+  check('the public signup form still works without a token', () =>
+    assert.strictEqual(res.statusCode, 200));
+  check('the signup source is trimmed to a short plain label', () => {
+    const added = subscribers.find((s) => s.email === 'new.fan@example.com');
+    assert.ok(added.source.length <= 50);
+  });
+
   console.log(`\n${passed} checks passed.\n`);
 })();

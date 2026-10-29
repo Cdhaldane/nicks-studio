@@ -7,9 +7,9 @@
  * functions) so the whole admin surface costs one Serverless Function instead
  * of seven.
  *
- * Behavior is preserved verbatim from the original admin-*.js endpoints; the
- * only shared change is the readBlobJson/writeBlobJson helper that every
- * resource previously duplicated.
+ * Public site content (tour dates, announcement, social links, popup image)
+ * shares the readBlobJson/writeBlobJson helper below. Booking requests hold
+ * personal details, so they go through _private-blob.js instead.
  */
 const { head, put } = require('@vercel/blob');
 
@@ -19,6 +19,7 @@ const {
   verifySessionToken,
   SESSION_TTL_MS,
 } = require('./_auth');
+const { readPrivateJson, writePrivateJson } = require('./_private-blob');
 
 const TOKEN = () => process.env.BLOB_READ_WRITE_TOKEN;
 
@@ -43,6 +44,12 @@ async function writeBlobJson(pathname, data) {
 }
 
 const methodNotAllowed = (res) => res.status(405).json({ error: 'Method not allowed' });
+
+/**
+ * These URLs are rendered straight into public hrefs, so only web links and
+ * site-relative paths are allowed — never `javascript:` or `data:`.
+ */
+const isSafeLink = (url) => !url || /^https?:\/\//i.test(url) || /^\/(?!\/)/.test(url);
 
 /* ── Social Media ── */
 const SOCIAL_PATH = 'admin/social-stats.json';
@@ -87,43 +94,15 @@ async function social(req, res) {
   if (req.method === 'PUT') {
     const { social: incoming } = req.body || {};
     if (!incoming) return res.status(400).json({ success: false, message: 'Social data required' });
+    const badLink = (incoming.platforms || []).find((p) => !isSafeLink((p && p.url) || ''));
+    if (badLink) {
+      return res
+        .status(400)
+        .json({ success: false, message: `${badLink.name || 'A link'} must start with https://` });
+    }
     const updated = { ...incoming, lastUpdated: new Date().toISOString() };
     await writeBlobJson(SOCIAL_PATH, updated);
     return res.status(200).json({ success: true, social: updated });
-  }
-  return methodNotAllowed(res);
-}
-
-/* ── Press Kit ── */
-const PRESS_KIT_PATH = 'admin/press-kit.json';
-const DEFAULT_PRESS_KIT = {
-  artistName: 'Nickola Magnolia',
-  genre: 'Indie / Alternative',
-  hometown: '',
-  bio: '',
-  shortBio: '',
-  pressPhotos: [],
-  streamingLinks: { spotify: '', appleMusic: '', youtube: '', soundcloud: '' },
-  socialLinks: { instagram: '', tiktok: '', twitter: '', facebook: '' },
-  contactEmail: '',
-  managementEmail: '',
-  bookingEmail: '',
-  achievements: [],
-  updatedAt: null,
-};
-
-async function pressKit(req, res) {
-  if (req.method === 'GET') {
-    return res.status(200).json({ pressKit: await readBlobJson(PRESS_KIT_PATH, DEFAULT_PRESS_KIT) });
-  }
-  if (req.method === 'PUT') {
-    const { pressKit: incoming } = req.body || {};
-    if (!incoming) {
-      return res.status(400).json({ success: false, message: 'Press kit data required' });
-    }
-    const updated = { ...incoming, updatedAt: new Date().toISOString() };
-    await writeBlobJson(PRESS_KIT_PATH, updated);
-    return res.status(200).json({ success: true, pressKit: updated });
   }
   return methodNotAllowed(res);
 }
@@ -164,75 +143,31 @@ async function tourDates(req, res) {
   return methodNotAllowed(res);
 }
 
-/* ── Setlists ── */
-const SETLISTS_PATH = 'admin/setlists.json';
-
-async function setlists(req, res) {
-  if (req.method === 'GET') {
-    return res.status(200).json({ setlists: await readBlobJson(SETLISTS_PATH, []) });
-  }
-  if (req.method === 'POST') {
-    const { setlist } = req.body || {};
-    if (!setlist || !setlist.name) {
-      return res.status(400).json({ success: false, message: 'Setlist name is required' });
-    }
-    const current = await readBlobJson(SETLISTS_PATH, []);
-    const newSetlist = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-      name: setlist.name,
-      songs: setlist.songs || [],
-      showDate: setlist.showDate || null,
-      venue: setlist.venue || '',
-      notes: setlist.notes || '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    await writeBlobJson(SETLISTS_PATH, [...current, newSetlist]);
-    return res.status(201).json({ success: true, setlist: newSetlist });
-  }
-  if (req.method === 'PUT') {
-    const { setlists: incoming } = req.body || {};
-    if (!Array.isArray(incoming)) {
-      return res.status(400).json({ success: false, message: 'Invalid setlists data' });
-    }
-    const updated = incoming.map((s) => ({ ...s, updatedAt: new Date().toISOString() }));
-    await writeBlobJson(SETLISTS_PATH, updated);
-    return res.status(200).json({ success: true, setlists: updated });
-  }
-  if (req.method === 'DELETE') {
-    const { id } = req.body || {};
-    if (!id) return res.status(400).json({ success: false, message: 'ID required' });
-    const current = await readBlobJson(SETLISTS_PATH, []);
-    await writeBlobJson(SETLISTS_PATH, current.filter((s) => s.id !== id));
-    return res.status(200).json({ success: true });
-  }
-  return methodNotAllowed(res);
-}
-
 /* ── Booking Requests ── */
+// Shared with api/booking-request.js, which appends public submissions.
 const BOOKING_PATH = 'admin/booking-requests.json';
 
 async function bookingRequests(req, res) {
   if (req.method === 'GET') {
-    return res.status(200).json({ requests: await readBlobJson(BOOKING_PATH, []) });
+    return res.status(200).json({ requests: await readPrivateJson(BOOKING_PATH, []) });
   }
   if (req.method === 'PUT') {
     const { id, status } = req.body || {};
     if (!id || !['pending', 'accepted', 'declined'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid id or status' });
     }
-    const current = await readBlobJson(BOOKING_PATH, []);
+    const current = await readPrivateJson(BOOKING_PATH, []);
     const updated = current.map((r) =>
       r.id === id ? { ...r, status, updatedAt: new Date().toISOString() } : r
     );
-    await writeBlobJson(BOOKING_PATH, updated);
+    await writePrivateJson(BOOKING_PATH, updated);
     return res.status(200).json({ success: true, requests: updated });
   }
   if (req.method === 'DELETE') {
     const { id } = req.body || {};
     if (!id) return res.status(400).json({ success: false, message: 'ID required' });
-    const current = await readBlobJson(BOOKING_PATH, []);
-    await writeBlobJson(BOOKING_PATH, current.filter((r) => r.id !== id));
+    const current = await readPrivateJson(BOOKING_PATH, []);
+    await writePrivateJson(BOOKING_PATH, current.filter((r) => r.id !== id));
     return res.status(200).json({ success: true });
   }
   return methodNotAllowed(res);
@@ -272,6 +207,11 @@ async function announcement(req, res) {
       return res
         .status(400)
         .json({ success: false, message: 'An enabled announcement needs a title' });
+    }
+    if (!isSafeLink((incoming.linkUrl || '').trim()) || !isSafeLink((incoming.imageUrl || '').trim())) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Links must start with https:// (or / for a page on this site)' });
     }
     const updated = {
       enabled: Boolean(incoming.enabled),
@@ -435,9 +375,7 @@ async function session(req, res) {
 
 module.exports = {
   social,
-  'press-kit': pressKit,
   'tour-dates': tourDates,
-  setlists,
   'booking-requests': bookingRequests,
   'popup-image': popupImage,
   announcement,

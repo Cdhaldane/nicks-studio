@@ -1,11 +1,12 @@
 /**
  * Blob-backed persistence for the newsletter.
  *
- * Two documents:
+ * Two documents, both holding addresses, so both go through _private-blob.js
+ * (unguessable pathnames; reads throw rather than return an empty list):
  *   newsletter/subscribers.json — the audience
  *   newsletter/campaigns.json   — campaign queue + the daily send quota ledger
  */
-const { head, put } = require('@vercel/blob');
+const { readPrivateJson, writePrivateJson } = require('./_private-blob');
 
 const SUBSCRIBERS_PATH = 'newsletter/subscribers.json';
 const CAMPAIGNS_PATH = 'newsletter/campaigns.json';
@@ -20,35 +21,10 @@ const MAX_CAMPAIGNS = 50;
  */
 const MAX_DETAILED_CAMPAIGNS = 10;
 
-const token = () => process.env.BLOB_READ_WRITE_TOKEN;
-
-/** Reads a JSON blob, returning `fallback` when it doesn't exist yet. */
-async function readBlob(pathname, fallback) {
-  try {
-    const meta = await head(pathname, { token: token() });
-    // Cache-bust: blob URLs are CDN-cached and we need read-after-write here.
-    const res = await fetch(`${meta.url}?t=${Date.now()}`, { cache: 'no-store' });
-    if (!res.ok) return fallback;
-    return await res.json();
-  } catch {
-    return fallback;
-  }
-}
-
-async function writeBlob(pathname, data) {
-  await put(pathname, JSON.stringify(data), {
-    access: 'public',
-    allowOverwrite: true,
-    addRandomSuffix: false,
-    token: token(),
-    contentType: 'application/json',
-  });
-}
-
 // ── Subscribers ──
 
-const readSubscribers = () => readBlob(SUBSCRIBERS_PATH, []);
-const writeSubscribers = (subscribers) => writeBlob(SUBSCRIBERS_PATH, subscribers);
+const readSubscribers = () => readPrivateJson(SUBSCRIBERS_PATH, []);
+const writeSubscribers = (subscribers) => writePrivateJson(SUBSCRIBERS_PATH, subscribers);
 
 /**
  * Only these receive campaigns. Legacy rows predate the `status` field, so a
@@ -62,7 +38,7 @@ const activeSubscribers = (subscribers) =>
 const emptyState = () => ({ campaigns: [], quota: { date: null, used: 0 } });
 
 async function readCampaignState() {
-  const state = await readBlob(CAMPAIGNS_PATH, null);
+  const state = await readPrivateJson(CAMPAIGNS_PATH, null);
   if (!state || typeof state !== 'object') return emptyState();
   return {
     campaigns: Array.isArray(state.campaigns) ? state.campaigns : [],
@@ -90,7 +66,7 @@ const pruneRecipientDetail = (campaigns) =>
   );
 
 const writeCampaignState = (state) =>
-  writeBlob(CAMPAIGNS_PATH, {
+  writePrivateJson(CAMPAIGNS_PATH, {
     ...state,
     campaigns: pruneRecipientDetail(state.campaigns.slice(0, MAX_CAMPAIGNS)),
   });

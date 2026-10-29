@@ -6,10 +6,13 @@
  *
  *   GET|POST /api/square?action=<name>
  *   actions: catalog-items, catalog-item, catalog-category, catalog-image,
- *            checkout, payment-link, process-payment, order, orders, notify-order
+ *            checkout, order, notify-order
  *
  *   notify-order emails the shop owner about a completed sale. The order
  *   confirmation page calls it once Square sends the buyer back from checkout.
+ *
+ *   There is deliberately no order listing: `order` returns buyer details for
+ *   one unguessable order ID, and a list of IDs would expose every customer.
  */
 const handlers = require('./_square-handlers');
 
@@ -21,7 +24,7 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const action = req.query.action;
-  const handler = handlers[action];
+  const handler = Object.prototype.hasOwnProperty.call(handlers, action) ? handlers[action] : null;
   if (!handler) {
     return res.status(404).json({ error: `Unknown square action: ${action || '(none)'}` });
   }

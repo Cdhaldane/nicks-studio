@@ -334,9 +334,11 @@ const nextQueuedCampaign = (campaigns) =>
 
 /** POST — subscribe a single email from the site footer/popup. */
 async function subscribe(req, res) {
-  const { email, source = 'website' } = req.body || {};
+  const { email } = req.body || {};
+  // Public input that ends up in the admin's CSV export — keep it short and plain.
+  const source = sanitizeField((req.body || {}).source).slice(0, 50) || 'website';
 
-  if (!email || !EMAIL_RE.test(email)) {
+  if (typeof email !== 'string' || !EMAIL_RE.test(email) || email.length > MAX_FIELD_LEN) {
     return res.status(400).json({ success: false, message: 'Invalid email address' });
   }
   const normalizedEmail = email.toLowerCase().trim();
@@ -378,7 +380,10 @@ async function importSubscribers(req, res) {
   }
 
   const existing = await readSubscribers();
-  const knownEmails = new Set(existing.map((s) => s.email));
+  // Every existing row counts, unsubscribed ones included — that is what stops
+  // an import from re-adding someone who opted out. Lowercased because rows
+  // predating normalisation can hold mixed case.
+  const knownEmails = new Set(existing.map((s) => String(s.email || '').toLowerCase().trim()));
 
   let imported = 0;
   let duplicates = 0;
@@ -429,16 +434,29 @@ async function list(req, res) {
   });
 }
 
-/** DELETE — hard-remove a subscriber. */
+/**
+ * DELETE (admin) — unsubscribe someone on their behalf.
+ *
+ * The row is kept and marked rather than deleted: it is the record that they
+ * opted out (CASL), and it's what stops a later spreadsheet import re-adding
+ * them. Only they can reactivate it, by signing up again themselves.
+ */
 async function remove(req, res) {
   const { email } = req.body || {};
-  if (!email) {
+  if (typeof email !== 'string' || !email.trim()) {
     return res.status(400).json({ success: false, message: 'Email required' });
   }
   const normalizedEmail = email.toLowerCase().trim();
   const subscribers = await readSubscribers();
-  await writeSubscribers(subscribers.filter((s) => s.email !== normalizedEmail));
-  return res.status(200).json({ success: true, message: 'Subscriber removed' });
+  const at = new Date().toISOString();
+  await writeSubscribers(
+    subscribers.map((s) =>
+      String(s.email || '').toLowerCase().trim() === normalizedEmail
+        ? { ...s, status: 'unsubscribed', unsubscribed_at: at, unsubscribed_by: 'admin' }
+        : s
+    )
+  );
+  return res.status(200).json({ success: true, message: 'Subscriber unsubscribed' });
 }
 
 /** POST (admin) — send one preview copy to a nominated address. */

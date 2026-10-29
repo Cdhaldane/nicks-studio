@@ -1,6 +1,10 @@
 /**
  * Spotify Artist Stats (server-side proxy)
- * GET /api/spotify-stats → { artist, topTracks, recentAlbums }
+ * GET /api/spotify-stats             → { artist, topTracks, recentAlbums }
+ * GET /api/spotify-stats?view=albums → { albums } — Spotify album objects for the Music page
+ *
+ * The client secret must stay server-side: anything prefixed REACT_APP_ is
+ * compiled into the public JS bundle.
  */
 
 const ARTIST_ID = '5UrVks2tmoQ4BwTvlkQaI4'; // Nickola Magnolia
@@ -30,14 +34,41 @@ async function fetchSpotify(endpoint, token) {
   return res.json();
 }
 
+/** The Music page's album carousel. Errors are 502s so the page can offer a retry. */
+async function albums(res) {
+  try {
+    const token = await getToken();
+    if (!token) {
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(502).json({ error: 'Spotify not configured', albums: [] });
+    }
+    const data = await fetchSpotify(
+      `/artists/${ARTIST_ID}/albums?include_groups=album,single&market=US&limit=50`,
+      token
+    );
+    if (!data) {
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(502).json({ error: 'Spotify request failed', albums: [] });
+    }
+    return res.status(200).json({ albums: data.items || [] });
+  } catch (error) {
+    console.error('Spotify albums error:', error);
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(502).json({ error: 'Spotify request failed', albums: [] });
+  }
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Cache-Control', 'public, max-age=3600');
+  // s-maxage lets Vercel's CDN share one Spotify lookup across every visitor.
+  res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  if (req.query.view === 'albums') return albums(res);
 
   try {
     const token = await getToken();

@@ -8,13 +8,13 @@
  *
  *   Public
  *     POST   /api/newsletter                       { email, source? }     subscribe
- *     POST   /api/newsletter                       { subscribers: [...] } bulk import
- *     GET    /api/newsletter                                              list all
- *     DELETE /api/newsletter                       { email }              remove one
  *     GET    /api/newsletter?action=unsubscribe&token=…                   opt-out page
  *     POST   /api/newsletter?action=unsubscribe&token=…                   one-click opt-out
  *
  *   Admin (Bearer session token from /api/admin?resource=login)
+ *     POST   /api/newsletter                       { subscribers: [...] } bulk import
+ *     GET    /api/newsletter                                              list all
+ *     DELETE /api/newsletter                       { email }              unsubscribe one (row kept)
  *     POST   /api/newsletter?action=test           { to, subject, body }  send one test
  *     POST   /api/newsletter?action=send           { subject, body }      queue campaign
  *     GET    /api/newsletter?action=campaigns                             history + quota
@@ -77,10 +77,16 @@ module.exports = async (req, res) => {
 
     // ── Legacy method-based routes ──
 
-    if (req.method === 'POST' && Array.isArray((req.body || {}).subscribers)) {
-      return await handlers.importSubscribers(req, res);
+    // The only public one: the site's signup forms.
+    if (req.method === 'POST' && !Array.isArray((req.body || {}).subscribers)) {
+      return await handlers.subscribe(req, res);
     }
-    if (req.method === 'POST') return await handlers.subscribe(req, res);
+
+    // The rest read or rewrite the whole list, so they're admin-only.
+    if (req.method === 'POST' || req.method === 'GET' || req.method === 'DELETE') {
+      if (!requireAdmin(req, res)) return undefined;
+    }
+    if (req.method === 'POST') return await handlers.importSubscribers(req, res);
     if (req.method === 'GET') return await handlers.list(req, res);
     if (req.method === 'DELETE') return await handlers.remove(req, res);
 

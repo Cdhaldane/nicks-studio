@@ -19,7 +19,7 @@ const COLORS = {
 
 const SOCIAL_LINKS = [
   { label: 'Instagram', url: 'https://instagram.com/nickolamagnolia' },
-  { label: 'Spotify', url: 'https://open.spotify.com/artist/nickolamagnolia' },
+  { label: 'Spotify', url: 'https://open.spotify.com/artist/5UrVks2tmoQ4BwTvlkQaI4' },
   { label: 'Website', url: SITE_URL },
 ];
 

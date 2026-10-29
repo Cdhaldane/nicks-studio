@@ -99,36 +99,53 @@ async function catalogImage(req, res) {
   }
 }
 
+const MAX_CART_LINES = 50;
+const MAX_LINE_QUANTITY = 99;
+
+/**
+ * Validates the cart sent by the browser. Only catalog IDs and quantities are
+ * accepted — Square prices each line from the catalog, so the buyer can't set
+ * what they pay.
+ */
+const parseLineItems = (lineItems) => {
+  if (!Array.isArray(lineItems) || lineItems.length === 0 || lineItems.length > MAX_CART_LINES) {
+    return null;
+  }
+  const parsed = lineItems.map((item) => ({
+    catalogObjectId: typeof item?.catalogObjectId === 'string' ? item.catalogObjectId : '',
+    quantity: Number(item?.quantity),
+  }));
+  const valid = parsed.every(
+    (item) =>
+      item.catalogObjectId &&
+      Number.isInteger(item.quantity) &&
+      item.quantity >= 1 &&
+      item.quantity <= MAX_LINE_QUANTITY
+  );
+  return valid
+    ? parsed.map((item) => ({ ...item, quantity: String(item.quantity) }))
+    : null;
+};
+
 /* ── Create a checkout session ── */
 async function checkout(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  const { redirectUrl } = req.body || {};
+  const lineItems = parseLineItems((req.body || {}).lineItems);
+  if (!lineItems) {
+    return sendJSON(res, { error: 'Invalid cart', message: 'Your cart could not be read.' }, 400);
+  }
   try {
-    const { lineItems, redirectUrl } = req.body;
     const squareClient = getSquareClient();
     const locationId = getLocationId();
 
-    const orderResponse = await squareClient.orders.create({
-      order: {
-        locationId,
-        lineItems: lineItems.map((item) => ({
-          catalogObjectId: item.catalogObjectId,
-          quantity: String(item.quantity),
-        })),
-      },
-      idempotencyKey: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    });
-
+    // The payment link creates its own order; Square appends its ID to the
+    // redirect URL, which is how the confirmation page finds it.
     const checkoutResponse = await squareClient.checkout.paymentLinks.create({
-      idempotencyKey: `checkout-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      order: {
-        locationId,
-        lineItems: lineItems.map((item) => ({
-          catalogObjectId: item.catalogObjectId,
-          quantity: String(item.quantity),
-        })),
-      },
+      idempotencyKey: `checkout-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+      order: { locationId, lineItems },
       checkoutOptions: {
         redirectUrl: redirectUrl || `${process.env.FRONTEND_URL}/order-confirmation`,
         askForShippingAddress: true,
@@ -139,7 +156,7 @@ async function checkout(req, res) {
       checkout: {
         id: checkoutResponse.paymentLink?.id,
         checkout_page_url: checkoutResponse.paymentLink?.url,
-        order: orderResponse.order,
+        order_id: checkoutResponse.paymentLink?.orderId,
       },
       payment_link: checkoutResponse.paymentLink,
     });
@@ -148,80 +165,6 @@ async function checkout(req, res) {
     sendJSON(
       res,
       { error: 'Failed to create checkout', message: error.message, details: error.errors },
-      500
-    );
-  }
-}
-
-/* ── Create a payment link ── */
-async function paymentLink(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  try {
-    const { lineItems, checkoutOptions } = req.body;
-    const squareClient = getSquareClient();
-    const locationId = getLocationId();
-
-    const response = await squareClient.checkout.paymentLinks.create({
-      idempotencyKey: `link-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      quickPay:
-        lineItems.length === 1
-          ? { name: lineItems[0].name, priceMoney: lineItems[0].basePriceMoney, locationId }
-          : undefined,
-      order:
-        lineItems.length > 1
-          ? {
-              locationId,
-              lineItems: lineItems.map((item) => ({
-                name: item.name,
-                quantity: String(item.quantity),
-                basePriceMoney: item.basePriceMoney,
-              })),
-            }
-          : undefined,
-      checkoutOptions: {
-        redirectUrl:
-          checkoutOptions?.redirectUrl || `${process.env.FRONTEND_URL}/order-confirmation`,
-        askForShippingAddress: checkoutOptions?.askForShippingAddress ?? true,
-      },
-    });
-
-    sendJSON(res, response);
-  } catch (error) {
-    console.error('Error creating payment link:', error);
-    sendJSON(
-      res,
-      { error: 'Failed to create payment link', message: error.message, details: error.errors },
-      500
-    );
-  }
-}
-
-/* ── Process a payment ── */
-async function processPayment(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  try {
-    const { sourceId, amount, currency, verificationToken } = req.body;
-    const squareClient = getSquareClient();
-    const locationId = getLocationId();
-
-    const response = await squareClient.payments.create({
-      sourceId,
-      idempotencyKey: `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      amountMoney: { amount: BigInt(amount), currency: currency || 'USD' },
-      locationId,
-      verificationToken,
-    });
-
-    sendJSON(res, response);
-  } catch (error) {
-    console.error('Error processing payment:', error);
-    sendJSON(
-      res,
-      { error: 'Failed to process payment', message: error.message, details: error.errors },
       500
     );
   }
@@ -242,59 +185,12 @@ async function order(req, res) {
   }
 }
 
-/* ── List recent orders (merch dashboard) ── */
-async function orders(req, res) {
-  if (req.method !== 'GET') {
-    return sendJSON(res, { error: 'Method not allowed' }, 405);
-  }
-  try {
-    const squareClient = getSquareClient();
-    const locationId = getLocationId();
-    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
-
-    const response = await squareClient.orders.search({
-      locationIds: [locationId],
-      query: {
-        sort: { sortField: 'CREATED_AT', sortOrder: 'DESC' },
-        filter: {
-          stateFilter: { states: ['COMPLETED', 'OPEN'] },
-          dateTimeFilter: {
-            createdAt: { startAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
-          },
-        },
-      },
-      limit,
-    });
-
-    const mapped = (response.orders || []).map((o) => ({
-      id: o.id,
-      state: o.state,
-      totalMoney: o.totalMoney,
-      lineItems: (o.lineItems || []).map((item) => ({
-        name: item.name,
-        quantity: item.quantity,
-        totalMoney: item.totalMoney,
-      })),
-      createdAt: o.createdAt,
-      fulfillments: (o.fulfillments || []).map((f) => ({ type: f.type, state: f.state })),
-    }));
-
-    sendJSON(res, { orders: mapped, count: mapped.length });
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    sendJSON(res, { orders: [], count: 0, error: error.message }, 200);
-  }
-}
-
 module.exports = {
   'catalog-items': catalogItems,
   'catalog-item': catalogItem,
   'catalog-category': catalogCategory,
   'catalog-image': catalogImage,
   checkout,
-  'payment-link': paymentLink,
-  'process-payment': processPayment,
   order,
-  orders,
   'notify-order': notifyOrder,
 };
