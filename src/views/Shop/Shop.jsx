@@ -1,56 +1,105 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Modal from '../../components/Modal/Modal';
 import { useDispatch } from 'react-redux';
-import { connect } from 'react-redux';
-import { useAlert } from '../../components/Alert/AlertProvider';
+import ProductDialog from '../../components/ProductDialog/ProductDialog';
 import SEOHelmet from '../../components/SEO/SEOHelmet';
 import { BreadcrumbSchema } from '../../components/SEO/StructuredData';
 import { fetchAllProducts } from '../../services/squareService';
+import { formatPrice, toCartLine } from '../../utils/cart';
 import './Shop.css';
-import { Parallax } from 'react-scroll-parallax';
 
 const SORT_OPTIONS = [
   { value: 'default', label: 'Featured' },
-  { value: 'price-asc', label: 'Price: Low → High' },
-  { value: 'price-desc', label: 'Price: High → Low' },
-  { value: 'name-asc', label: 'A → Z' },
-  { value: 'name-desc', label: 'Z → A' },
+  { value: 'price-asc', label: 'Price, low to high' },
+  { value: 'price-desc', label: 'Price, high to low' },
+  { value: 'name-asc', label: 'Alphabetical, A–Z' },
+  { value: 'name-desc', label: 'Alphabetical, Z–A' },
 ];
 
-function Shop({ items }) {
+const SKELETON_CARDS = 6;
+
+const variantPrice = variant => Number(variant?.price?.amount) || 0;
+
+/** Lowest price across a product's variants — what "From $X" and price sorting use. */
+const minPrice = product => {
+  const prices = product.variants.map(variantPrice).filter(price => price > 0);
+  return prices.length ? Math.min(...prices) : 0;
+};
+
+const isSoldOut = product => product.variants.every(variant => variant.available === false);
+
+const priceLabel = product => {
+  const currency = product.variants[0]?.price?.currencyCode;
+  const prices = new Set(product.variants.map(variantPrice));
+  const low = formatPrice(minPrice(product), currency);
+  return prices.size > 1 ? `From ${low}` : low;
+};
+
+function ProductCard({ product, onOpen }) {
+  const [primary, secondary] = product.images;
+  const soldOut = isSoldOut(product);
+  return (
+    <li className={`product-card${soldOut ? ' is-sold-out' : ''}`}>
+      <button type="button" className="product-card-button" onClick={() => onOpen(product)}>
+        <span className="product-card-media">
+          <img src={primary?.src} alt={product.title} loading="lazy" className="product-card-image" />
+          {/* Second photo fades in on hover, like most merch stores. */}
+          {secondary && (
+            <img src={secondary.src} alt="" aria-hidden="true" loading="lazy" className="product-card-image is-alt" />
+          )}
+          {soldOut && <span className="product-badge">Sold out</span>}
+        </span>
+        <span className="product-card-body">
+          <span className="product-card-title">{product.title}</span>
+          <span className="product-card-price">{priceLabel(product)}</span>
+          {product.variants.length > 1 && (
+            <span className="product-card-meta">{product.variants.length} options</span>
+          )}
+        </span>
+      </button>
+    </li>
+  );
+}
+
+function Shop() {
   const [products, setProducts] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('default');
   const dispatch = useDispatch();
-  const { showAlert } = useAlert();
+
+  const loadProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setProducts(await fetchAllProducts());
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError('We couldn’t load the store right now.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [loadProducts]);
 
-  const getPrice = product =>
-    parseFloat(product.variants?.[0]?.price?.amount ?? 0);
-
-  const filteredProducts = useMemo(() => {
+  const visibleProducts = useMemo(() => {
     let result = [...products];
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
       result = result.filter(
-        p =>
-          p.title?.toLowerCase().includes(q) ||
-          p.description?.toLowerCase().includes(q)
+        p => p.title?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
       );
     }
     switch (sortBy) {
       case 'price-asc':
-        result.sort((a, b) => getPrice(a) - getPrice(b));
+        result.sort((a, b) => minPrice(a) - minPrice(b));
         break;
       case 'price-desc':
-        result.sort((a, b) => getPrice(b) - getPrice(a));
+        result.sort((a, b) => minPrice(b) - minPrice(a));
         break;
       case 'name-asc':
         result.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
@@ -64,76 +113,67 @@ function Shop({ items }) {
     return result;
   }, [products, searchQuery, sortBy]);
 
-  const handleClearFilters = useCallback(() => {
-    setSearchQuery('');
-    setSortBy('default');
-  }, []);
+  const addToCart = (product, variant, quantity) => {
+    // The reducer merges repeat adds of the same variant and opens the cart drawer.
+    dispatch({ type: 'ADD_TO_CART', payload: toCartLine(product, variant, quantity) });
+    setSelectedProduct(null);
+  };
 
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-      const fetchedProducts = await fetchAllProducts();
-      console.log('Fetched products:', fetchedProducts);
-      setProducts(fetchedProducts);
-      setError(null);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('Failed to load products. Please try again later.');
-      showAlert('error', 'Failed to load products');
-    } finally {
-      setLoading(false);
+  const renderGrid = () => {
+    if (loading) {
+      return (
+        <ul className="product-grid" aria-busy="true" aria-label="Loading products">
+          {Array.from({ length: SKELETON_CARDS }, (_, i) => (
+            <li key={i} className="product-card is-skeleton" aria-hidden="true">
+              <span className="product-card-media" />
+              <span className="skeleton-line" />
+              <span className="skeleton-line is-short" />
+            </li>
+          ))}
+        </ul>
+      );
     }
-  };
-
-  const onClose = () => {
-    setIsOpen(false);
-  };
-
-  const addToCart = item => {
-    console.log(items);
-    if (items.length > 0) {
-      const cartItems = items.map(item => JSON.parse(item));
-      console.log(cartItems);
-      if (cartItems.find(cartItem => cartItem.id === item.id)) {
-        showAlert('error', 'Item already in cart!');
-        onClose();
-        return;
-      }
-    }
-
-    dispatch({
-      type: 'ADD_TO_CART',
-      payload: JSON.stringify(item),
-    });
-    onClose();
-  };
-  if (loading) {
-    return (
-      <div className="shop-container">
-        <div className="loading"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="shop-container">
-        <div className="error-message">
-          <p>{error}</p>
-          <button onClick={loadProducts} className="btn">
-            Retry
+    if (error) {
+      return (
+        <div className="shop-state">
+          <i className="fa-solid fa-store-slash" aria-hidden="true" />
+          <h2>{error}</h2>
+          <p>Please check your connection and try again.</p>
+          <button type="button" className="shop-button" onClick={loadProducts}>
+            Try again
           </button>
         </div>
-      </div>
+      );
+    }
+    if (visibleProducts.length === 0) {
+      return (
+        <div className="shop-state">
+          <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+          <h2>{searchQuery ? `Nothing matches “${searchQuery}”` : 'New merch is on the way'}</h2>
+          <p>{searchQuery ? 'Try a different search.' : 'Check back soon.'}</p>
+          {searchQuery && (
+            <button type="button" className="shop-button is-quiet" onClick={() => setSearchQuery('')}>
+              Clear search
+            </button>
+          )}
+        </div>
+      );
+    }
+    return (
+      <ul className="product-grid">
+        {visibleProducts.map(product => (
+          <ProductCard key={product.id} product={product} onOpen={setSelectedProduct} />
+        ))}
+      </ul>
     );
-  }
+  };
 
   return (
     <>
       <SEOHelmet
         title="Shop - Nickola Magnolia | Official Merchandise"
         description="Official Nickola Magnolia merchandise — t-shirts, hoodies, vinyl, and record release keepsakes. Support your favorite Country & Americana artist from the Great Lakes and Northumberland County, Ontario."
-        keywords="Nickola Magnolia merchandise, country music merch, band t-shirts, vinyl records, artist shop, americana merchandise, hometown record release merch, country music Ontario live, Calgary Stampede 2026 merch"
+        keywords="Nickola Magnolia merchandise, country music merch, band t-shirts, vinyl records, artist shop, americana merchandise, country music Ontario live"
         url={window.location.href}
         type="website"
       />
@@ -144,118 +184,57 @@ function Shop({ items }) {
         ]}
       />
 
-      <div className="shop-container">
-        <Parallax speed={5}>
-          {/* <div className="nav-title bio merch">
-            <span>Merchandise</span>
-            <span className="back">Merchandise</span>
-          </div> */}
-        </Parallax>
-
-        {/* Search & Filter Toolbar */}
-        <div className="shop-toolbar">
-          <div className="shop-search">
-            <i className="fa-solid fa-magnifying-glass shop-search-icon" aria-hidden="true" />
-            <input
-              type="text"
-              placeholder="Search merch…"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="shop-search-input"
-              aria-label="Search products"
-            />
-            {searchQuery && (
-              <button
-                className="shop-search-clear"
-                onClick={() => setSearchQuery('')}
-                aria-label="Clear search"
-              >
-                <i className="fa-solid fa-xmark" aria-hidden="true" />
-              </button>
-            )}
-          </div>
-          <select
-            className="shop-sort"
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            aria-label="Sort products"
-          >
-            {SORT_OPTIONS.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Active filter feedback */}
-        {(searchQuery || sortBy !== 'default') && (
-          <div className="shop-filter-status">
-            <span>
-              {filteredProducts.length} result{filteredProducts.length !== 1 ? 's' : ''}
-              {searchQuery && <> for "<strong>{searchQuery}</strong>"</>}
-            </span>
-            <button className="shop-clear-filters" onClick={handleClearFilters}>
-              Clear filters
-            </button>
-          </div>
-        )}
-
-        <div className="shop-main">
-          {filteredProducts.length === 0 ? (
-            <div className="no-products">
-              <p>{searchQuery ? 'No products match your search.' : 'No products available at the moment.'}</p>
-              {searchQuery && (
-                <button className="btn btn-secondary" onClick={() => setSearchQuery('')}>
-                  Clear search
-                </button>
-              )}
+      <div className="shop-page">
+        <section className="shop-surface" aria-labelledby="shop-title">
+          <header className="shop-header">
+            <div className="shop-heading">
+              <p className="shop-eyebrow">Official store</p>
+              <h1 id="shop-title" className="shop-title">Merch</h1>
             </div>
-          ) : (
-            filteredProducts.map(product => (
-              <div
-                key={product.id}
-                className="shop-item"
-                onClick={() => {
-                  setIsOpen(true);
-                  setSelectedProduct(product);
-                }}
-              >
-                <div className="item-image-wrapper">
-                  <img
-                    src={product.images[0]?.src}
-                    alt={product.title}
-                    className="item-image"
-                    loading="lazy"
-                  />
-                  {product.variants[0]?.available === false && (
-                    <div className="sold-out-badge">Sold Out</div>
-                  )}
-                </div>
-                <h3 className="item-title">{product.title}</h3>
-                <p className="item-price">
-                  ${parseFloat(product.variants[0]?.price?.amount).toFixed(2)}
-                </p>
-                {product.variants.length > 1 && (
-                  <p className="variant-count">
-                    {product.variants.length} variants
-                  </p>
-                )}
+            <div className="shop-controls">
+              <div className="shop-search">
+                <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+                <input
+                  type="search"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  aria-label="Search products"
+                />
               </div>
-            ))
+              <label className="shop-sort">
+                <span className="sr-only">Sort by</span>
+                <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                  {SORT_OPTIONS.map(({ value, label }) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                <i className="fa-solid fa-chevron-down" aria-hidden="true" />
+              </label>
+            </div>
+          </header>
+
+          {!loading && !error && (
+            <p className="shop-count" aria-live="polite">
+              {searchQuery
+                ? `${visibleProducts.length} result${visibleProducts.length === 1 ? '' : 's'}`
+                : `${products.length} product${products.length === 1 ? '' : 's'}`}
+            </p>
           )}
-        </div>
+
+          {renderGrid()}
+        </section>
       </div>
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
+
+      <ProductDialog
         product={selectedProduct}
-        onExecute={item => addToCart(item)}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={addToCart}
       />
     </>
   );
 }
 
-const mapStateToProps = state => ({
-  items: state.cart.items,
-});
-
-export default connect(mapStateToProps)(Shop);
+export default Shop;

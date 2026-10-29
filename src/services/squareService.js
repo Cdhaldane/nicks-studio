@@ -3,8 +3,7 @@
  *
  * This service handles all Square API interactions including:
  * - Fetching catalog items (products)
- * - Creating checkout sessions
- * - Processing payments via Square Web Payments SDK
+ * - Creating checkout sessions (priced by Square from the catalog)
  */
 
 // Square Configuration
@@ -221,135 +220,10 @@ export const createCheckout = async lineItems => {
     return {
       webUrl: data.checkout?.checkout_page_url || data.payment_link?.url,
       id: data.checkout?.id || data.payment_link?.id,
-      orderId: data.checkout?.order?.id,
+      orderId: data.checkout?.order_id,
     };
   } catch (error) {
     console.error('Error creating Square checkout:', error);
-    throw error;
-  }
-};
-
-/**
- * Create a Square Payment Link (alternative to checkout)
- * Payment links are simpler and don't expire
- */
-export const createPaymentLink = async (lineItems, orderInfo = {}) => {
-  try {
-    console.log('Creating Square payment link with items:', lineItems);
-
-    const response = await fetch(`${API_PROXY_URL}/square?action=payment-link`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        lineItems: lineItems.map(item => ({
-          name: item.title,
-          quantity: String(item.quantity),
-          basePriceMoney: {
-            amount: Math.round(item.price * 100), // Convert to cents
-            currency: 'USD',
-          },
-        })),
-        checkoutOptions: {
-          redirectUrl: `${window.location.origin}/order-confirmation`,
-          askForShippingAddress: true,
-        },
-        ...orderInfo,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create payment link');
-    }
-
-    const data = await response.json();
-
-    console.log('Square payment link created:', data);
-
-    return {
-      webUrl: data.payment_link.url,
-      id: data.payment_link.id,
-      orderId: data.payment_link.order_id,
-    };
-  } catch (error) {
-    console.error('Error creating Square payment link:', error);
-    throw error;
-  }
-};
-
-/**
- * Initialize Square Web Payments SDK for inline payments
- * This allows for embedded payment forms
- */
-export const initializeSquarePayments = async () => {
-  if (!window.Square) {
-    console.error('Square Web Payments SDK not loaded');
-    return null;
-  }
-
-  try {
-    const payments = window.Square.payments(
-      SQUARE_CONFIG.applicationId,
-      SQUARE_CONFIG.locationId
-    );
-
-    return payments;
-  } catch (error) {
-    console.error('Failed to initialize Square payments:', error);
-    throw error;
-  }
-};
-
-/**
- * Create a card payment method for inline checkout
- */
-export const createCardPayment = async (payments, containerId) => {
-  try {
-    const card = await payments.card();
-    await card.attach(`#${containerId}`);
-    return card;
-  } catch (error) {
-    console.error('Failed to create card payment:', error);
-    throw error;
-  }
-};
-
-/**
- * Process a payment with the tokenized card
- */
-export const processPayment = async (card, amount) => {
-  try {
-    const result = await card.tokenize();
-
-    if (result.status === 'OK') {
-      // Send token to backend to process payment
-      const response = await fetch(`${API_PROXY_URL}/square?action=process-payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sourceId: result.token,
-          amount: Math.round(amount * 100), // Convert to cents
-          currency: 'USD',
-          locationId: SQUARE_CONFIG.locationId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Payment processing failed');
-      }
-
-      return await response.json();
-    } else {
-      throw new Error(
-        result.errors?.[0]?.message || 'Card tokenization failed'
-      );
-    }
-  } catch (error) {
-    console.error('Payment processing error:', error);
     throw error;
   }
 };
@@ -368,9 +242,5 @@ export default {
   fetchProduct,
   fetchProductsByCategory,
   createCheckout,
-  createPaymentLink,
-  initializeSquarePayments,
-  createCardPayment,
-  processPayment,
   getSquareConfig,
 };
