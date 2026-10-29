@@ -24,6 +24,7 @@ const SocialPanel = ({ Icons }) => {
   const [platforms, setPlatforms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('idle');
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     loadSocial();
@@ -59,6 +60,8 @@ const SocialPanel = ({ Icons }) => {
   const handleSave = async () => {
     setSaveStatus('saving');
     const result = await vercelEmailStorageService.saveSocialStats({ platforms });
+    // The API names a rejected link, e.g. one missing https://.
+    setSaveError(result.success ? '' : result.message || '');
     setSaveStatus(result.success ? 'success' : 'error');
     setTimeout(() => setSaveStatus('idle'), 3000);
   };
@@ -91,7 +94,7 @@ const SocialPanel = ({ Icons }) => {
         <div className="toast toast-success"><Icons.Check /> Social links saved</div>
       )}
       {saveStatus === 'error' && (
-        <div className="toast toast-error">Couldn't save. Please try again.</div>
+        <div className="toast toast-error">{saveError || "Couldn't save. Please try again."}</div>
       )}
 
       <div className="panel">

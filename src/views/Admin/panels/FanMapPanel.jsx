@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import vercelEmailStorageService from '../../../services/vercelEmailStorageService';
 
+const pad = (n) => String(n).padStart(2, '0');
+
+/** YYYY-MM-DD in the viewer's timezone — toISOString() would bucket evening signups into tomorrow. */
+const localDayKey = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+const isActive = (s) => (s.status || 'active') === 'active';
+
 const FanMapPanel = ({ Icons }) => {
   const [subscribers, setSubscribers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,9 +19,25 @@ const FanMapPanel = ({ Icons }) => {
   const loadSubscribers = async () => {
     setLoading(true);
     const data = await vercelEmailStorageService.getSubscribers();
-    setSubscribers(data);
+    // Audience figures describe who campaigns actually reach.
+    setSubscribers(data.filter(isActive));
     setLoading(false);
   };
+
+  const domainCount = useMemo(
+    () => new Set(subscribers.map(s => s.email.split('@')[1]?.toLowerCase() || 'unknown')).size,
+    [subscribers]
+  );
+
+  const signupsByDay = useMemo(() => {
+    const counts = {};
+    subscribers.forEach(s => {
+      if (!s.subscribed_at) return;
+      const key = localDayKey(new Date(s.subscribed_at));
+      counts[key] = (counts[key] || 0) + 1;
+    });
+    return counts;
+  }, [subscribers]);
 
   const emailDomainStats = useMemo(() => {
     const domains = {};
@@ -88,7 +111,7 @@ const FanMapPanel = ({ Icons }) => {
             <Icons.Users />
           </div>
           <div className="stat-card-info">
-            <span className="stat-card-label">Total Fans</span>
+            <span className="stat-card-label">Active Fans</span>
             <span className="stat-card-value">{subscribers.length}</span>
           </div>
         </div>
@@ -98,7 +121,7 @@ const FanMapPanel = ({ Icons }) => {
           </div>
           <div className="stat-card-info">
             <span className="stat-card-label">Email Domains</span>
-            <span className="stat-card-value">{emailDomainStats.length}+</span>
+            <span className="stat-card-value">{domainCount}</span>
           </div>
         </div>
         <div className="stat-card">
@@ -183,9 +206,10 @@ const FanMapPanel = ({ Icons }) => {
               const cells = [];
               for (let week = 11; week >= 0; week--) {
                 for (let day = 0; day < 7; day++) {
-                  const cellDate = new Date(now - (week * 7 + (6 - day)) * 24 * 60 * 60 * 1000);
-                  const dateStr = cellDate.toISOString().split('T')[0];
-                  const count = subscribers.filter(s => s.subscribed_at?.startsWith(dateStr)).length;
+                  const cellDate = new Date(now);
+                  cellDate.setDate(now.getDate() - (week * 7 + (6 - day)));
+                  const dateStr = localDayKey(cellDate);
+                  const count = signupsByDay[dateStr] || 0;
                   cells.push(
                     <div
                       key={`${week}-${day}`}

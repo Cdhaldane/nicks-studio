@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import vercelEmailStorageService from '../../../services/vercelEmailStorageService';
 import CampaignRecipientsModal from './CampaignRecipientsModal';
+import { toCsvText } from '../../../utils/csv';
 
 const TEMPLATES = [
   {
@@ -155,13 +156,11 @@ const EmailPanel = ({ Icons }) => {
   };
 
   const handleExportCSV = () => {
-    const rows = ['Email,Status,Subscribed,Source'];
-    subscribers.forEach((s) => {
-      rows.push(
-        `${s.email},${s.status || 'active'},${s.subscribed_at || ''},${s.source || ''}`
-      );
-    });
-    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+    const csv = toCsvText(
+      ['Email', 'Status', 'Subscribed', 'Source'],
+      subscribers.map((s) => [s.email, s.status || 'active', s.subscribed_at || '', s.source || ''])
+    );
+    const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

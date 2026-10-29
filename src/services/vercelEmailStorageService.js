@@ -1,6 +1,13 @@
-import { authHeaders } from './adminAuth';
+import { adminFetch } from './adminAuth';
 
 const API_BASE = process.env.REACT_APP_API_URL || '/api';
+
+/**
+ * Largest image the admin can upload. Images travel as base64 JSON (~1.33x
+ * their size) and Vercel rejects request bodies over 4.5 MB, so 3 MB is the
+ * real ceiling even though the API itself would accept 5 MB.
+ */
+export const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
 
 class VercelEmailStorageService {
   // ── Email campaigns ──
@@ -9,9 +16,9 @@ class VercelEmailStorageService {
   /** Sends a single preview copy so the client can check it before the real blast. */
   async sendTestEmail({ to, subject, body }) {
     try {
-      const response = await fetch(`${API_BASE}/newsletter?action=test`, {
+      const response = await adminFetch(`${API_BASE}/newsletter?action=test`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to, subject, body }),
       });
       const data = await response.json();
@@ -25,9 +32,9 @@ class VercelEmailStorageService {
   /** Queues a campaign to every active subscriber. */
   async sendCampaign({ subject, body }) {
     try {
-      const response = await fetch(`${API_BASE}/newsletter?action=send`, {
+      const response = await adminFetch(`${API_BASE}/newsletter?action=send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject, body }),
       });
       const data = await response.json();
@@ -44,9 +51,9 @@ class VercelEmailStorageService {
    */
   async renderPreview({ subject, body }) {
     try {
-      const response = await fetch(`${API_BASE}/newsletter?action=preview`, {
+      const response = await adminFetch(`${API_BASE}/newsletter?action=preview`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject, body }),
       });
       const data = await response.json();
@@ -63,9 +70,7 @@ class VercelEmailStorageService {
   /** Campaign history plus today's remaining send allowance. */
   async getCampaigns() {
     try {
-      const response = await fetch(`${API_BASE}/newsletter?action=campaigns&t=${Date.now()}`, {
-        headers: authHeaders(),
-      });
+      const response = await adminFetch(`${API_BASE}/newsletter?action=campaigns&t=${Date.now()}`);
       if (!response.ok) return { campaigns: [], quota: null, verifyAddress: null };
       const data = await response.json();
       return {
@@ -85,9 +90,8 @@ class VercelEmailStorageService {
    */
   async getCampaignRecipients(id) {
     try {
-      const response = await fetch(
+      const response = await adminFetch(
         `${API_BASE}/newsletter?action=recipients&id=${encodeURIComponent(id)}&t=${Date.now()}`,
-        { headers: authHeaders() }
       );
       const data = await response.json();
       if (!response.ok) {
@@ -131,7 +135,8 @@ class VercelEmailStorageService {
 
   async getSubscribers() {
     try {
-      const response = await fetch(`${API_BASE}/newsletter`);
+      const response = await adminFetch(`${API_BASE}/newsletter`);
+      if (!response.ok) return [];
       const data = await response.json();
       return data.subscribers || [];
     } catch (error) {
@@ -142,7 +147,7 @@ class VercelEmailStorageService {
 
   async importSubscribers(subscribers, source = 'import') {
     try {
-      const response = await fetch(`${API_BASE}/newsletter`, {
+      const response = await adminFetch(`${API_BASE}/newsletter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscribers, source }),
@@ -162,7 +167,7 @@ class VercelEmailStorageService {
 
   async removeSubscriber(email) {
     try {
-      const response = await fetch(`${API_BASE}/newsletter`, {
+      const response = await adminFetch(`${API_BASE}/newsletter`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -174,14 +179,16 @@ class VercelEmailStorageService {
     }
   }
 
-  async getAnalytics() {
-    const subscribers = await this.getSubscribers();
+  /** Signup counts, computed from a subscriber list the caller already has. */
+  getAnalytics(subscribers) {
     const now = new Date();
     const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
 
     return {
       totalSubscribers: subscribers.length,
+      // Who a campaign would actually reach; rows without a status predate it and count as active.
+      activeSubscribers: subscribers.filter(s => (s.status || 'active') === 'active').length,
       recentSubscribers7d: subscribers.filter(
         s => new Date(s.subscribed_at) >= sevenDaysAgo
       ).length,
@@ -200,28 +207,6 @@ class VercelEmailStorageService {
     } catch {
       return null;
     }
-  }
-
-  async uploadPopupImage(file) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const [header, imageData] = reader.result.split(',');
-          const mimeType = header.match(/:(.*?);/)[1];
-          const response = await fetch(`${API_BASE}/admin?resource=popup-image`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ imageData, mimeType, fileName: file.name }),
-          });
-          resolve(await response.json());
-        } catch {
-          resolve({ success: false, message: 'Upload failed' });
-        }
-      };
-      reader.onerror = () => resolve({ success: false, message: 'Failed to read file' });
-      reader.readAsDataURL(file);
-    });
   }
 
   async exportSubscribers() {
@@ -253,7 +238,7 @@ class VercelEmailStorageService {
 
   async saveTourDates(tourDates) {
     try {
-      const response = await fetch(`${API_BASE}/admin?resource=tour-dates`, {
+      const response = await adminFetch(`${API_BASE}/admin?resource=tour-dates`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tourDates }),
@@ -266,17 +251,6 @@ class VercelEmailStorageService {
     }
   }
 
-  async getSiteAnalytics() {
-    try {
-      const response = await fetch(`${API_BASE}/analytics?t=${Date.now()}`);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching site analytics:', error);
-      return null;
-    }
-  }
-
   // ── Spotify Stats ──
   async getSpotifyStats() {
     try {
@@ -285,70 +259,6 @@ class VercelEmailStorageService {
     } catch (error) {
       console.error('Error fetching Spotify stats:', error);
       return { artist: null, topTracks: [], recentAlbums: [] };
-    }
-  }
-
-  // ── Square Orders (Merch) ──
-  async getMerchOrders(limit = 20) {
-    try {
-      const response = await fetch(`${API_BASE}/square?action=orders&limit=${limit}&t=${Date.now()}`);
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      return { orders: [], count: 0 };
-    }
-  }
-
-  // ── Setlists ──
-  async getSetlists() {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=setlists&t=${Date.now()}`);
-      const data = await response.json();
-      return data.setlists || [];
-    } catch (error) {
-      console.error('Error fetching setlists:', error);
-      return [];
-    }
-  }
-
-  async saveSetlists(setlists) {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=setlists`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ setlists }),
-      });
-      const data = await response.json();
-      return { success: response.ok, setlists: data.setlists };
-    } catch (error) {
-      return { success: false, message: 'Failed to save setlists' };
-    }
-  }
-
-  async createSetlist(setlist) {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=setlists`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ setlist }),
-      });
-      const data = await response.json();
-      return { success: response.ok, setlist: data.setlist };
-    } catch (error) {
-      return { success: false, message: 'Failed to create setlist' };
-    }
-  }
-
-  async deleteSetlist(id) {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=setlists`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-      return { success: response.ok };
-    } catch (error) {
-      return { success: false };
     }
   }
 
@@ -374,7 +284,7 @@ class VercelEmailStorageService {
 
   async getBookingRequests() {
     try {
-      const response = await fetch(`${API_BASE}/admin?resource=booking-requests&t=${Date.now()}`);
+      const response = await adminFetch(`${API_BASE}/admin?resource=booking-requests&t=${Date.now()}`);
       const data = await response.json();
       return data.requests || [];
     } catch (error) {
@@ -385,7 +295,7 @@ class VercelEmailStorageService {
 
   async updateBookingRequest(id, status) {
     try {
-      const response = await fetch(`${API_BASE}/admin?resource=booking-requests`, {
+      const response = await adminFetch(`${API_BASE}/admin?resource=booking-requests`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status }),
@@ -399,7 +309,7 @@ class VercelEmailStorageService {
 
   async deleteBookingRequest(id) {
     try {
-      const response = await fetch(`${API_BASE}/admin?resource=booking-requests`, {
+      const response = await adminFetch(`${API_BASE}/admin?resource=booking-requests`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
@@ -407,32 +317,6 @@ class VercelEmailStorageService {
       return { success: response.ok };
     } catch (error) {
       return { success: false };
-    }
-  }
-
-  // ── Press Kit ──
-  async getPressKit() {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=press-kit&t=${Date.now()}`);
-      const data = await response.json();
-      return data.pressKit || null;
-    } catch (error) {
-      console.error('Error fetching press kit:', error);
-      return null;
-    }
-  }
-
-  async savePressKit(pressKit) {
-    try {
-      const response = await fetch(`${API_BASE}/admin?resource=press-kit`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pressKit }),
-      });
-      const data = await response.json();
-      return { success: response.ok, pressKit: data.pressKit };
-    } catch (error) {
-      return { success: false, message: 'Failed to save press kit' };
     }
   }
 
@@ -450,7 +334,7 @@ class VercelEmailStorageService {
 
   async saveAnnouncement(announcement) {
     try {
-      const response = await fetch(`${API_BASE}/admin?resource=announcement`, {
+      const response = await adminFetch(`${API_BASE}/admin?resource=announcement`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ announcement }),
@@ -469,11 +353,15 @@ class VercelEmailStorageService {
         try {
           const [header, imageData] = reader.result.split(',');
           const mimeType = header.match(/:(.*?);/)[1];
-          const response = await fetch(`${API_BASE}/admin?resource=announcement`, {
+          const response = await adminFetch(`${API_BASE}/admin?resource=announcement`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ imageData, mimeType, fileName: file.name }),
           });
+          if (response.status === 413) {
+            resolve({ success: false, message: 'That image is too large to upload. Please use one under 3 MB.' });
+            return;
+          }
           resolve(await response.json());
         } catch {
           resolve({ success: false, message: 'Upload failed' });
@@ -498,13 +386,13 @@ class VercelEmailStorageService {
 
   async saveSocialStats(social) {
     try {
-      const response = await fetch(`${API_BASE}/admin?resource=social`, {
+      const response = await adminFetch(`${API_BASE}/admin?resource=social`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ social }),
       });
       const data = await response.json();
-      return { success: response.ok, social: data.social };
+      return { success: response.ok, message: data.message, social: data.social };
     } catch (error) {
       return { success: false, message: 'Failed to save social stats' };
     }

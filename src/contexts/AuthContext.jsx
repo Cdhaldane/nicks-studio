@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getToken, setToken, clearToken, authHeaders } from '../services/adminAuth';
+import {
+  getToken,
+  setToken,
+  clearToken,
+  authHeaders,
+  SESSION_EXPIRED_EVENT,
+} from '../services/adminAuth';
 
 const AuthContext = createContext();
 
@@ -50,6 +56,14 @@ export const AuthProvider = ({ children }) => {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Tokens last 12 hours; once one lapses mid-session, any admin request that
+  // gets a 401 sends the dashboard back to the login screen.
+  useEffect(() => {
+    const handleExpired = () => setIsAuthenticated(false);
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handleExpired);
   }, []);
 
   const login = useCallback(async (password) => {

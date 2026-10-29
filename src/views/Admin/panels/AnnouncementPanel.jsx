@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import vercelEmailStorageService from '../../../services/vercelEmailStorageService';
+import vercelEmailStorageService, {
+  MAX_UPLOAD_BYTES,
+} from '../../../services/vercelEmailStorageService';
 
 const EMPTY_ANNOUNCEMENT = {
   enabled: false,
@@ -40,6 +42,10 @@ const AnnouncementPanel = ({ Icons }) => {
     const file = e.target.files[0];
     e.target.value = ''; // allow re-selecting the same file later
     if (!file) return;
+    if (file.size > MAX_UPLOAD_BYTES) {
+      alert('Image must be under 3 MB.');
+      return;
+    }
     setUploadStatus('uploading');
     const result = await vercelEmailStorageService.uploadAnnouncementImage(file);
     if (result.success && result.imageUrl) {
@@ -64,6 +70,12 @@ const AnnouncementPanel = ({ Icons }) => {
     const result = await vercelEmailStorageService.saveAnnouncement(announcement);
     if (result.success && result.announcement) {
       setAnnouncement({ ...EMPTY_ANNOUNCEMENT, ...result.announcement });
+    }
+    // A rejected link is fixable, unlike a network blip — say which it was.
+    if (!result.success && result.message) {
+      setValidationError(result.message);
+      setSaveStatus('idle');
+      return;
     }
     setSaveStatus(result.success ? 'success' : 'error');
     setTimeout(() => setSaveStatus('idle'), 3000);
@@ -234,7 +246,7 @@ const AnnouncementPanel = ({ Icons }) => {
                 <span className="upload-label">
                   {uploadStatus === 'uploading' ? 'Uploading...' : 'Click to upload an image'}
                 </span>
-                <span className="upload-hint">JPG, PNG or WebP · Max 5 MB</span>
+                <span className="upload-hint">JPG, PNG or WebP · Max 3 MB</span>
               </label>
               {announcement.imageUrl && (
                 <button onClick={handleRemoveImage} className="btn btn-ghost btn-sm">

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import vercelEmailStorageService from '../../../services/vercelEmailStorageService';
+import { toCsvText } from '../../../utils/csv';
 
 /** Rows past this are not painted — the list stays usable at any audience size. */
 const MAX_VISIBLE_ROWS = 500;
@@ -44,13 +45,11 @@ const buildRows = ({ sent, pending, failed }) => {
   ];
 };
 
-const toCsv = (rows) => {
-  const escape = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
-  return [
-    'Email,Status,Sent At,Error',
-    ...rows.map((r) => [r.email, r.status, r.at || '', r.error || ''].map(escape).join(',')),
-  ].join('\n');
-};
+const toCsv = (rows) =>
+  toCsvText(
+    ['Email', 'Status', 'Sent At', 'Error'],
+    rows.map((r) => [r.email, r.status, r.at || '', r.error || ''])
+  );
 
 const CampaignRecipientsModal = ({ campaign, Icons, onClose }) => {
   const [data, setData] = useState(null);

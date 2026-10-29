@@ -38,3 +38,20 @@ export const authHeaders = () => {
   const token = getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
+
+/** Fired on window when the API rejects the token; AuthContext logs out on it. */
+export const SESSION_EXPIRED_EVENT = 'admin-session-expired';
+
+/**
+ * fetch() for admin-only endpoints. Carries the session token, and on a 401
+ * ends the session so the dashboard returns to the login screen rather than
+ * rendering every panel as empty.
+ */
+export const adminFetch = async (url, { headers, ...options } = {}) => {
+  const response = await fetch(url, { ...options, headers: { ...headers, ...authHeaders() } });
+  if (response.status === 401) {
+    clearToken();
+    window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+  }
+  return response;
+};

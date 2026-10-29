@@ -967,6 +967,18 @@
   color: var(--text-secondary, #b3b3b3);
 }
 
+/* Opted out — kept on the list, but campaigns skip them. */
+.unsubscribed-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: var(--text-muted, #888);
+  vertical-align: middle;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -1991,280 +2003,6 @@
 }
 
 /* ═══════════════════════════════════════════════════
-   MERCH PANEL
-   ═══════════════════════════════════════════════════ */
-
-.merch-panel .merch-rank {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.merch-rank-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-}
-
-.merch-rank-item-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: #f3f3f3;
-}
-
-.merch-rank-item-count {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.order-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.order-item {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-}
-
-.order-item-id {
-  font-size: 12px;
-  font-family: monospace;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.order-item-date {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.order-item-amount {
-  font-size: 13px;
-  font-weight: 600;
-  color: #34d399;
-}
-
-/* ═══════════════════════════════════════════════════
-   PRESS KIT PANEL
-   ═══════════════════════════════════════════════════ */
-
-.press-kit-panel .form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.press-kit-panel .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.press-kit-panel .form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.press-kit-panel .form-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.press-kit-panel .form-input,
-.press-kit-panel .form-textarea {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: #f3f3f3;
-  font-size: 13px;
-  transition: border-color 0.2s;
-}
-
-.press-kit-panel .form-input:focus,
-.press-kit-panel .form-textarea:focus {
-  outline: none;
-  border-color: var(--primary, #772117);
-}
-
-.press-kit-panel .form-textarea {
-  min-height: 120px;
-  resize: vertical;
-  font-family: inherit;
-}
-
-.press-kit-panel .links-editor {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.press-kit-panel .link-row {
-  display: grid;
-  grid-template-columns: 100px 1fr auto;
-  gap: 8px;
-  align-items: center;
-}
-
-.press-kit-panel .link-row input {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: #f3f3f3;
-  font-size: 12px;
-}
-
-.press-kit-panel .link-row input:focus {
-  outline: none;
-  border-color: var(--primary, #772117);
-}
-
-/* ═══════════════════════════════════════════════════
-   SETLIST PANEL
-   ═══════════════════════════════════════════════════ */
-
-.setlist-panel {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 20px;
-}
-
-.setlist-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.setlist-item {
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.setlist-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.setlist-item.active {
-  border-color: var(--primary, #772117);
-  background: rgba(119, 33, 23, 0.1);
-}
-
-.setlist-item-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: #f3f3f3;
-}
-
-.setlist-item-meta {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  margin-top: 4px;
-}
-
-.setlist-editor .song-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.song-row {
-  display: grid;
-  grid-template-columns: 28px 1fr 60px 32px;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 6px;
-}
-
-.song-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.song-number {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.3);
-  text-align: center;
-}
-
-.song-name-input {
-  background: transparent;
-  border: none;
-  color: #f3f3f3;
-  font-size: 13px;
-  padding: 4px 0;
-}
-
-.song-name-input:focus {
-  outline: none;
-  border-bottom: 1px solid var(--primary, #772117);
-}
-
-.song-duration {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  text-align: right;
-}
-
-.song-remove {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition:
-    color 0.15s,
-    background 0.15s;
-}
-
-.song-remove:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.add-song-row {
-  display: grid;
-  grid-template-columns: 1fr 60px auto;
-  gap: 8px;
-  align-items: center;
-  margin-top: 12px;
-}
-
-.add-song-row input {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: #f3f3f3;
-  font-size: 13px;
-}
-
-.add-song-row input:focus {
-  outline: none;
-  border-color: var(--primary, #772117);
-}
-
-/* ═══════════════════════════════════════════════════
    BOOKING PANEL
    ═══════════════════════════════════════════════════ */
 
@@ -2526,52 +2264,6 @@
 }
 
 /* ═══════════════════════════════════════════════════
-   REVENUE PANEL
-   ═══════════════════════════════════════════════════ */
-
-.revenue-panel .revenue-sources {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.revenue-source-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-}
-
-.revenue-source-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: #f3f3f3;
-}
-
-.revenue-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.revenue-source-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: #34d399;
-}
-
-.revenue-source-value.revenue-estimate {
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 400;
-  font-size: 12px;
-}
-
-/* ═══════════════════════════════════════════════════
    FAN MAP PANEL
    ═══════════════════════════════════════════════════ */
 
@@ -2650,10 +2342,6 @@
    ═══════════════════════════════════════════════════ */
 
 @media (max-width: 900px) {
-  .setlist-panel {
-    grid-template-columns: 1fr;
-  }
-
   .email-layout {
     grid-template-columns: 1fr;
   }
@@ -2663,10 +2351,6 @@
   }
 
   .fan-map-panel .analytics-two-col {
-    grid-template-columns: 1fr;
-  }
-
-  .press-kit-panel .form-grid {
     grid-template-columns: 1fr;
   }
 

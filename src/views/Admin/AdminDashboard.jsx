@@ -7,12 +7,8 @@ import './AdminDashboard.css';
 /* ── Lazy-loaded feature panels ── */
 const SpotifyPanel = lazy(() => import('./panels/SpotifyPanel'));
 const SocialPanel = lazy(() => import('./panels/SocialPanel'));
-const MerchPanel = lazy(() => import('./panels/MerchPanel'));
-const PressKitPanel = lazy(() => import('./panels/PressKitPanel'));
-const SetlistPanel = lazy(() => import('./panels/SetlistPanel'));
 const BookingPanel = lazy(() => import('./panels/BookingPanel'));
 const EmailPanel = lazy(() => import('./panels/EmailPanel'));
-const RevenuePanel = lazy(() => import('./panels/RevenuePanel'));
 const FanMapPanel = lazy(() => import('./panels/FanMapPanel'));
 const AnnouncementPanel = lazy(() => import('./panels/AnnouncementPanel'));
 
@@ -224,14 +220,12 @@ const getDateParts = (dateStr) => {
 const AdminDashboard = () => {
   const [subscribers, setSubscribers] = useState([]);
   const [analytics, setAnalytics] = useState(null);
-  const [siteAnalytics, setSiteAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [popupImageUrl, setPopupImageUrl] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState('idle');
   const [tourDates, setTourDates] = useState([]);
   const [tourSaveStatus, setTourSaveStatus] = useState('idle');
+  const [tourSaveError, setTourSaveError] = useState('');
   const [importState, setImportState] = useState('idle'); // idle | parsing | importing
   const [importPreview, setImportPreview] = useState(null);
   const [importError, setImportError] = useState(null);
@@ -263,20 +257,18 @@ const AdminDashboard = () => {
     setSidebarOpen(false);
   };
 
+  // `loading` is only true for the first load. Refreshes leave the open panel
+  // mounted, so a half-written campaign survives clicking Refresh.
   const loadData = async () => {
-    setLoading(true);
     try {
-      const subscriberData = await vercelEmailStorageService.getSubscribers();
-      const analyticsData = await vercelEmailStorageService.getAnalytics();
-      const imageUrl = await vercelEmailStorageService.getPopupImage();
-      const tourData = await vercelEmailStorageService.getTourDates();
-      const siteData = await vercelEmailStorageService.getSiteAnalytics();
+      const [subscriberData, tourData] = await Promise.all([
+        vercelEmailStorageService.getSubscribers(),
+        vercelEmailStorageService.getTourDates(),
+      ]);
 
       setSubscribers(subscriberData);
-      setAnalytics(analyticsData);
-      setPopupImageUrl(imageUrl);
+      setAnalytics(vercelEmailStorageService.getAnalytics(subscriberData));
       setTourDates(tourData);
-      setSiteAnalytics(siteData);
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
@@ -292,12 +284,14 @@ const AdminDashboard = () => {
     await vercelEmailStorageService.downloadCurrentData();
   };
 
+  // Unsubscribes rather than deletes: the row stays as an opt-out record, so a
+  // later spreadsheet import can't quietly re-add someone who asked to leave.
   const handleRemoveSubscriber = async (email) => {
-    if (window.confirm(`Are you sure you want to remove ${email}?`)) {
+    if (window.confirm(`Unsubscribe ${email}? They won't receive any more campaigns.`)) {
       const result = await vercelEmailStorageService.removeSubscriber(email);
       if (result.success) {
         loadData();
-        alert('Subscriber removed successfully');
+        alert(`${email} has been unsubscribed.`);
       } else {
         alert(result.message);
       }
@@ -377,6 +371,8 @@ const AdminDashboard = () => {
   const handleSaveTourDates = async () => {
     setTourSaveStatus('saving');
     const result = await vercelEmailStorageService.saveTourDates(tourDates);
+    // The API names the problem (e.g. a row missing its venue) — show that.
+    setTourSaveError(result.success ? '' : result.message || '');
     setTourSaveStatus(result.success ? 'success' : 'error');
     setTimeout(() => setTourSaveStatus('idle'), 3000);
   };
@@ -403,26 +399,6 @@ const AdminDashboard = () => {
     });
     return { upcoming, past };
   }, [tourDates]);
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image must be under 5 MB.');
-      return;
-    }
-    setUploadStatus('uploading');
-    const result = await vercelEmailStorageService.uploadPopupImage(file);
-    if (result.success) {
-      setPopupImageUrl(result.imageUrl);
-      setUploadStatus('success');
-      setTimeout(() => setUploadStatus('idle'), 3000);
-    } else {
-      setUploadStatus('error');
-      setTimeout(() => setUploadStatus('idle'), 3000);
-    }
-    e.target.value = '';
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();
@@ -537,27 +513,6 @@ const AdminDashboard = () => {
             <Icons.Globe />
             <span>Social Media</span>
           </button>
-          {/* <button
-            className={`sidebar-link ${activeTab === 'merch' ? 'active' : ''}`}
-            onClick={() => selectTab('merch')}
-          >
-            <Icons.ShoppingBag />
-            <span>Merch Sales</span>
-          </button> */}
-          {/* <button
-            className={`sidebar-link ${activeTab === 'pressKit' ? 'active' : ''}`}
-            onClick={() => selectTab('pressKit')}
-          >
-            <Icons.FileText />
-            <span>Press Kit</span>
-          </button>
-          <button
-            className={`sidebar-link ${activeTab === 'setlists' ? 'active' : ''}`}
-            onClick={() => selectTab('setlists')}
-          >
-            <Icons.ListMusic />
-            <span>Setlists</span>
-          </button> */}
           <button
             className={`sidebar-link ${activeTab === 'booking' ? 'active' : ''}`}
             onClick={() => selectTab('booking')}
@@ -572,19 +527,12 @@ const AdminDashboard = () => {
             <Icons.Mail />
             <span>Email</span>
           </button>
-          {/* <button
-            className={`sidebar-link ${activeTab === 'revenue' ? 'active' : ''}`}
-            onClick={() => selectTab('revenue')}
-          >
-            <Icons.DollarSign />
-            <span>Revenue</span>
-          </button> */}
           <button
             className={`sidebar-link ${activeTab === 'fanMap' ? 'active' : ''}`}
             onClick={() => selectTab('fanMap')}
           >
-            <Icons.MapPin />
-            <span>Fan Map</span>
+            <Icons.Users />
+            <span>Audience</span>
           </button>
         </nav>
 
@@ -618,13 +566,9 @@ const AdminDashboard = () => {
               {activeTab === 'settings' && 'Settings'}
               {activeTab === 'spotify' && 'Spotify Stats'}
               {activeTab === 'social' && 'Social Media'}
-              {activeTab === 'merch' && 'Merch Sales'}
-              {activeTab === 'pressKit' && 'Press Kit'}
-              {activeTab === 'setlists' && 'Setlist Manager'}
               {activeTab === 'booking' && 'Booking Requests'}
               {activeTab === 'email' && 'Email Campaigns'}
-              {activeTab === 'revenue' && 'Revenue Summary'}
-              {activeTab === 'fanMap' && 'Fan Map'}
+              {activeTab === 'fanMap' && 'Audience'}
             </h1>
           </div>
           <div className="topbar-right">
@@ -646,8 +590,8 @@ const AdminDashboard = () => {
                       <Icons.Users />
                     </div>
                     <div className="stat-card-info">
-                      <span className="stat-card-label">Total Subscribers</span>
-                      <span className="stat-card-value">{analytics.totalSubscribers}</span>
+                      <span className="stat-card-label">Active Subscribers</span>
+                      <span className="stat-card-value">{analytics.activeSubscribers}</span>
                     </div>
                   </div>
                   <div className="stat-card">
@@ -743,22 +687,13 @@ const AdminDashboard = () => {
                           <span className="action-item-desc">Add or edit shows</span>
                         </div>
                       </button>
-                      <button onClick={() => selectTab('settings')} className="action-item">
-                        <div className="action-item-icon">
-                          <Icons.Image />
-                        </div>
-                        <div className="action-item-text">
-                          <span className="action-item-title">Update Popup</span>
-                          <span className="action-item-desc">Change hero image</span>
-                        </div>
-                      </button>
                       <button onClick={() => selectTab('analytics')} className="action-item">
                         <div className="action-item-icon">
                           <Icons.BarChart />
                         </div>
                         <div className="action-item-text">
                           <span className="action-item-title">View Analytics</span>
-                          <span className="action-item-desc">Traffic & engagement</span>
+                          <span className="action-item-desc">Traffic in Google Analytics</span>
                         </div>
                       </button>
                     </div>
@@ -817,7 +752,11 @@ const AdminDashboard = () => {
             <div className="subscribers-tab">
               <div className="tab-toolbar">
                 <div className="toolbar-info">
-                  <span className="toolbar-count">{subscribers.length} total subscribers</span>
+                  <span className="toolbar-count">
+                    {analytics?.activeSubscribers ?? subscribers.length} active
+                    {analytics && analytics.activeSubscribers !== subscribers.length &&
+                      ` · ${subscribers.length - analytics.activeSubscribers} unsubscribed`}
+                  </span>
                 </div>
                 <div className="toolbar-actions">
                   <label
@@ -953,17 +892,25 @@ const AdminDashboard = () => {
                   {subscribers.map((subscriber) => (
                     <div key={subscriber.id} className="table-row">
                       <span className="sub-name">{subscriber.name || '—'}</span>
-                      <span className="email">{subscriber.email}</span>
+                      <span className="email">
+                        {subscriber.email}
+                        {subscriber.status === 'unsubscribed' && (
+                          <span className="unsubscribed-tag">Unsubscribed</span>
+                        )}
+                      </span>
                       <span className="date">{formatDate(subscriber.subscribed_at)}</span>
                       <span className={`source-badge src-${subscriber.source}`}>{subscriber.source}</span>
                       <span className="actions">
-                        <button
-                          onClick={() => handleRemoveSubscriber(subscriber.email)}
-                          className="btn-icon btn-icon-danger"
-                          title="Remove subscriber"
-                        >
-                          <Icons.Trash />
-                        </button>
+                        {subscriber.status !== 'unsubscribed' && (
+                          <button
+                            onClick={() => handleRemoveSubscriber(subscriber.email)}
+                            className="btn-icon btn-icon-danger"
+                            title="Unsubscribe"
+                            aria-label={`Unsubscribe ${subscriber.email}`}
+                          >
+                            <Icons.Trash />
+                          </button>
+                        )}
                       </span>
                     </div>
                   ))}
@@ -1020,7 +967,7 @@ const AdminDashboard = () => {
               )}
               {tourSaveStatus === 'error' && (
                 <div className="toast toast-error">
-                  <Icons.AlertCircle /> Failed to save. Try again.
+                  <Icons.AlertCircle /> {tourSaveError || 'Failed to save. Try again.'}
                 </div>
               )}
 
@@ -1138,230 +1085,36 @@ const AdminDashboard = () => {
 
           {activeTab === 'analytics' && (
             <div className="analytics-tab">
-              {!siteAnalytics ? (
-                <div className="empty-state">
-                  <Icons.BarChart />
-                  <h3>No analytics data yet</h3>
-                  <p>Data will appear once visitors start browsing the site.</p>
+              {/* Traffic used to be logged to a Blob file on every page view, which
+                  lost visits under load and burned the Blob quota. GA4 (index.html)
+                  already records the same thing properly. */}
+              <div className="panel">
+                <div className="panel-header">
+                  <h2 className="panel-title">
+                    <Icons.BarChart />
+                    Site Traffic
+                  </h2>
                 </div>
-              ) : (
-                <>
-                  {/* Summary Cards */}
-                  <div className="stat-grid">
-                    <div className="stat-card">
-                      <div className="stat-card-icon icon-blue">
-                        <Icons.Eye />
-                      </div>
-                      <div className="stat-card-info">
-                        <span className="stat-card-label">Today</span>
-                        <span className="stat-card-value">{siteAnalytics.summary.today}</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-icon icon-purple">
-                        <Icons.Calendar />
-                      </div>
-                      <div className="stat-card-info">
-                        <span className="stat-card-label">Last 7 Days</span>
-                        <span className="stat-card-value">{siteAnalytics.summary.last7d}</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-icon icon-green">
-                        <Icons.TrendingUp />
-                      </div>
-                      <div className="stat-card-info">
-                        <span className="stat-card-label">Last 30 Days</span>
-                        <span className="stat-card-value">{siteAnalytics.summary.last30d}</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-icon icon-amber">
-                        <Icons.Globe />
-                      </div>
-                      <div className="stat-card-info">
-                        <span className="stat-card-label">All Time</span>
-                        <span className="stat-card-value">{siteAnalytics.summary.total}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Daily Traffic Chart */}
-                  {siteAnalytics.dailyViews && siteAnalytics.dailyViews.length > 0 && (
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h2 className="panel-title">Daily Traffic (Last 30 Days)</h2>
-                      </div>
-                      <div className="panel-body">
-                        <div className="daily-chart">
-                          {(() => {
-                            const max = Math.max(...siteAnalytics.dailyViews.map(d => d.views), 1);
-                            return siteAnalytics.dailyViews.map((day) => (
-                              <div key={day.date} className="chart-bar-wrapper" title={`${day.date}: ${day.views} views`}>
-                                <div
-                                  className="chart-bar"
-                                  style={{ height: `${(day.views / max) * 100}%` }}
-                                />
-                                <span className="chart-label">
-                                  {new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                </span>
-                              </div>
-                            ));
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Two Column Analytics */}
-                  <div className="analytics-two-col">
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h2 className="panel-title">Traffic Sources</h2>
-                      </div>
-                      <div className="panel-body">
-                        {siteAnalytics.sources && siteAnalytics.sources.length > 0 ? (
-                          <div className="analytics-list">
-                            {siteAnalytics.sources.map((s) => (
-                              <div key={s.source} className="analytics-list-item">
-                                <span className={`source-indicator src-${s.source}`}>{s.source}</span>
-                                <span className="analytics-list-value">{s.views}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="no-activity">No source data yet.</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h2 className="panel-title">Top Pages</h2>
-                      </div>
-                      <div className="panel-body">
-                        {siteAnalytics.topPages && siteAnalytics.topPages.length > 0 ? (
-                          <div className="analytics-list">
-                            {siteAnalytics.topPages.map((p) => (
-                              <div key={p.page} className="analytics-list-item">
-                                <span className="analytics-list-label">{p.page}</span>
-                                <span className="analytics-list-value">{p.views}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="no-activity">No page data yet.</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="analytics-two-col">
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h2 className="panel-title">Devices</h2>
-                      </div>
-                      <div className="panel-body">
-                        {siteAnalytics.devices && siteAnalytics.devices.length > 0 ? (
-                          <div className="analytics-list">
-                            {siteAnalytics.devices.map((d) => (
-                              <div key={d.device} className="analytics-list-item">
-                                <span className="analytics-list-label device-label">
-                                  {d.device === 'mobile' ? <Icons.Smartphone /> : d.device === 'tablet' ? <Icons.Tablet /> : <Icons.Monitor />}
-                                  {d.device}
-                                </span>
-                                <span className="analytics-list-value">{d.views}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="no-activity">No device data yet.</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h2 className="panel-title">Top Referrers</h2>
-                      </div>
-                      <div className="panel-body">
-                        {siteAnalytics.topReferrers && siteAnalytics.topReferrers.length > 0 ? (
-                          <div className="analytics-list">
-                            {siteAnalytics.topReferrers.map((r) => (
-                              <div key={r.referrer} className="analytics-list-item">
-                                <span className="analytics-list-label">{r.referrer}</span>
-                                <span className="analytics-list-value">{r.views}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="no-activity">No referrer data yet.</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
+                <div className="panel-body">
+                  <p className="section-desc">
+                    Visits, top pages, traffic sources and devices are tracked in Google Analytics.
+                  </p>
+                  <a
+                    href="https://analytics.google.com/analytics/web/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                  >
+                    <Icons.Eye />
+                    <span>Open Google Analytics</span>
+                  </a>
+                </div>
+              </div>
             </div>
           )}
 
           {activeTab === 'settings' && (
             <div className="settings-tab">
-              {/* Popup Hero Image */}
-              <div className="panel">
-                <div className="panel-header">
-                  <h2 className="panel-title">
-                    <Icons.Image />
-                    Popup Hero Image
-                  </h2>
-                </div>
-                <div className="panel-body">
-                  <p className="section-desc">This image appears in the newsletter signup popup shown to first-time visitors.</p>
-                  <div className="image-upload-section">
-                    <div className="image-preview-wrapper">
-                      {popupImageUrl ? (
-                        <img src={popupImageUrl} alt="Current popup hero" className="popup-image-preview" />
-                      ) : (
-                        <div className="image-placeholder">
-                          <Icons.Image />
-                          <p>Default image in use</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="upload-controls">
-                      <label
-                        className={`upload-zone${uploadStatus === 'uploading' ? ' uploading' : ''}`}
-                        htmlFor="popup-image-upload"
-                      >
-                        <input
-                          id="popup-image-upload"
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          onChange={handleImageUpload}
-                          disabled={uploadStatus === 'uploading'}
-                          style={{ display: 'none' }}
-                        />
-                        <Icons.Upload />
-                        <span className="upload-label">
-                          {uploadStatus === 'uploading' ? 'Uploading...' : 'Click to upload a new image'}
-                        </span>
-                        <span className="upload-hint">JPG, PNG or WebP · Max 5 MB</span>
-                      </label>
-                      {uploadStatus === 'success' && (
-                        <div className="toast toast-success">
-                          <Icons.Check /> Image updated successfully
-                        </div>
-                      )}
-                      {uploadStatus === 'error' && (
-                        <div className="toast toast-error">
-                          <Icons.AlertCircle /> Upload failed. Please try again.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* System Info */}
               <div className="panel">
                 <div className="panel-header">
@@ -1423,12 +1176,8 @@ const AdminDashboard = () => {
           <Suspense fallback={<div className="panel"><div className="panel-body"><div className="empty-state-inline"><div className="loading-spinner" /></div></div></div>}>
             {activeTab === 'spotify' && <SpotifyPanel Icons={Icons} />}
             {activeTab === 'social' && <SocialPanel Icons={Icons} />}
-            {activeTab === 'merch' && <MerchPanel Icons={Icons} />}
-            {activeTab === 'pressKit' && <PressKitPanel Icons={Icons} />}
-            {activeTab === 'setlists' && <SetlistPanel Icons={Icons} />}
             {activeTab === 'booking' && <BookingPanel Icons={Icons} />}
             {activeTab === 'email' && <EmailPanel Icons={Icons} />}
-            {activeTab === 'revenue' && <RevenuePanel Icons={Icons} />}
             {activeTab === 'fanMap' && <FanMapPanel Icons={Icons} />}
             {activeTab === 'announcement' && <AnnouncementPanel Icons={Icons} />}
           </Suspense>
