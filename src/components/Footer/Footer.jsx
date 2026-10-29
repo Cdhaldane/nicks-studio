@@ -5,6 +5,7 @@ import { validateEmail } from '../../utils/helpers';
 import './Footer.css';
 import vercelEmailStorageService from '../../services/vercelEmailStorageService';
 import BookingForm from '../BookingForm/BookingForm';
+import useDialog from '../../hooks/useDialog';
 import '../Modal/Modal.css';
 
 function Footer() {
@@ -19,15 +20,8 @@ function Footer() {
   const [showBooking, setShowBooking] = useState(false);
   const location = useLocation();
 
-  // Close the booking modal on Escape.
-  useEffect(() => {
-    if (!showBooking) return undefined;
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') setShowBooking(false);
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [showBooking]);
+  // Escape to close, focus kept inside while open, scroll locked behind it.
+  const bookingDialogRef = useDialog(showBooking, () => setShowBooking(false));
 
   useEffect(() => {
     let cancelled = false;
@@ -240,6 +234,7 @@ function Footer() {
     {showBooking && (
       <div
         className="modal"
+        ref={bookingDialogRef}
         onClick={(e) => { if (e.target === e.currentTarget) setShowBooking(false); }}
         role="dialog"
         aria-modal="true"

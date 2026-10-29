@@ -117,47 +117,6 @@
     border: none;
   }
 
-  .shop-container {
-    margin-top: var(--nav-height);
-    padding: var(--space-lg) var(--space-md);
-  }
-
-  .shop-main {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-    padding: var(--space-md);
-  }
-
-  .shop-item {
-    font-size: var(--font-size-sm);
-    padding: var(--space-md);
-    border-radius: var(--radius-lg);
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all var(--transition-normal);
-  }
-
-  .shop-item:hover {
-    transform: translateY(-4px);
-    border-color: var(--primary);
-  }
-
-  .shop-item img {
-    width: 100%;
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-sm);
-  }
-
-  .shop-item h3 {
-    font-size: var(--font-size-base);
-    margin: var(--space-sm) 0;
-  }
-
-  .shop-item p {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-  }
-
   /* Modal mobile styles */
 
 
@@ -336,11 +295,6 @@
     font-size: var(--font-size-base);
   }
 
-  .shop-main {
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
-  }
-
   .email-join {
     left: var(--space-sm);
     right: var(--space-sm);
@@ -412,7 +366,6 @@
   }
 
   /* Remove hover effects that don't work on touch */
-  .shop-item:hover,
   .footer-nav-link:hover {
     transform: none;
   }
@@ -422,30 +375,13 @@
 @media (max-width: 768px) {
   /* Larger focus indicators on mobile */
   :focus-visible {
-    outline: 3px solid var(--primary);
+    outline: 3px solid var(--text);
     outline-offset: 3px;
   }
 
   /* Better contrast for small screens */
   .text-muted {
     color: var(--text-secondary);
-  }
-
-  /* Skip to content link for mobile */
-  .skip-to-content {
-    position: absolute;
-    top: -40px;
-    left: 6px;
-    background: var(--primary);
-    color: var(--white);
-    padding: 8px;
-    text-decoration: none;
-    border-radius: 4px;
-    z-index: var(--z-max);
-  }
-
-  .skip-to-content:focus {
-    top: 6px;
   }
 }
 
@@ -460,11 +396,6 @@
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-
-  .shop-item {
-    background: rgba(0, 0, 0, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-  }
 }
 
 /* Reduced motion for mobile */
@@ -476,8 +407,7 @@
   }
 
   .social-button,
-  .btn,
-  .shop-item {
+  .btn {
     transition: none;
   }
 }

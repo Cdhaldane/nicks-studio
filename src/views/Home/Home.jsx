@@ -92,8 +92,8 @@ const Home = () => {
     <>
       <SEOHelmet 
         title="Nickola Magnolia - Country & Americana Music from the Great Lakes"
-        description="Country & Americana from the shores of the Great Lakes. Hometown record release show June 11, 2026 in Northumberland County, Ontario. New music, tour dates, and merchandise."
-        keywords="Nickola Magnolia, country music, americana, great lakes, country artist, albums, tour, merchandise, hometown record release, June 11 2026, album release show Ontario, live music Northumberland County, things to do Port Hope, things to do Cobourg, things to do Peterborough, concerts near me June 2026, country music Ontario live, Calgary Stampede 2026 lineup, Calgary Stampede concerts July 2026, Nashville North lineup 2026, Calgary Stampede country artists, live music Calgary Stampede"
+        description="Country & Americana from the shores of the Great Lakes. Based in Northumberland County, Ontario. New music, tour dates, and merchandise."
+        keywords="Nickola Magnolia, country music, americana, great lakes, country artist, albums, tour, merchandise, live music Northumberland County, things to do Port Hope, things to do Cobourg, things to do Peterborough, country music Ontario live"
         type="website"
         url={window.location.href}
       />
@@ -133,7 +133,7 @@ const Home = () => {
           <Parallax speed={-5}>
             <div className="hero-content">
               <img
-                src={`${process.env.PUBLIC_URL}/logo-trans.png`}
+                src={`${process.env.PUBLIC_URL}/logo-trans-800.png`}
                 alt="Nickola Magnolia"
                 className="hero-logo"
               />

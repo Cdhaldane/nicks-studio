@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import {
   Routes,
   Route,
@@ -16,21 +16,27 @@ import Music from './views/Music/Music.jsx';
 import Privacy from './views/Privacy/Privacy.jsx';
 import Terms from './views/Terms/Terms.jsx';
 import Accessibility from './views/Accessibility/Accessibility.jsx';
-import AdminPage from './views/Admin/AdminPage.jsx';
 import OrderConfirmation from './views/OrderConfirmation/OrderConfirmation.jsx';
 import Footer from './components/Footer/Footer.jsx';
 import Navbar from './components/Navbar/Navbar.jsx';
-import NewsPopup from './components/NewsPopup/NewsPopup.jsx';
 import AnnouncementPopup from './components/Announcement/AnnouncementPopup.jsx';
-
-import usePageTracking from './hooks/usePageTracking';
 
 import './App.css';
 import './Styles-Mobile.css';
 
+// Only the site owner uses the dashboard, so it (and its stylesheet) is split
+// out of the bundle every visitor downloads.
+const AdminPage = lazy(() => import('./views/Admin/AdminPage.jsx'));
+
+// The CSS reduced-motion rule can't reach react-scroll-parallax's JS transforms.
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
 function App() {
+  // Page views are tracked by GA4 (public/index.html), whose enhanced
+  // measurement picks up client-side route changes on its own.
   const location = useLocation();
-  usePageTracking();
 
   return (
     <HelmetProvider>
@@ -38,9 +44,9 @@ function App() {
 
         <AlertProvider>
           <Alert />
-          {/* <NewsPopup /> */}
+          {/* NewsPopup is retired; see AnnouncementPopup before bringing it back. */}
           <AnnouncementPopup />
-          <ParallaxProvider>
+          <ParallaxProvider isDisabled={prefersReducedMotion}>
             <div
               className="main"
               style={{
@@ -50,7 +56,16 @@ function App() {
                   `url(${process.env.PUBLIC_URL}/optimized/n1-large.jpg)`,
               }}
             >
-              {location.pathname !== '/admin' && location.pathname !== '/order-confirmation' && <Navbar />}
+              {location.pathname !== '/admin' && location.pathname !== '/order-confirmation' && (
+                <>
+                  <a href="#main-content" className="skip-to-content">
+                    Skip to content
+                  </a>
+                  <Navbar />
+                </>
+              )}
+              {/* Skip-link target: zero-size, so it doesn't affect the flex layout. */}
+              <div id="main-content" tabIndex={-1} />
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
@@ -59,7 +74,14 @@ function App() {
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/accessibility" element={<Accessibility />} />
-                <Route path="/admin" element={<AdminPage />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <Suspense fallback={null}>
+                      <AdminPage />
+                    </Suspense>
+                  }
+                />
                 <Route path="/order-confirmation" element={<OrderConfirmation />} />
               </Routes>
               {location.pathname !== '/' &&

@@ -167,12 +167,6 @@ const Accessibility = () => {
                 <p>
                   <strong>Email:</strong> <a href="mailto:accessibility@nickolamagnolia.com">accessibility@nickolamagnolia.com</a>
                 </p>
-                <p>
-                  <strong>Phone:</strong> <a href="tel:+1-555-123-4567">+1 (555) 123-4567</a>
-                </p>
-                <p>
-                  <strong>Mail:</strong> Nickola Magnolia Accessibility Team<br />
-                </p>
               </div>
               <p>
                 When reporting accessibility issues, please include:

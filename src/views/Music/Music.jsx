@@ -3,22 +3,22 @@ import Carousel from "react-multi-carousel";
 import Record from "./Record";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import { useSpotify } from "../../hooks/useSpotify";
 import SEOHelmet from "../../components/SEO/SEOHelmet";
 import { MusicAlbumSchema, BreadcrumbSchema } from "../../components/SEO/StructuredData";
 import "react-multi-carousel/lib/styles.css";
 import "./Music.css";
 
+const API_BASE = process.env.REACT_APP_API_URL || "/api";
+
 const Music = () => {
   const [albums, setAlbums] = useState([]);
   const [currentAlbum, setCurrentAlbum] = useState(0);
   const [currentSong, setCurrentSong] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  const { isMobile, isTablet } = useWindowSize();
-  const { token, loading, error: spotifyError } = useSpotify();
 
-  console.log("Music component rendered", token);
+  const { isMobile, isTablet } = useWindowSize();
+
   const timelineRef = useRef(null);
 
   // Dynamic responsive configuration based on screen size
@@ -45,20 +45,11 @@ const Music = () => {
     },
   };
 
-  // Fetch artist albums using the token from useSpotify hook
+  // Albums come through our API, which holds the Spotify credentials.
   const fetchAlbums = useCallback(async () => {
-    if (!token) return;
-    
+    setLoading(true);
     try {
-      const response = await fetch(
-        "https://api.spotify.com/v1/artists/5UrVks2tmoQ4BwTvlkQaI4/albums?include_groups=album,single&market=US&limit=50",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await fetch(`${API_BASE}/spotify-stats?view=albums`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -66,20 +57,19 @@ const Music = () => {
 
       const data = await response.json();
 
-      setAlbums(data.items || []);
+      setAlbums(data.albums || []);
       setError(null);
     } catch (err) {
       console.error("Error fetching albums:", err);
       setError("Failed to load albums. Please try again later.");
+    } finally {
+      setLoading(false);
     }
-  }, [token]);
+  }, []);
 
-  // Fetch albums when token is available
   useEffect(() => {
-    if (token) {
-      fetchAlbums();
-    }
-  }, [token, fetchAlbums]);
+    fetchAlbums();
+  }, [fetchAlbums]);
 
   // Handle song selection
   const handleSongSelect = useCallback((album) => {
@@ -121,12 +111,12 @@ const Music = () => {
   }
 
   // Error state
-  if (error || spotifyError || (albums.length === 0 && !loading)) {
+  if (error) {
     return (
       <div className="music-container">
         <div className="error-container">
           <h2>Unable to Load Music</h2>
-          <p>{error || spotifyError}</p>
+          <p>{error}</p>
           <button
             onClick={fetchAlbums}
             className="retry-button"
@@ -152,11 +142,11 @@ const Music = () => {
   }
 
   return (
-    <div className="music-container" id="main-content">
+    <div className="music-container">
       <SEOHelmet 
         title="Music - Nickola Magnolia | Albums & Songs"
-        description="Latest albums and singles from Nickola Magnolia — Country & Americana from the Great Lakes. Hometown record release show June 11, 2026. Stream on Spotify and beyond."
-        keywords="Nickola Magnolia music, country albums, americana songs, spotify artist, new music releases, great lakes country, album release show Ontario, hometown record release June 11 2026, country music Ontario live, who is performing at Calgary Stampede 2026, Calgary Stampede 2026 lineup, Nashville North lineup 2026"
+        description="Latest albums and singles from Nickola Magnolia — Country & Americana from the Great Lakes. Stream on Spotify and beyond."
+        keywords="Nickola Magnolia music, country albums, americana songs, spotify artist, new music releases, great lakes country, country music Ontario live"
         image={albums[currentAlbum]?.images?.[0]?.url || "/nick-bio.jpg"}
         url={window.location.href}
         type="music.album"

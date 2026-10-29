@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './ErrorBoundary.css';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -44,7 +45,8 @@ class ErrorBoundary extends React.Component {
               <details className="error-details">
                 <summary>Error details (development only)</summary>
                 <pre>{this.state.error && this.state.error.toString()}</pre>
-                <pre>{this.state.errorInfo.componentStack}</pre>
+                {/* errorInfo arrives a render later, via componentDidCatch. */}
+                <pre>{this.state.errorInfo?.componentStack}</pre>
               </details>
             )}
             <button 

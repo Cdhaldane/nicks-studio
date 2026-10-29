@@ -24,8 +24,11 @@ const Alert = () => {
   }
 
   return (
-    <div className={`alert ${alertClass}`}>
-      <i className="fas fa-exclamation-circle"></i>
+    <div
+      className={`alert ${alertClass}`}
+      role={alert.type === "error" || alert.type === "warning" ? "alert" : "status"}
+    >
+      <i className="fas fa-exclamation-circle" aria-hidden="true"></i>
       {alert.message}
     </div>
   );

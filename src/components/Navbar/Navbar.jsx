@@ -3,14 +3,16 @@ import Cart from '../Cart/Cart';
 import TourSchedule from '../TourSchedule/TourSchedule';
 import '../Modal/Modal.css';
 import './Navbar.css';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import useDialog from '../../hooks/useDialog';
 
 const Navbar = () => {
   const [width, setWidth] = useState(window.innerWidth);
   const [isOpen, setIsOpen] = useState(false);
   const [showTourDates, setShowTourDates] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
+  // Escape is already handled below; this adds focus trap/return and scroll lock.
+  const tourDialogRef = useDialog(showTourDates, () => setShowTourDates(false));
 
   const isMobile = width <= 1250;
 
@@ -109,26 +111,22 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Title — always visible */}
-        <div
-          className={`nav-title ${isMobile ? 'mobile-title' : ''}`}
-          onClick={() => navigate('/')}
-        >
-          
+        {/* Title — always visible. A real link, so it's reachable by keyboard. */}
+        <Link to="/" className={`nav-title ${isMobile ? 'mobile-title' : ''}`} aria-label="Nickola Magnolia — home">
           {isMobile ? (
             <img
-              src={`${process.env.PUBLIC_URL}/logo-init.png`}
+              src={`${process.env.PUBLIC_URL}/logo-init-400.png`}
               alt="Nickola Magnolia"
               className="nav-logo nav-logo-initials"
             />
           ) : (
             <img
-              src={`${process.env.PUBLIC_URL}/logo-init.png`}
+              src={`${process.env.PUBLIC_URL}/logo-init-400.png`}
               alt="Nickola Magnolia"
               className="nav-logo nav-logo-full"
             />
           )}
-        </div>
+        </Link>
 
         {/* Desktop: right links */}
         {!isMobile && (
@@ -162,6 +160,9 @@ const Navbar = () => {
           <nav
             className={`mobile-drawer ${isOpen ? 'open' : ''}`}
             aria-label="Mobile navigation"
+            // Closed, the drawer is only slid off-screen — inert keeps its links
+            // out of the tab order and away from screen readers.
+            {...(!isOpen && { inert: '', 'aria-hidden': true })}
           >
             <div className="mobile-links">
               {navItems.map(item => renderNavLink(item, closeMobileMenu))}
@@ -179,6 +180,7 @@ const Navbar = () => {
       {showTourDates && (
         <div
           className="modal"
+          ref={tourDialogRef}
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowTourDates(false);
           }}

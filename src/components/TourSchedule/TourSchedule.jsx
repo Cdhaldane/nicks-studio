@@ -8,9 +8,17 @@ const parseDate = (dateStr) => {
   return new Date(year, month - 1, day);
 };
 
+// "Toronto, ON" / "Calgary, Alberta". Matched on the province itself — a bare
+// /ON/i also matched "Boston" and "Houston".
+const PROVINCE_CODE_RE = /,\s*(ON|AB|BC|QC|MB|SK|NS|NB|NL|PE|YT|NT|NU)\b/;
+const CANADA_NAME_RE =
+  /\b(Ontario|Alberta|British Columbia|Quebec|Manitoba|Saskatchewan|Nova Scotia|New Brunswick|Newfoundland|Prince Edward Island|Canada)\b/i;
+const isCanadian = (city = '') => PROVINCE_CODE_RE.test(city) || CANADA_NAME_RE.test(city);
+
 const buildEventSchema = (show) => {
-  const start = parseDate(show.date);
-  const isoDate = start.toISOString().split('T')[0];
+  // show.date is already YYYY-MM-DD. Round-tripping it through toISOString()
+  // shifted it a day earlier for anyone east of UTC.
+  const isoDate = show.date;
   const isHometown = /hometown|record release|album release/i.test(
     `${show.note || ''} ${show.venue || ''}`
   );
@@ -30,9 +38,7 @@ const buildEventSchema = (show) => {
       address: {
         '@type': 'PostalAddress',
         addressLocality: show.city,
-        addressCountry: /ON|Ontario|Canada|AB|Alberta/i.test(show.city)
-          ? 'CA'
-          : 'US',
+        addressCountry: isCanadian(show.city) ? 'CA' : 'US',
       },
     },
     performer: {

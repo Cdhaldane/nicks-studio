@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import useDialog from '../../hooks/useDialog';
 import vercelEmailStorageService from '../../services/vercelEmailStorageService';
 import './AnnouncementPopup.css';
-
-// Matches the key NewsPopup stores via useLocalStorage (JSON-encoded).
-const hasSeenSignup = () => {
-  try {
-    return JSON.parse(window.localStorage.getItem('hasSeenEmailSignup')) === true;
-  } catch {
-    return false;
-  }
-};
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -39,27 +31,21 @@ const AnnouncementPopup = () => {
   useEffect(() => {
     if (!announcement || dismissedAt === announcement.updatedAt) return undefined;
 
-    let timer;
-    if (hasSeenSignup()) {
-      timer = setTimeout(() => setVisible(true), 1200);
-      return () => clearTimeout(timer);
-    }
-    // First visit: the newsletter signup popup is about to appear — wait for
-    // it to close (NewsPopup dispatches this event) before showing ours.
-    const onNewsPopupClosed = () => {
-      timer = setTimeout(() => setVisible(true), 600);
-    };
-    window.addEventListener('news-popup-closed', onNewsPopupClosed);
-    return () => {
-      window.removeEventListener('news-popup-closed', onNewsPopupClosed);
-      clearTimeout(timer);
-    };
+    // This used to wait for NewsPopup to close on a first visit, but NewsPopup
+    // is no longer mounted (App.js), so first-time visitors never saw this.
+    // If NewsPopup comes back, sequence the two again via its
+    // 'news-popup-closed' event so they don't stack.
+    const timer = setTimeout(() => setVisible(true), 1200);
+    return () => clearTimeout(timer);
   }, [announcement, dismissedAt]);
 
   const handleClose = () => {
     setVisible(false);
     setDismissedAt(announcement.updatedAt);
   };
+
+  const isHiddenRoute = location.pathname === '/admin' || location.pathname === '/order-confirmation';
+  const dialogRef = useDialog(Boolean(announcement) && visible && !isHiddenRoute, handleClose);
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) handleClose();
@@ -84,7 +70,7 @@ const AnnouncementPopup = () => {
   };
 
   if (!announcement) return null;
-  if (location.pathname === '/admin' || location.pathname === '/order-confirmation') return null;
+  if (isHiddenRoute) return null;
 
   if (!visible) {
     // Floating icon button (replaces the old "New Album" text trigger) so
@@ -110,6 +96,7 @@ const AnnouncementPopup = () => {
         role="dialog"
         aria-modal="true"
         aria-label="Announcement"
+        ref={dialogRef}
       >
         <button className="announcement-close" onClick={handleClose} aria-label="Close">×</button>
         {announcement.imageUrl && (

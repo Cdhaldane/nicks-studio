@@ -9,7 +9,8 @@ const SEOHelmet = ({
   url = window.location.href,
   type = "website",
   author = "Nickola Magnolia",
-  siteName = "Nickola Magnolia Official Website"
+  siteName = "Nickola Magnolia Official Website",
+  noIndex = false
 }) => {
   const canonicalUrl = url.split('?')[0]; // Remove query parameters for canonical URL
   const fullImageUrl = image.startsWith('http') ? image : `${window.location.origin}${image}`;
@@ -21,7 +22,7 @@ const SEOHelmet = ({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="author" content={author} />
-      <meta name="robots" content="index, follow" />
+      <meta name="robots" content={noIndex ? "noindex, nofollow" : "index, follow"} />
       <meta name="language" content="English" />
       <meta name="revisit-after" content="7 days" />
       
@@ -72,13 +73,13 @@ const SEOHelmet = ({
       </script>
       
       {/* Additional Meta Tags */}
-      <meta name="theme-color" content="var(--primary)" />
-      <meta name="msapplication-TileColor" content="var(--primary)" />
+      <meta name="theme-color" content="#772117" />
+      <meta name="msapplication-TileColor" content="#772117" />
       <meta name="application-name" content="Nickola Magnolia" />
       
       {/* Geo Tags */}
-      <meta name="geo.region" content="US-MI" />
-      <meta name="geo.placename" content="Michigan" />
+      <meta name="geo.region" content="CA-ON" />
+      <meta name="geo.placename" content="Northumberland County, Ontario" />
       
       {/* Music Industry Tags */}
       <meta name="music:musician" content="Nickola Magnolia" />

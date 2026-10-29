@@ -254,7 +254,7 @@ body {
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
@@ -520,10 +520,28 @@ body {
   scrollbar-color: var(--primary) var(--bg-secondary);
 }
 
-/* Focus Styles */
+/* Focus Styles — light on the dark theme; the burgundy primary was ~2:1, under WCAG's 3:1. */
 :focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
+}
+
+/* Hidden until a keyboard user tabs to it, then jumps past the navigation. */
+.skip-to-content {
+  position: absolute;
+  top: -48px;
+  left: 8px;
+  background: var(--primary);
+  color: var(--white);
+  padding: 10px 14px;
+  text-decoration: none;
+  border-radius: 6px;
+  z-index: var(--z-max);
+  transition: top var(--transition-fast);
+}
+
+.skip-to-content:focus {
+  top: 8px;
 }
 
 /* Selection Styles */
