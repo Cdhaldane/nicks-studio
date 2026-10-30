@@ -84,6 +84,8 @@ const BookingForm = () => {
         festivals, theatres, listening rooms, corporate and private events, and
         fly dates. Share the details below, or email management at{' '}
         <a href="mailto:nmagnoliamanagement@gmail.com">nmagnoliamanagement@gmail.com</a>.
+        Bio, highlights and live formats are in the{' '}
+        <a href="/nickola-magnolia-epk.pdf" download="Nickola Magnolia EPK.pdf">one-page EPK</a>.
       </p>
 
       <div className="booking-row">

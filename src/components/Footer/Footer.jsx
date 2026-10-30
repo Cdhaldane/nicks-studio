@@ -127,14 +127,24 @@ function Footer() {
           <p className="footer-tagline">
             Outlaw soul with a vintage edge — country storytelling, retro-soul warmth and rock & roll grit.
           </p>
-          <button
-            type="button"
-            className="footer-booking-btn"
-            onClick={() => setShowBooking(true)}
-          >
-            <i className="fa-solid fa-microphone-lines" aria-hidden="true" />
-            Booking Inquiries
-          </button>
+          <div className="footer-actions">
+            <button
+              type="button"
+              className="footer-booking-btn"
+              onClick={() => setShowBooking(true)}
+            >
+              <i className="fa-solid fa-microphone-lines" aria-hidden="true" />
+              Booking Inquiries
+            </button>
+            <a
+              href="/nickola-magnolia-epk.pdf"
+              download="Nickola Magnolia EPK.pdf"
+              className="footer-booking-btn footer-epk-btn"
+            >
+              <i className="fa-solid fa-file-arrow-down" aria-hidden="true" />
+              Download EPK
+            </a>
+          </div>
         </div>
 
         {/* Links Section */}
