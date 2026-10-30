@@ -172,8 +172,8 @@ function Shop() {
     <>
       <SEOHelmet
         title="Shop - Nickola Magnolia | Official Merchandise"
-        description="Official Nickola Magnolia merchandise — t-shirts, hoodies, vinyl, and record release keepsakes. Support your favorite Country & Americana artist from the Great Lakes and Northumberland County, Ontario."
-        keywords="Nickola Magnolia merchandise, country music merch, band t-shirts, vinyl records, artist shop, americana merchandise, country music Ontario live"
+        description="Official Nickola Magnolia merchandise — t-shirts, hoodies, vinyl, and record release keepsakes. Support the independent alt-country and outlaw soul artist from Northumberland County, Ontario."
+        keywords="Nickola Magnolia merchandise, country music merch, band t-shirts, vinyl records, artist shop, alt-country merch, country music Ontario live"
         url={window.location.href}
         type="website"
       />

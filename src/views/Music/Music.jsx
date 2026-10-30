@@ -145,8 +145,8 @@ const Music = () => {
     <div className="music-container">
       <SEOHelmet 
         title="Music - Nickola Magnolia | Albums & Songs"
-        description="Latest albums and singles from Nickola Magnolia — Country & Americana from the Great Lakes. Stream on Spotify and beyond."
-        keywords="Nickola Magnolia music, country albums, americana songs, spotify artist, new music releases, great lakes country, country music Ontario live"
+        description="Albums and singles from Nickola Magnolia — outlaw soul, alt-country and rock & roll from Ontario. Stream on Spotify and beyond."
+        keywords="Nickola Magnolia music, Bad Woman album, Broken Lonesome, alt-country albums, outlaw country, retro soul, spotify artist, new music releases, country music Ontario live"
         image={albums[currentAlbum]?.images?.[0]?.url || "/nick-bio.jpg"}
         url={window.location.href}
         type="music.album"

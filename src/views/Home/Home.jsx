@@ -91,16 +91,16 @@ const Home = () => {
   return (
     <>
       <SEOHelmet 
-        title="Nickola Magnolia - Country & Americana Music from the Great Lakes"
-        description="Country & Americana from the shores of the Great Lakes. Based in Northumberland County, Ontario. New music, tour dates, and merchandise."
-        keywords="Nickola Magnolia, country music, americana, great lakes, country artist, albums, tour, merchandise, live music Northumberland County, things to do Port Hope, things to do Cobourg, things to do Peterborough, country music Ontario live"
+        title="Nickola Magnolia | Outlaw Soul & Alt-Country"
+        description="Outlaw soul with a vintage edge: alt-country, retro soul and rock & roll from Northumberland County, Ontario. New music, tour dates, and merchandise."
+        keywords="Nickola Magnolia, outlaw soul, alt-country, retro soul, rock and roll, Canadian singer-songwriter, albums, tour, merchandise, live music Northumberland County, things to do Port Hope, things to do Cobourg, things to do Peterborough, country music Ontario live"
         type="website"
         url={window.location.href}
       />
       <WebsiteSchema />
       <PersonSchema 
         name="Nickola Magnolia"
-        description="Country & Americana musician from the Great Lakes region, blending classic country melodies with intimate rock influences"
+        description="Independent Canadian singer-songwriter blending gritty alt-country, retro soul and rock & roll"
         image={`${window.location.origin}/nick-bio.jpg`}
         url={window.location.href}
         sameAs={[
@@ -121,7 +121,7 @@ const Home = () => {
       >
         <ResponsiveImage
           src={getCurrentHeroImage().replace('.jpg', '')} // Remove extension as ResponsiveImage expects base name
-          alt="Nickola Magnolia - Country & Americana Artist"
+          alt="Nickola Magnolia - Outlaw Soul & Alt-Country Artist"
           className="hero-image"
           loading="eager"
           sizes="100vw"
@@ -138,7 +138,7 @@ const Home = () => {
                 className="hero-logo"
               />
               <h1 className="hero-title animate-in">
-                <span className="hero-subtitle">Country & Americana</span>
+                <span className="hero-subtitle">Outlaw Soul · Alt-Country</span>
               </h1>
             </div>
           </Parallax>

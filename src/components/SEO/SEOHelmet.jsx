@@ -2,9 +2,9 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const SEOHelmet = ({ 
-  title = "Nickola Magnolia - Country & Americana Music from the Great Lakes",
-  description = "Intertwining classic Country melodies with intimate Rock and Americana influences from the shores of the Great Lakes. Listen to new music, shop merchandise, and tour dates.",
-  keywords = "Nickola Magnolia, country music, americana, great lakes, country artist, music, albums, tour, merchandise",
+  title = "Nickola Magnolia | Outlaw Soul & Alt-Country",
+  description = "Outlaw soul with a vintage edge: alt-country, retro soul and rock & roll from independent Canadian singer-songwriter Nickola Magnolia. Listen to new music, shop merchandise, and tour dates.",
+  keywords = "Nickola Magnolia, outlaw soul, alt-country, retro soul, rock and roll, Canadian singer-songwriter, music, albums, tour, merchandise",
   image = "/nick-bio.jpg",
   url = window.location.href,
   type = "website",
@@ -52,13 +52,13 @@ const SEOHelmet = ({
           "@context": "https://schema.org",
           "@type": "MusicGroup",
           "name": "Nickola Magnolia",
-          "genre": ["Country", "Americana", "Rock"],
+          "genre": ["Alt-Country", "Outlaw Country", "Retro Soul", "Rock & Roll"],
           "description": description,
           "url": canonicalUrl,
           "image": fullImageUrl,
           "foundingLocation": {
             "@type": "Place",
-            "name": "Great Lakes Region"
+            "name": "Port Hope, Ontario, Canada"
           },
           "member": {
             "@type": "Person",
@@ -84,7 +84,7 @@ const SEOHelmet = ({
       {/* Music Industry Tags */}
       <meta name="music:musician" content="Nickola Magnolia" />
       <meta name="music:album" content="Latest Albums" />
-      <meta name="music:genre" content="Country, Americana" />
+      <meta name="music:genre" content="Outlaw Soul, Alt-Country, Retro Soul, Rock & Roll" />
     </Helmet>
   );
 };

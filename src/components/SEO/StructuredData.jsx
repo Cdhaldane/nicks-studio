@@ -34,7 +34,7 @@ export const MusicAlbumSchema = ({ album, artist }) => (
       },
       "datePublished": album.release_date,
       "image": album.images?.[0]?.url,
-      "genre": ["Country", "Americana"],
+      "genre": ["Alt-Country", "Country"],
       "url": album.external_urls?.spotify
     })}
   </script>
@@ -69,7 +69,7 @@ export const WebsiteSchema = () => (
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Nickola Magnolia Official Website",
-      "description": "Official website of Nickola Magnolia - Country & Americana music from the Great Lakes",
+      "description": "Official website of Nickola Magnolia - outlaw soul and alt-country from Ontario, Canada",
       "url": "https://nickolamagnolia.com",
       "potentialAction": {
         "@type": "SearchAction",

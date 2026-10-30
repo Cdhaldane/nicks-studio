@@ -160,7 +160,7 @@ For support, email support@nickolamagnolia.com or join our Discord community.
 
 ## 🎵 About Nickola Magnolia
 
-Nickola Magnolia is a Country/Americana artist from the shores of the Great Lakes. Her music intertwines classic Country melodies with intimate Rock and Americana influences.
+Nickola Magnolia is an independent Canadian singer-songwriter blending gritty alt-country, retro soul and rock & roll — outlaw soul with a vintage edge.
 
 ---
 

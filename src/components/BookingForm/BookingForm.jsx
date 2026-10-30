@@ -80,8 +80,10 @@ const BookingForm = () => {
   return (
     <form className="booking-form" onSubmit={handleSubmit} noValidate>
       <p className="booking-intro">
-        Looking to book Nickola Magnolia for a show, festival, or private event?
-        Share the details below and we&apos;ll get back to you.
+        Nickola Magnolia plays solo, duo, 5-piece and 6–7 piece band shows:
+        festivals, theatres, listening rooms, corporate and private events, and
+        fly dates. Share the details below, or email management at{' '}
+        <a href="mailto:nmagnoliamanagement@gmail.com">nmagnoliamanagement@gmail.com</a>.
       </p>
 
       <div className="booking-row">

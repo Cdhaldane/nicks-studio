@@ -157,11 +157,11 @@ export const SOCIAL_MEDIA = [
 
 // SEO and meta data
 export const SEO = {
-  DEFAULT_TITLE: 'Nickola Magnolia - Country & Americana Artist',
+  DEFAULT_TITLE: 'Nickola Magnolia | Outlaw Soul & Alt-Country',
   DEFAULT_DESCRIPTION:
-    'Intertwining classic Country melodies with intimate Rock and Americana influences from the shores of the Great Lakes.',
+    'Outlaw soul with a vintage edge — country storytelling, retro-soul warmth and rock & roll grit.',
   KEYWORDS:
-    'Nickola Magnolia, Country Music, Americana, Canadian Artist, Music, Albums, Merchandise',
+    'Nickola Magnolia, Outlaw Soul, Alt-Country, Retro Soul, Canadian Artist, Music, Albums, Merchandise',
   SITE_URL: 'https://nickolamagnolia.com',
   TWITTER_HANDLE: '@nickolamagnolia',
   FACEBOOK_APP_ID: '',

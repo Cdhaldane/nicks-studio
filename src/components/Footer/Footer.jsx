@@ -125,7 +125,7 @@ function Footer() {
         <div className="footer-header">
           <h2 className="footer-title">Nickola Magnolia</h2>
           <p className="footer-tagline">
-            Intertwining classic Country melodies with intimate Rock and Americana influences from the shores of the Great Lakes.
+            Outlaw soul with a vintage edge — country storytelling, retro-soul warmth and rock & roll grit.
           </p>
           <button
             type="button"

@@ -21,6 +21,12 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+.booking-intro a {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .booking-form {
   display: flex;
   flex-direction: column;
